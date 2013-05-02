@@ -1,0 +1,6 @@
+language: php
+services:
+  - riak
+before_script:
+  - "ulimit -n 2048"
+script: ./script/build_module.sh
