@@ -1,0 +1,3 @@
+[submodule "riack"]
+	path = riack
+	url = git://github.com/trifork/riack.git

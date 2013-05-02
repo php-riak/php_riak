@@ -4,8 +4,11 @@ php:
   - "5.4"
 services:
   - riak
+before_install:
+  - git submodule update --init --recursive
 before_script:
   - "ulimit -n 2048"
+  - ./script/build_riack.sh
   - ./script/build_module.sh
 script:
   - PHP=`which php`
