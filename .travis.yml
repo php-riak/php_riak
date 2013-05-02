@@ -6,4 +6,7 @@ services:
   - riak
 before_script:
   - "ulimit -n 2048"
-script: ./script/build_module.sh
+  - ./script/build_module.sh
+script:
+  - PHP=`which php`
+  - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q
