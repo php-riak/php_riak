@@ -1,4 +1,7 @@
 language: php
+php:
+  - "5.5"
+  - "5.4"
 services:
   - riak
 before_script:
