@@ -1,12 +1,8 @@
-// include PHP API
 #include <php.h>
-
-// header file we'll create below
 #include "php_riak.h"
+#include "riak.h"
 
-// define the function(s) we want to add
 zend_function_entry riak_functions[] = {
-  PHP_FE(cthulhu, NULL)
   { NULL, NULL, NULL }
 };
 
@@ -17,7 +13,7 @@ zend_module_entry riak_module_entry = {
   STANDARD_MODULE_HEADER,
   PHP_RIAK_EXTNAME,
   riak_functions,
-  NULL,
+  PHP_MINIT(riak),
   NULL,
   NULL,
   NULL,
@@ -29,8 +25,7 @@ zend_module_entry riak_module_entry = {
 // install module
 ZEND_GET_MODULE(riak)
 
-// actual non-template code!
-PHP_FUNCTION(cthulhu) {
-  // php_printf is PHP's version of printf, it's essentially "echo" from C
-  php_printf("In his house at R'lyeh dead Cthulhu waits dreaming.\n");
+PHP_MINIT_FUNCTION(riak) 
+{
+	riak_init_riak(TSRMLS_C);
 }

@@ -5,7 +5,7 @@ PHP_ARG_ENABLE(riak, whether to enable Riak extension, [  --enable-riak   Enable
 if test "$PHP_RIAK" != "no"; then
 
   dnl this defines the extension
-  PHP_NEW_EXTENSION(riak, php_riak.c, $ext_shared)
+  PHP_NEW_EXTENSION(riak, php_riak.c riak.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in

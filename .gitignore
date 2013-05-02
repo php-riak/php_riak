@@ -13,6 +13,7 @@ autom4te.cache/
 *.lo
 libtool
 missing
+php-setup.sh
 run-tests.php
 config.*
 !config.m4
