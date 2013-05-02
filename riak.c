@@ -15,8 +15,8 @@ void riak_init_riak(TSRMLS_D)
   INIT_CLASS_ENTRY(ce, "Riak", riak_class_methods);
   riak_ce_riak = zend_register_internal_class(&ce TSRMLS_CC);
   
-  zend_declare_property_stringl(riak_ce_riak, "host", strlen("host"), DEFAULT_HOST, strlen(DEFAULT_HOST), ZEND_ACC_PRIVATE TSRMLS_CC);
-  zend_declare_property_long(riak_ce_riak, "port", strlen("port"), DEFAULT_PORT, ZEND_ACC_PRIVATE TSRMLS_CC);
+  zend_declare_property_stringl(riak_ce_riak, "host", sizeof("host")-1, DEFAULT_HOST, sizeof(DEFAULT_HOST)-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_long(riak_ce_riak, "port", sizeof("port")-1, DEFAULT_PORT, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
 PHP_METHOD(Riak, __construct)
@@ -27,6 +27,8 @@ PHP_METHOD(Riak, __construct)
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|l", &host, &host_len, &port) == FAILURE) {
 		return;
 	}
-	zend_update_property_stringl(riak_class_methods, getThis(), "host", strlen("host"), host, host_len TSRMLS_CC);
-	zend_update_property_long(riak_class_methods, getThis(), "port", strlen("port"), port TSRMLS_CC);
+	zend_update_property_stringl(riak_class_methods, getThis(), "host", sizeof("host")-1, host, host_len TSRMLS_CC);
+	zend_update_property_long(riak_class_methods, getThis(), "port", sizeof("port")-1, port TSRMLS_CC);
 }
+
+
