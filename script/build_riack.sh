@@ -1,5 +1,7 @@
 #!/bin/bash
 cd riack/
-cmake -D BUILD_SHARED_LIBS:BOOL=OFF -D RIAK_TEST_SERVER_IP=$1 -D RIAK_TEST_SERVER_PB_PORT=$2 src/
+mv src/CMakeLists.txt src/CMakeLists.txt.old
+sed -e "s/8081/$2/g" -e "s/127.0.0.1/$1/g" ./src/CMakeLists.txt.old > ./src/CMakeLists.txt
+cmake -D BUILD_SHARED_LIBS:BOOL=OFF src/
 make clean all
 exit $?
