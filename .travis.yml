@@ -10,7 +10,7 @@ before_install:
   - git submodule update --init --recursive
 before_script:
   - "ulimit -n 2048"
-  - ./script/build_riack.sh
+  - ./script/build_riack.sh 127.0.0.1 8087
   - ./script/build_module.sh
 script:
   - ./script/test_riack.sh
