@@ -5,6 +5,7 @@ php:
 services:
   - riak
 before_install:
+  - sudo service riak start
   - sudo apt-get update -qq
   - sudo apt-get install -qq libprotobuf-dev protobuf-compiler libprotobuf-c0-dev protobuf-c-compiler
   - git submodule update --init --recursive
