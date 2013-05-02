@@ -3,6 +3,9 @@ build/
 include/
 autom4te.cache/
 
+*.iml
+.idea/
+
 .anjuta_sym_db.db
 .libs/
 .deps

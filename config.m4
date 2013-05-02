@@ -4,8 +4,13 @@ PHP_ARG_ENABLE(riak, whether to enable Riak extension, [  --enable-riak   Enable
 
 if test "$PHP_RIAK" != "no"; then
 
+  PHP_SUBST(RIAK_SHARED_LIBADD)
+  PHP_ADD_LIBPATH(riack)
+  PHP_ADD_LIBRARY(riack,, RIAK_SHARED_LIBADD)
+  PHP_ADD_INCLUDE([riack/src])
+
   dnl this defines the extension
-  PHP_NEW_EXTENSION(riak, php_riak.c riak.c, $ext_shared)
+  PHP_NEW_EXTENSION(riak, php_riak.c client.c bucket.c exceptions.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in
@@ -20,5 +25,4 @@ if test "$PHP_RIAK" != "no"; then
     AC_MSG_RESULT([yes])
     ;;
   esac
-
 fi

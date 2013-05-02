@@ -1,16 +1,18 @@
 --TEST--
-Test Riak class constuctors
+Basic riak connection
 --FILE--
 <?php
-$riak = new Riak('1.2.3.4');
-echo $riak->host.PHP_EOL;
-echo $riak->port.PHP_EOL;
-$riak = new Riak('4.3.2.1', 1234);
-echo $riak->host.PHP_EOL;
-echo $riak->port.PHP_EOL;
+include_once "connect.inc";
+try {
+	$riak = new RiakClient($host, $port);
+	if (isset($riak)) {
+		echo "done!".PHP_EOL;
+	}
+	$riak = new RiakClient("255.255.255.255");
+} catch (RiakConnectionException $e) {
+	echo "Connection error!".PHP_EOL;
+}
 ?>
 --EXPECT--
-1.2.3.4
-8087
-4.3.2.1
-1234
+done!
+Connection error!
