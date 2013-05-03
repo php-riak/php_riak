@@ -18,10 +18,14 @@
 #include "client.h"
 #include "exceptions.h"
 
+#define GET_RIACK_CLIENT(VAR_NAME) struct RIACK_CLIENT* VAR_NAME = ((client_data*)zend_object_store_get_object(getThis() TSRMLS_CC))->client
+#define CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(CLIENT, STATUS) if ( STATUS != RIACK_SUCCESS) { throwException(CLIENT,  STATUS TSRMLS_CC); return; }
+
 zend_class_entry *riak_client_ce;
 
 static zend_function_entry riak_client_methods[] = {
   PHP_ME(RiakClient, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+  PHP_ME(RiakClient, ping, NULL, ZEND_ACC_PUBLIC)
   {NULL, NULL, NULL}
 };
 
@@ -33,8 +37,12 @@ void riak_client_init(TSRMLS_D)
   ce.create_object = create_client_data;
   riak_client_ce = zend_register_internal_class(&ce TSRMLS_CC);
   
-  zend_declare_property_stringl(riak_client_ce, "host", sizeof("host")-1, DEFAULT_HOST, sizeof(DEFAULT_HOST)-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-  zend_declare_property_long(riak_client_ce, "port", sizeof("port")-1, DEFAULT_PORT, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_client_ce, "host", sizeof("host")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_client_ce, "port", sizeof("port")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  
+  zend_declare_property_null(riak_client_ce, "w", sizeof("w")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_client_ce, "dw", sizeof("dw")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_client_ce, "r", sizeof("r")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
 zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC) 
@@ -86,6 +94,28 @@ PHP_METHOD(RiakClient, __construct)
   efree(szHost);
   if (connResult != RIACK_SUCCESS) {
     zend_throw_exception(riak_connection_exception_ce, "Connection error", 1000 TSRMLS_CC);
+  }
+}
+
+PHP_METHOD(RiakClient, ping)
+{
+  int pingStatus;
+  GET_RIACK_CLIENT(client);
+  
+  pingStatus = riack_ping(client);
+  CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, pingStatus);
+}
+
+void throwException(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
+{
+  if (errorStatus == RIACK_ERROR_COMMUNICATION) {
+    zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);		
+  } else if (errorStatus == RIACK_ERROR_RESPONSE) {
+    if (client->last_error) {
+      zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC);	
+    } else {
+      zend_throw_exception(riak_response_exception_ce, "Unexpected response from riak", 1002 TSRMLS_CC);
+    }
   }
 }
 

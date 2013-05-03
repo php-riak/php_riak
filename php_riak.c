@@ -49,19 +49,19 @@ ZEND_GET_MODULE(riak)
 // Module constructor
 PHP_MINIT_FUNCTION(riak) 
 {
-	riack_init();
-	// TODO Store persistant connections here
-    le_riack_clients = zend_register_list_destructors_ex(NULL, le_riack_clients_pefree, "Persistent clients", module_number);
-	riak_client_init(TSRMLS_C);
-	riak_exceptions_init(TSRMLS_C);
-	return SUCCESS;
+  riack_init();
+  // TODO Store persistant connections here
+  le_riack_clients = zend_register_list_destructors_ex(NULL, le_riack_clients_pefree, "Persistent clients", module_number);
+  riak_client_init(TSRMLS_C);
+  riak_exceptions_init(TSRMLS_C);
+  return SUCCESS;
 }
 
 // Module destructor
 PHP_MSHUTDOWN_FUNCTION(riak)
 {
-	riack_cleanup();
-	return SUCCESS;
+  riack_cleanup();
+  return SUCCESS;
 }
 
 void le_riack_clients_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) {

@@ -15,10 +15,12 @@
    limitations under the License.
 */
 #include <php.h>
+#include "bucket.h"
 
 zend_class_entry *riak_bucket_ce;
 
 static zend_function_entry riak_bucket_methods[] = {
+  PHP_ME(RiakBucket, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
   {NULL, NULL, NULL}
 };
 
@@ -28,4 +30,25 @@ void riak_init_bucket(TSRMLS_D)
 
   INIT_CLASS_ENTRY(ce, "RiakBucket", riak_bucket_methods);
   riak_bucket_ce = zend_register_internal_class(&ce TSRMLS_CC);
+  
+  zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_bucket_ce, "client", sizeof("client")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  
+  zend_declare_property_null(riak_bucket_ce, "w", sizeof("w")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_bucket_ce, "dw", sizeof("dw")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_bucket_ce, "r", sizeof("r")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+}
+
+/////////////////////////////////////////////////////////////
+
+PHP_METHOD(RiakBucket, __construct)
+{
+  char *name;
+  int nameLen;
+  zval* client;
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "os", &client, &name, &nameLen) == FAILURE) {
+    return;
+  }
+  zend_update_property_stringl(riak_bucket_ce, getThis(), "name", sizeof("name")-1, name, nameLen TSRMLS_CC);
+  zend_update_property(riak_bucket_ce, getThis(), "client", sizeof("client")-1, client TSRMLS_CC);
 }

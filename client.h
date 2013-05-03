@@ -15,15 +15,15 @@
    limitations under the License.
 */
 
-#ifndef RIAK__H__
-#define RIAK__H__
+#ifndef RIAK_CLIENT__H__
+#define RIAK_CLIENT__H__
 
 #include <riack.h>
 
 typedef struct _client_data {
-    // required
-    zend_object std;
-    struct RIACK_CLIENT* client;
+  // required
+  zend_object std;
+  struct RIACK_CLIENT* client;
 } client_data;
 
 /////////////////////////////////////////////////
@@ -39,5 +39,8 @@ zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC);
 void free_client_data(void *object TSRMLS_DC);
 
 PHP_METHOD(RiakClient, __construct);
- 
+PHP_METHOD(RiakClient, ping);
+
+void throwException(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
+
 #endif

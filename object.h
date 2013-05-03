@@ -15,12 +15,11 @@
    limitations under the License.
 */
 
-#ifndef RIAK_BUCKET__H__
-#define RIAK_BUCKET__H__
+#ifndef RIAK_OBJECT__H__
+#define RIAK_OBJECT__H__
 
-extern zend_class_entry *riak_bucket_ce;
+extern zend_class_entry *riak_object_ce;
 
-void riak_init_bucket(TSRMLS_D);
-PHP_METHOD(RiakBucket, __construct);
+void riak_init_object(TSRMLS_D);
 
 #endif

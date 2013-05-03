@@ -18,11 +18,19 @@
 #include <zend_exceptions.h>
 
 zend_class_entry *riak_connection_exception_ce;
+zend_class_entry *riak_communication_exception_ce;
+zend_class_entry *riak_response_exception_ce;
 
 void riak_exceptions_init(TSRMLS_D) 
 {
-  zend_class_entry ce;
+  zend_class_entry ceConnExc, ceCommExc, ceRespExc;
  
-  INIT_CLASS_ENTRY(ce, "RiakConnectionException", NULL);
-  riak_connection_exception_ce = zend_register_internal_class_ex(&ce, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+  INIT_CLASS_ENTRY(ceConnExc, "RiakConnectionException", NULL);
+  riak_connection_exception_ce = zend_register_internal_class_ex(&ceConnExc, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+  
+  INIT_CLASS_ENTRY(ceCommExc, "RiakCommunicationException", NULL);
+  riak_communication_exception_ce = zend_register_internal_class_ex(&ceCommExc, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+
+  INIT_CLASS_ENTRY(ceRespExc, "RiakResponseException", NULL);
+  riak_response_exception_ce = zend_register_internal_class_ex(&ceRespExc, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
 }
