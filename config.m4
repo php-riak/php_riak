@@ -7,6 +7,8 @@ if test "$PHP_RIAK" != "no"; then
   PHP_SUBST(RIAK_SHARED_LIBADD)
   PHP_ADD_LIBPATH(riack)
   PHP_ADD_LIBRARY(riack,, RIAK_SHARED_LIBADD)
+  PHP_ADD_LIBRARY(protobuf-c,, RIAK_SHARED_LIBADD)
+
   PHP_ADD_INCLUDE([riack/src])
 
   dnl this defines the extension

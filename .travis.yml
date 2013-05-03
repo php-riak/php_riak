@@ -6,7 +6,7 @@ env:
 services: riak
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq protobuf-c protobuf-c-dev valgrind
+  - sudo apt-get install -qq libprotobuf-dev protobuf-compiler libprotobuf-c0-dev protobuf-c-compiler valgrind
   - git submodule update --init --recursive
 before_script:
   - "ulimit -n 2048"
