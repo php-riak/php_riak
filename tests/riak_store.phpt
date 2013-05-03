@@ -5,9 +5,6 @@ Simple store test with no read back
 include_once "connect.inc";
 try {
 	$client = new RiakClient($host, $port);
-	if (isset($client)) {
-		echo "connected!".PHP_EOL;
-	}
 	$bucket = new RiakBucket($client, "test_bucket");
   $obj = new RiakObject("dummy");
   $obj->contentType = "text/plain";
@@ -19,5 +16,4 @@ try {
 }
 ?>
 --EXPECT--
-connected!
 success!
