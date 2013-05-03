@@ -19,6 +19,8 @@
 #include <riack.h>
 #include "php_riak.h"
 #include "client.h"
+#include "object.h"
+#include "bucket.h"
 #include "exceptions.h"
 
 int le_riack_clients;
@@ -53,6 +55,8 @@ PHP_MINIT_FUNCTION(riak)
   // TODO Store persistant connections here
   le_riack_clients = zend_register_list_destructors_ex(NULL, le_riack_clients_pefree, "Persistent clients", module_number);
   riak_client_init(TSRMLS_C);
+  riak_object_init(TSRMLS_C);
+  riak_bucket_init(TSRMLS_C);
   riak_exceptions_init(TSRMLS_C);
   return SUCCESS;
 }

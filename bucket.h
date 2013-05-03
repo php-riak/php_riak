@@ -20,7 +20,7 @@
 
 extern zend_class_entry *riak_bucket_ce;
 
-void riak_init_bucket(TSRMLS_D);
+void riak_bucket_init(TSRMLS_D);
 PHP_METHOD(RiakBucket, __construct);
 
 #endif

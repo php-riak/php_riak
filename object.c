@@ -24,11 +24,11 @@ static zend_function_entry riak_object_methods[] = {
   {NULL, NULL, NULL}
 };
 
-void riak_init_object(TSRMLS_D)
+void riak_object_init(TSRMLS_D)
 {
   zend_class_entry ce;
 
-  INIT_CLASS_ENTRY(ce, "RiakObject", riak_bucket_methods);
+  INIT_CLASS_ENTRY(ce, "RiakObject", riak_object_methods);
   riak_object_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
   zend_declare_property_null(riak_object_ce, "key", sizeof("key")-1, ZEND_ACC_PUBLIC TSRMLS_CC);

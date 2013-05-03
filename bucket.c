@@ -24,7 +24,7 @@ static zend_function_entry riak_bucket_methods[] = {
   {NULL, NULL, NULL}
 };
 
-void riak_init_bucket(TSRMLS_D)
+void riak_bucket_init(TSRMLS_D)
 {
   zend_class_entry ce;
 

@@ -20,6 +20,7 @@
 
 extern zend_class_entry *riak_object_ce;
 
-void riak_init_object(TSRMLS_D);
+void riak_object_init(TSRMLS_D);
+PHP_METHOD(RiakObject, __construct);
 
 #endif
