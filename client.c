@@ -18,6 +18,7 @@
 #include <zend_exceptions.h>
 #include "php_riak.h"
 #include "client.h"
+#include "object.h"
 #include "exceptions.h"
 
 #define GET_RIACK_CLIENT(VAR_NAME) struct RIACK_CLIENT* VAR_NAME = ((client_data*)zend_object_store_get_object(getThis() TSRMLS_CC))->client
@@ -179,7 +180,41 @@ PHP_METHOD(RiakClient, store)
 
 PHP_METHOD(RiakClient, fetch)
 {
+  char *key;
+  int keyLen, riackResult;
+  size_t contentCount;
+  zval *zBucket, *zObject, **zTmp;
+  HashTable *zBucketProps;
+  struct RIACK_GET_PROPERTIES props;
+  struct RIACK_GET_OBJECT getResult;
+  RIACK_STRING rsBucket, rsKey;
   
+  GET_RIACK_CLIENT(client);
+
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "oos", &zBucket, &zObject, &key, &keyLen) == FAILURE) {
+    return;
+  }
+  zBucketProps = zend_std_get_properties(zBucket TSRMLS_CC);
+  memset(&props, 0, sizeof(props));
+  memset(&getResult, 0, sizeof(getResult));
+  HASH_GET_INTO_RIACK_STRING_OR_ELSE(zBucketProps, "name", zTmp, rsBucket) {
+    // Handle error
+  }
+  rsKey.len = keyLen;
+  rsKey.value = key;
+  riackResult = riack_get(client, rsBucket, rsKey, &props, &getResult);
+  if (riackResult == RIACK_SUCCESS) {
+    contentCount = getResult.object.content_count;
+    if (contentCount > 1) {
+      // TODO Handle siblings!
+    } else if (contentCount == 0) {
+      set_object_from_riak_content(zObject, &getResult.object.content[0] TSRMLS_CC);
+      // TODO vclock
+    }
+    riack_free_get_object(client, &getResult);
+  } else {
+    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+  }
 }
 
 void throwException(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)

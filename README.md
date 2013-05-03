@@ -37,21 +37,16 @@ This will compile the needed library and php_riak will automatically find it, it
 ## Building
 First make sure the depencies above and PHP are installed properly.
 
-In a terminal make sure you are in project root, then run the following scripts
+In a terminal make sure you are in project root, then run the following commands
 
 	phpize
 	./configure
-	make install
-
-To install the extension
-
 	sudo make install
 
 Module is now installed but it needs to be added to the appropriate php.ini as well, this can be done by adding the following line to your php.ini  
 
 	extension=riak.so
-
-All done!
+Migh vary depending on you php installation though.
 
 ## Usage
 TODO
