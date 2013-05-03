@@ -15,4 +15,7 @@ before_script:
 script:
   - ./script/test_riack.sh
   - PHP=`which php`
-  - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q
+  - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q -m
+after_script:
+  - cat ./tests/*.out
+  - cat ./tests/*.mem
