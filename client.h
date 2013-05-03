@@ -40,6 +40,8 @@ void free_client_data(void *object TSRMLS_DC);
 
 PHP_METHOD(RiakClient, __construct);
 PHP_METHOD(RiakClient, ping);
+PHP_METHOD(RiakClient, fetch);
+PHP_METHOD(RiakClient, store);
 
 void throwException(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
 

@@ -50,7 +50,12 @@
   PUSH_PARAM(param1); PUSH_PARAM(param2);                               \
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
   POP_PARAM(); POP_PARAM();
-  
+
+#define HASH_GET_INTO_RIACK_STRING_OR_ELSE(HT, KEY, ZVAL_PP, RIACK_STR) if ((zend_hash_find(HT, KEY, sizeof(KEY), (void**)&ZVAL_PP) == SUCCESS) \
+     && (Z_TYPE_P(*ZVAL_PP) == IS_STRING)) { \
+       RIACK_STR.len = Z_STRLEN_P(*ZVAL_PP); \
+       RIACK_STR.value = Z_STRVAL_P(*ZVAL_PP); } else
+
 /////////////////////////////////////////////////
 // Functions
 

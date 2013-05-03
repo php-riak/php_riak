@@ -32,7 +32,10 @@ void riak_object_init(TSRMLS_D)
   riak_object_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
   zend_declare_property_null(riak_object_ce, "key", sizeof("key")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-  zend_declare_property_null(riak_object_ce, "value", sizeof("value")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_object_ce, "vclock", sizeof("vclock")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_object_ce, "contentEncoding", sizeof("contentEncoding")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_string(riak_object_ce, "contentType", sizeof("contentType")-1, "text/plain", ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(riak_object_ce, "data", sizeof("data")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
 /////////////////////////////////////////////////////////////
@@ -41,9 +44,7 @@ PHP_METHOD(RiakObject, __construct)
 {
   char *key;
   int keyLen;
-  zval* client;
-  zval* bucket;
-  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &client, &bucket, &key, &keyLen) == FAILURE) {
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &keyLen) == FAILURE) {
     return;
   }
   zend_update_property_stringl(riak_object_ce, getThis(), "key", sizeof("key")-1, key, keyLen TSRMLS_CC);

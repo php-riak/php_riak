@@ -15,6 +15,8 @@
    limitations under the License.
 */
 #include <php.h>
+#include <zend_exceptions.h>
+#include "php_riak.h"
 #include "client.h"
 #include "exceptions.h"
 
@@ -26,6 +28,8 @@ zend_class_entry *riak_client_ce;
 static zend_function_entry riak_client_methods[] = {
   PHP_ME(RiakClient, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
   PHP_ME(RiakClient, ping, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(RiakClient, fetch, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(RiakClient, store, NULL, ZEND_ACC_PUBLIC)
   {NULL, NULL, NULL}
 };
 
@@ -104,6 +108,78 @@ PHP_METHOD(RiakClient, ping)
   
   pingStatus = riack_ping(client);
   CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, pingStatus);
+}
+
+PHP_METHOD(RiakClient, store)
+{
+  char *key, *contentType;
+  int keyLen, contentTypeLen;
+  zval *zBucket, *zObject, **zTmp;
+  HashTable *zBucketProps, *zObjectProps;
+  struct RIACK_OBJECT obj, returnedObj;
+  struct RIACK_CONTENT riackContent;
+  struct RIACK_PUT_PROPERTIES props;
+  int riackResult;
+  GET_RIACK_CLIENT(client);
+  
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "oos", &zBucket, &zObject, &key, &keyLen) == FAILURE) {
+    return;
+  }
+  zBucketProps = zend_std_get_properties(zBucket TSRMLS_CC);
+  zObjectProps = zend_std_get_properties(zObject TSRMLS_CC);
+  
+  memset(&obj, 0, sizeof(obj));
+  memset(&returnedObj, 0, sizeof(returnedObj));
+  memset(&riackContent, 0, sizeof(riackContent));
+  memset(&props, 0, sizeof(props));
+
+  //// fill content ////
+
+  // Set content type
+  HASH_GET_INTO_RIACK_STRING_OR_ELSE(zObjectProps, "contentType", zTmp, riackContent.content_type) {
+	  // Handle possible errors
+  }
+  // Set content encoding
+  HASH_GET_INTO_RIACK_STRING_OR_ELSE(zObjectProps, "contentEncoding", zTmp, riackContent.content_encoding) {
+	  // Handle possible errors
+  }
+  
+  // Set data
+  if (zend_hash_find(zObjectProps, "data", sizeof("data"), (void**)&zTmp) == SUCCESS) {
+    if (Z_TYPE_P(*zTmp) == IS_STRING) {
+      riackContent.data_len = Z_STRLEN_P(*zTmp);
+      riackContent.data = Z_STRVAL_P(*zTmp);
+    }
+  }
+  
+  //// fill obj ////
+  
+  // Set vclock
+  if (zend_hash_find(zObjectProps, "vclock", sizeof("vclock"), (void**)&zTmp) == SUCCESS) {
+    if (Z_TYPE_P(*zTmp) == IS_STRING) {
+      obj.vclock.len = Z_STRLEN_P(*zTmp);
+      obj.vclock.clock = Z_STRVAL_P(*zTmp);
+    }
+  }
+  // Set bucket name
+  HASH_GET_INTO_RIACK_STRING_OR_ELSE(zBucketProps, "name", zTmp, obj.bucket) {
+    // Handle error
+  }
+  obj.content_count = 1;
+  obj.content = &riackContent;
+  obj.key.len = keyLen;
+  obj.key.value = key;
+  
+  riackResult = riack_put(client, obj, &returnedObj, &props);
+  CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+
+  // TODO Return updated object
+  riack_free_object(client, &returnedObj);
+}
+
+PHP_METHOD(RiakClient, fetch)
+{
+  
 }
 
 void throwException(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
