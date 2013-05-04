@@ -1,6 +1,6 @@
 /*
-   Copyright 2012 Trifork A/S
-   Author: Kaspar Pedersen
+   Copyright 2013 Trifork A/S
+   Author: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

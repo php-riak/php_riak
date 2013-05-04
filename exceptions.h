@@ -1,6 +1,6 @@
 /*
-   Copyright 2012 Trifork A/S
-   Author: Kaspar Pedersen
+   Copyright 2013 Trifork A/S
+   Author: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,10 +18,15 @@
 #ifndef RIAK_EXCEPTIONS__H__
 #define RIAK_EXCEPTIONS__H__
 
+#include <zend_exceptions.h>
+
 extern zend_class_entry *riak_connection_exception_ce;
 extern zend_class_entry *riak_communication_exception_ce;
 extern zend_class_entry *riak_response_exception_ce;
 
+extern zend_class_entry *riak_conflicted_object_exception_ce;
 void riak_exceptions_init(TSRMLS_D);
- 
+
+PHP_METHOD(RiakConflictedObjectException, __construct);
+
 #endif

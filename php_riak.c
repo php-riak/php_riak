@@ -1,6 +1,6 @@
 /*
-   Copyright 2012 Trifork A/S
-   Author: Kaspar Pedersen
+   Copyright 2013 Trifork A/S
+   Author: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 */
 
 #include <php.h>
-#include <riack.h>
 #include "php_riak.h"
 #include "client.h"
 #include "object.h"
@@ -74,3 +73,18 @@ void le_riack_clients_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) {
     pefree(ptr, 1);
 	*/
 }
+
+
+void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
+{
+  if (errorStatus == RIACK_ERROR_COMMUNICATION) {
+    zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);		
+  } else if (errorStatus == RIACK_ERROR_RESPONSE) {
+    if (client->last_error) {
+      zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC);	
+    } else {
+      zend_throw_exception(riak_response_exception_ce, "Unexpected response from riak", 1002 TSRMLS_CC);
+    }
+  }
+}
+

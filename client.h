@@ -1,6 +1,6 @@
 /*
-   Copyright 2012 Trifork A/S
-   Author: Kaspar Pedersen
+   Copyright 2013 Trifork A/S
+   Author: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,11 +20,15 @@
 
 #include <riack.h>
 
+extern zend_class_entry *riak_client_ce;
+
 typedef struct _client_data {
   // required
   zend_object std;
   struct RIACK_CLIENT* client;
 } client_data;
+
+#define GET_RIACK_CLIENT(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->client
 
 /////////////////////////////////////////////////
 // Constants
@@ -40,9 +44,5 @@ void free_client_data(void *object TSRMLS_DC);
 
 PHP_METHOD(RiakClient, __construct);
 PHP_METHOD(RiakClient, ping);
-PHP_METHOD(RiakClient, fetch);
-PHP_METHOD(RiakClient, store);
-
-void throwException(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
 
 #endif

@@ -1,6 +1,6 @@
 /*
-   Copyright 2012 Trifork A/S
-   Author: Kaspar Pedersen
+   Copyright 2013 Trifork A/S
+   Author: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,9 +18,16 @@
 #ifndef RIAK_BUCKET__H__
 #define RIAK_BUCKET__H__
 
+#include <riack.h>
+
 extern zend_class_entry *riak_bucket_ce;
 
 void riak_bucket_init(TSRMLS_D);
 PHP_METHOD(RiakBucket, __construct);
+PHP_METHOD(RiakBucket, put);
+PHP_METHOD(RiakBucket, get);
+
+zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC);
+struct RIACK_CLIENT* get_riack_client(zval *zbucket TSRMLS_DC);
 
 #endif

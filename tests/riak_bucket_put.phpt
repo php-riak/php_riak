@@ -9,7 +9,7 @@ try {
   $obj = new RiakObject("dummy");
   $obj->contentType = "text/plain";
   $obj->data = "test value that should get written";
-  $client->store($bucket, $obj, "dummy");
+  $bucket->put($obj, "dummy");
   echo "success!";
 } catch (Exception $e) {
   echo $e->getMessage();
