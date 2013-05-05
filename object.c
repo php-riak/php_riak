@@ -50,6 +50,8 @@ PHP_METHOD(RiakObject, __construct)
 	zend_update_property_stringl(riak_object_ce, getThis(), "key", sizeof("key")-1, key, keyLen TSRMLS_CC);
 }
 
+/////////////////////////////////////////////////////////////
+
 void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC)
 {
 	//

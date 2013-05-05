@@ -22,6 +22,7 @@ zend_class_entry *riak_connection_exception_ce;
 zend_class_entry *riak_communication_exception_ce;
 zend_class_entry *riak_response_exception_ce;
 zend_class_entry *riak_conflicted_object_exception_ce;
+zend_class_entry *riak_not_found_exception_ce;
 
 static zend_function_entry riak_conflicted_exception_methods[] = {
 	PHP_ME(RiakConflictedObjectException, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
@@ -30,7 +31,7 @@ static zend_function_entry riak_conflicted_exception_methods[] = {
 
 void riak_exceptions_init(TSRMLS_D) 
 {
-	zend_class_entry ceConnExc, ceCommExc, ceRespExc, ceConflict;
+	zend_class_entry ceConnExc, ceCommExc, ceRespExc, ceConflict, ceNotFound;
 
 	INIT_CLASS_ENTRY(ceConnExc, "RiakConnectionException", NULL);
 	riak_connection_exception_ce = zend_register_internal_class_ex(&ceConnExc, 
@@ -44,6 +45,10 @@ void riak_exceptions_init(TSRMLS_D)
 	riak_response_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
 		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
 
+	INIT_CLASS_ENTRY(ceNotFound, "RiakNotFoundException", NULL);
+	riak_not_found_exception_ce = zend_register_internal_class_ex(&ceNotFound, 
+		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+
 	INIT_CLASS_ENTRY(ceConflict, "RiakConflictedObjectException", riak_conflicted_exception_methods);
 	riak_conflicted_object_exception_ce = zend_register_internal_class_ex(&ceConflict, 
 		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
@@ -55,12 +60,12 @@ void riak_exceptions_init(TSRMLS_D)
 PHP_METHOD(RiakConflictedObjectException, __construct)
 {
 	char *vclock;
-	int vlock_len;
+	int vclock_len;
 	zval *arr_objects;
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", &vclock, &vlock_len, &arr_objects) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", &vclock, &vclock_len, &arr_objects) == FAILURE) {
 		return;
 	}
 	zend_update_property_stringl(riak_conflicted_object_exception_ce, getThis(), 
-		"vclock", sizeof("vclock")-1, vclock, vlock_len TSRMLS_CC);
+		"vclock", sizeof("vclock")-1, vclock, vclock_len TSRMLS_CC);
 	zend_update_property(riak_conflicted_object_exception_ce, getThis(), "objects", sizeof("objects")-1, arr_objects TSRMLS_CC);
 }

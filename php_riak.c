@@ -78,7 +78,7 @@ void le_riack_clients_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) {
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
 {
   if (errorStatus == RIACK_ERROR_COMMUNICATION) {
-    zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);		
+    zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);
   } else if (errorStatus == RIACK_ERROR_RESPONSE) {
     if (client->last_error) {
       zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC);	

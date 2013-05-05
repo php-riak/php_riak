@@ -25,5 +25,6 @@ extern zend_class_entry *riak_object_ce;
 void riak_object_init(TSRMLS_D);
 void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC);
 PHP_METHOD(RiakObject, __construct);
+PHP_METHOD(RiakObject, delete);
 
 #endif
