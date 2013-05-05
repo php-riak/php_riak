@@ -23,9 +23,17 @@
 
 zend_class_entry *riak_client_ce;
 
+static ZEND_BEGIN_ARG_INFO_EX(arginfo_client_ctor, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, host)
+    ZEND_ARG_INFO(0, port)
+ZEND_END_ARG_INFO()
+
+static ZEND_BEGIN_ARG_INFO_EX(arginfo_client_ping, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_client_methods[] = {
-	PHP_ME(RiakClient, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(RiakClient, ping, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(RiakClient, __construct, arginfo_client_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(RiakClient, ping, arginfo_client_ping, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
