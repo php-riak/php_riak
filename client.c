@@ -23,12 +23,12 @@
 
 zend_class_entry *riak_client_ce;
 
-static ZEND_BEGIN_ARG_INFO_EX(arginfo_client_ctor, 0, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_client_ctor, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, host)
     ZEND_ARG_INFO(0, port)
 ZEND_END_ARG_INFO()
 
-static ZEND_BEGIN_ARG_INFO_EX(arginfo_client_ping, 0, ZEND_RETURN_VALUE, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_client_ping, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_client_methods[] = {
