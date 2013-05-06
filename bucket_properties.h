@@ -15,22 +15,13 @@
    limitations under the License.
 */
 
-#ifndef RIAK_BUCKET__H__
-#define RIAK_BUCKET__H__
+#ifndef RIAK_BUCKET__PROPERTIES__H__
+#define RIAK_BUCKET__PROPERTIES__H__
 
-#include <riack.h>
+extern zend_class_entry *riak_bucket_properties_ce;
 
-extern zend_class_entry *riak_bucket_ce;
+void riak_bucket_props_init(TSRMLS_D);
 
-void riak_bucket_init(TSRMLS_D);
-PHP_METHOD(RiakBucket, __construct);
-PHP_METHOD(RiakBucket, fetchProperties);
-PHP_METHOD(RiakBucket, putObject);
-PHP_METHOD(RiakBucket, getObject);
-PHP_METHOD(RiakBucket, deleteObject);
-
-zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC);
-RIACK_STRING get_riack_bucket_name(zval* bucket TSRMLS_DC);
-struct RIACK_CLIENT* get_riack_client(zval *zbucket TSRMLS_DC);
+PHP_METHOD(RiakBucketProperties, __construct);
 
 #endif

@@ -16,6 +16,7 @@
 */
 #include <php.h>
 #include "bucket.h"
+#include "bucket_properties.h"
 #include "client.h"
 #include "object.h"
 #include "exceptions.h"
@@ -41,11 +42,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_delete, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, object)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_fetchprops, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_bucket_methods[] = {
 	PHP_ME(RiakBucket, __construct, arginfo_bucket_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(RiakBucket, putObject, arginfo_bucket_put, ZEND_ACC_PUBLIC)
 	PHP_ME(RiakBucket, getObject, arginfo_bucket_get, ZEND_ACC_PUBLIC)
 	PHP_ME(RiakBucket, deleteObject, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
+
+	PHP_ME(RiakBucket, fetchProperties, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
@@ -58,7 +64,9 @@ void riak_bucket_init(TSRMLS_D)
 
 	zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_bucket_ce, "client", sizeof("client")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_bucket_ce, "properties", sizeof("properties")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+
+	zend_declare_property_null(riak_bucket_ce, "nVal", sizeof("nVal")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+	zend_declare_property_null(riak_bucket_ce, "allowMult", sizeof("allowMult")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
 /////////////////////////////////////////////////////////////
@@ -73,6 +81,38 @@ PHP_METHOD(RiakBucket, __construct)
 	}
 	zend_update_property_stringl(riak_bucket_ce, getThis(), "name", sizeof("name")-1, name, nameLen TSRMLS_CC);
 	zend_update_property(riak_bucket_ce, getThis(), "client", sizeof("client")-1, client TSRMLS_CC);
+}
+
+PHP_METHOD(RiakBucket, fetchProperties)
+{
+	struct RIACK_CLIENT *client;
+	RIACK_STRING bucketName;
+	uint32_t nVal = 3;
+	uint8_t allowMult = 0;
+	int riackResult;
+	zval *zBucketProps, *zAllowMult, *zNVal;
+	client = get_riack_client(getThis() TSRMLS_CC);
+	if (!client) {
+	    zend_throw_exception(riak_not_found_exception_ce, "No client", 500 TSRMLS_CC);
+	    return;
+	}
+	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
+	riackResult = riack_get_bucket_props(client,  bucketName, &nVal, &allowMult);
+	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+
+	MAKE_STD_ZVAL(zNVal);
+	ZVAL_LONG(zNVal, nVal);
+
+	MAKE_STD_ZVAL(zAllowMult);
+	ZVAL_BOOL(zAllowMult, allowMult);
+
+	MAKE_STD_ZVAL(zBucketProps);
+	object_init_ex(zBucketProps, riak_bucket_properties_ce);
+	CALL_METHOD2(RiakBucketProperties, __construct, zBucketProps, zBucketProps, zNVal, zAllowMult);
+	RETVAL_ZVAL(zBucketProps, 0, 1);
+
+	zval_ptr_dtor(&zNVal);
+	zval_ptr_dtor(&zAllowMult);
 }
 
 PHP_METHOD(RiakBucket, deleteObject)
@@ -95,9 +135,7 @@ PHP_METHOD(RiakBucket, deleteObject)
     	return;
     }
 	// Set bucket name
-	HASH_GET_INTO_RIACK_STRING_OR_ELSE(zBucketProps, "name", zTmp, bucketName) {
-		// Handle error
-	}
+	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
 	// Set key
 	HASH_GET_INTO_RIACK_STRING_OR_ELSE(zObjectProps, "key", zTmp, key) {
 		// Handle error

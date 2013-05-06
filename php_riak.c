@@ -20,6 +20,7 @@
 #include "client.h"
 #include "object.h"
 #include "bucket.h"
+#include "bucket_properties.h"
 #include "exceptions.h"
 
 int le_riack_clients;
@@ -56,6 +57,7 @@ PHP_MINIT_FUNCTION(riak)
   riak_client_init(TSRMLS_C);
   riak_object_init(TSRMLS_C);
   riak_bucket_init(TSRMLS_C);
+  riak_bucket_props_init(TSRMLS_C);
   riak_exceptions_init(TSRMLS_C);
   return SUCCESS;
 }
