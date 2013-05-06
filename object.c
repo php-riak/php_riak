@@ -19,8 +19,12 @@
 
 zend_class_entry *riak_object_ce;
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_object_ctor, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_object_methods[] = {
-	PHP_ME(RiakObject, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(RiakObject, __construct, arginfo_object_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	{NULL, NULL, NULL}
 };
 
@@ -34,8 +38,12 @@ void riak_object_init(TSRMLS_D)
 	zend_declare_property_null(riak_object_ce, "key", sizeof("key")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_object_ce, "vclock", sizeof("vclock")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_object_ce, "contentEncoding", sizeof("contentEncoding")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+	zend_declare_property_null(riak_object_ce, "charset", sizeof("charset")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_string(riak_object_ce, "contentType", sizeof("contentType")-1, "text/plain", ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_object_ce, "data", sizeof("data")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+	zend_declare_property_null(riak_object_ce, "isDeleted", sizeof("isDeleted")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+	zend_declare_property_null(riak_object_ce, "lastModified", sizeof("lastModified")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+	zend_declare_property_null(riak_object_ce, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
 /////////////////////////////////////////////////////////////
@@ -54,5 +62,28 @@ PHP_METHOD(RiakObject, __construct)
 
 void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC)
 {
-	//
+	zend_update_property_stringl(riak_object_ce, object, "data", sizeof("data")-1, 
+		(const char*)content->data, content->data_len TSRMLS_CC);
+	zend_update_property_stringl(riak_object_ce, object, "contentEncoding", sizeof("contentEncoding")-1, 
+		(const char*)content->content_encoding.value, content->content_encoding.len TSRMLS_CC);
+	zend_update_property_stringl(riak_object_ce, object, "contentType", sizeof("contentType")-1, 
+		(const char*)content->content_type.value, content->content_type.len TSRMLS_CC);
+	
+	zend_update_property_stringl(riak_object_ce, object, "charset", sizeof("charset")-1, content->charset.value, content->charset.len TSRMLS_CC);
+
+	if (content->deleted_present) {
+		zend_update_property_bool(riak_object_ce, object, "isDeleted", sizeof("isDeleted")-1, content->deleted TSRMLS_CC);
+	} else {
+		zend_update_property_null(riak_object_ce, object, "isDeleted", sizeof("isDeleted")-1 TSRMLS_CC);
+	}
+	if (content->last_modified_present) {
+		zend_update_property_long(riak_object_ce, object, "lastModified", sizeof("lastModified")-1, content->last_modified TSRMLS_CC);
+	} else {
+		zend_update_property_null(riak_object_ce, object, "lastModified", sizeof("lastModified")-1 TSRMLS_CC);
+	}
+	if (content->last_modified_usecs_present) {
+		zend_update_property_long(riak_object_ce, object, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1, content->last_modified_usecs TSRMLS_CC);
+	} else {
+		zend_update_property_null(riak_object_ce, object, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1 TSRMLS_CC);
+	}
 }
