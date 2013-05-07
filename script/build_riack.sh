@@ -6,7 +6,7 @@ if [[ -n "$1" ]]; then
   rm src/CMakeLists.txt.1
   if [[ -n "$2" ]]; then
     mv src/CMakeLists.txt src/CMakeLists.txt.1
-    sed -e "s/8081/$2/g" ./src/CMakeLists.txt.1 > ./src/CMakeLists.txt
+    sed -e "s/8087/$2/g" ./src/CMakeLists.txt.1 > ./src/CMakeLists.txt
     rm src/CMakeLists.txt.1
   fi
 fi

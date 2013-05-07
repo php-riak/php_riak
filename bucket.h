@@ -24,6 +24,7 @@ extern zend_class_entry *riak_bucket_ce;
 
 void riak_bucket_init(TSRMLS_D);
 PHP_METHOD(RiakBucket, __construct);
+PHP_METHOD(RiakBucket, applyProperties);
 PHP_METHOD(RiakBucket, fetchProperties);
 PHP_METHOD(RiakBucket, putObject);
 PHP_METHOD(RiakBucket, getObject);

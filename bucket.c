@@ -22,6 +22,13 @@
 #include "exceptions.h"
 #include "php_riak.h"
 
+#define GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR( VAR ) VAR = get_riack_client(getThis() TSRMLS_CC); \
+  if (!VAR) { \
+      zend_throw_exception(riak_not_found_exception_ce, "No client", 500 TSRMLS_CC); \
+      return; \
+  } 
+
+
 zend_class_entry *riak_bucket_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_ctor, 0, ZEND_RETURN_VALUE, 2)
@@ -45,6 +52,10 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_fetchprops, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_applyprops, 0, ZEND_RETURN_VALUE, 1)
+	ZEND_ARG_INFO(0, bucket_properties)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_bucket_methods[] = {
 	PHP_ME(RiakBucket, __construct, arginfo_bucket_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(RiakBucket, putObject, arginfo_bucket_put, ZEND_ACC_PUBLIC)
@@ -52,6 +63,7 @@ static zend_function_entry riak_bucket_methods[] = {
 	PHP_ME(RiakBucket, deleteObject, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
 
 	PHP_ME(RiakBucket, fetchProperties, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
+	PHP_ME(RiakBucket, applyProperties, arginfo_bucket_applyprops, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
@@ -83,6 +95,24 @@ PHP_METHOD(RiakBucket, __construct)
 	zend_update_property(riak_bucket_ce, getThis(), "client", sizeof("client")-1, client TSRMLS_CC);
 }
 
+PHP_METHOD(RiakBucket, applyProperties)
+{
+	struct RIACK_CLIENT *client;
+	RIACK_STRING bucketName;
+	zval* zBucketPropsObj;
+	HashTable *htBucketPropsProps;
+	uint32_t nVal;
+	uint8_t allowMult;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zBucketPropsObj) == FAILURE) {
+		return;
+	}
+	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
+	htBucketPropsProps = zend_std_get_properties(zBucketPropsObj TSRMLS_CC);
+
+}
+
 PHP_METHOD(RiakBucket, fetchProperties)
 {
 	struct RIACK_CLIENT *client;
@@ -91,11 +121,9 @@ PHP_METHOD(RiakBucket, fetchProperties)
 	uint8_t allowMult = 0;
 	int riackResult;
 	zval *zBucketProps, *zAllowMult, *zNVal;
-	client = get_riack_client(getThis() TSRMLS_CC);
-	if (!client) {
-	    zend_throw_exception(riak_not_found_exception_ce, "No client", 500 TSRMLS_CC);
-	    return;
-	}
+
+	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+
 	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
 	riackResult = riack_get_bucket_props(client,  bucketName, &nVal, &allowMult);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
@@ -120,24 +148,20 @@ PHP_METHOD(RiakBucket, deleteObject)
 	struct RIACK_DEL_PROPERTIES props;
 	struct RIACK_CLIENT *client;
 	zval *zObject, **zTmp;
-	HashTable *zBucketProps, *zObjectProps;
+	HashTable *htObjectProps;
 	RIACK_STRING bucketName, key;
 	int riackResult;
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zObject) == FAILURE) {
 		return;
 	}
-	zBucketProps = zend_std_get_properties(getThis() TSRMLS_CC);
-	zObjectProps = zend_std_get_properties(zObject TSRMLS_CC);
+	htObjectProps = zend_std_get_properties(zObject TSRMLS_CC);
 
-	client = get_riack_client(getThis() TSRMLS_CC);
-    if (!client) {
-        zend_throw_exception(riak_not_found_exception_ce, "No client", 500 TSRMLS_CC);
-    	return;
-    }
+	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+
 	// Set bucket name
 	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
 	// Set key
-	HASH_GET_INTO_RIACK_STRING_OR_ELSE(zObjectProps, "key", zTmp, key) {
+	HASH_GET_INTO_RIACK_STRING_OR_ELSE(htObjectProps, "key", zTmp, key) {
 		// Handle error
 	}
 	memset(&props, 0, sizeof(props));
@@ -165,11 +189,7 @@ PHP_METHOD(RiakBucket, putObject)
 	}
 	zObjectProps = zend_std_get_properties(zObject TSRMLS_CC);
 
-    client = get_riack_client(getThis() TSRMLS_CC);
-	if (!client) {
-	    zend_throw_exception(riak_not_found_exception_ce, "No client", 500 TSRMLS_CC);
-	    return;
-	}
+	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
 
 	memset(&obj, 0, sizeof(obj));
 	memset(&returnedObj, 0, sizeof(returnedObj));
@@ -235,11 +255,8 @@ PHP_METHOD(RiakBucket, getObject)
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &keyLen) == FAILURE) {
 		return;
 	}
-	client = get_riack_client(getThis() TSRMLS_CC);
-	if (!client) {
-	    zend_throw_exception(riak_not_found_exception_ce, "No client", 500 TSRMLS_CC);
-	    return;
-	}
+	
+	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
 
 	MAKE_STD_ZVAL(zKey);
 	ZVAL_STRINGL(zKey, key, keyLen, 1);
