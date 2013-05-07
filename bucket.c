@@ -99,8 +99,9 @@ PHP_METHOD(RiakBucket, applyProperties)
 {
 	struct RIACK_CLIENT *client;
 	RIACK_STRING bucketName;
-	zval* zBucketPropsObj;
+	zval* zBucketPropsObj, **zTmp;
 	HashTable *htBucketPropsProps;
+	int riackResult;
 	uint32_t nVal;
 	uint8_t allowMult;
 
@@ -111,6 +112,22 @@ PHP_METHOD(RiakBucket, applyProperties)
 	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
 	htBucketPropsProps = zend_std_get_properties(zBucketPropsObj TSRMLS_CC);
 
+	if ((zend_hash_find(htBucketPropsProps, "nVal", sizeof("nVal"), (void**)&zTmp) == SUCCESS)
+     	&& (Z_TYPE_P(*zTmp) == IS_LONG)) {
+		nVal = (uint32_t)Z_LVAL_PP(zTmp);
+ 	} else {
+ 		zend_throw_exception(riak_badarguments_exception_ce, "nVal must be integer", 5000 TSRMLS_CC);
+ 		return;
+ 	}
+ 	if ((zend_hash_find(htBucketPropsProps, "allowMult", sizeof("allowMult"), (void**)&zTmp) == SUCCESS)
+     	&& (Z_TYPE_P(*zTmp) == IS_BOOL)) {
+		allowMult = Z_BVAL_PP(zTmp);
+ 	} else {
+ 		zend_throw_exception(riak_badarguments_exception_ce, "allowMult must be boolean", 5001 TSRMLS_CC);
+ 		return;
+ 	}
+ 	riackResult = riack_set_bucket_props(client, bucketName, nVal, allowMult);
+ 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
 }
 
 PHP_METHOD(RiakBucket, fetchProperties)
@@ -162,7 +179,8 @@ PHP_METHOD(RiakBucket, deleteObject)
 	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
 	// Set key
 	HASH_GET_INTO_RIACK_STRING_OR_ELSE(htObjectProps, "key", zTmp, key) {
-		// Handle error
+		zend_throw_exception(riak_badarguments_exception_ce, "key missing from object", 5001 TSRMLS_CC);
+ 		return;
 	}
 	memset(&props, 0, sizeof(props));
 	// TODO properties

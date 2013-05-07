@@ -5,11 +5,16 @@ Test bucket properties
 include_once "connect.inc";
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_bucket_props");
-// TODO Get back here and set some properties we can read back!
-$props = $bucket->fetchProperties();
-if (isset($props)) {
+$oldProps = $bucket->fetchProperties();
+$newProps = new RiakBucketProperties(1, false);
+$bucket->applyProperties($newProps);
+$currentProps = $bucket->fetchProperties();
+if ($currentProps->nVal === 1 && $currentProps->allowMult === false) {
 	echo "success!";
+} else {
+	var_dump($currentProps);
 }
+$bucket->applyProperties($oldProps);
 ?>
 --EXPECT--
 success!

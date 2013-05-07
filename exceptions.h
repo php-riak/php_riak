@@ -20,6 +20,8 @@
 
 #include <zend_exceptions.h>
 
+extern zend_class_entry *riak_badarguments_exception_ce;
+
 extern zend_class_entry *riak_connection_exception_ce;
 extern zend_class_entry *riak_communication_exception_ce;
 extern zend_class_entry *riak_response_exception_ce;

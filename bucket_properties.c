@@ -15,6 +15,7 @@
    limitations under the License.
 */
 #include <php.h>
+#include "bucket_properties.h"
 #include "bucket.h"
 #include "client.h"
 #include "object.h"
@@ -29,7 +30,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_ctor, 0, ZEND_RETURN_VALUE, 2)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_bucket_properties_methods[] = {
-	PHP_ME(RiakBucket, __construct, arginfo_bucket_props_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(RiakBucketProperties, __construct, arginfo_bucket_props_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	{NULL, NULL, NULL}
 };
 
@@ -48,7 +49,8 @@ void riak_bucket_props_init(TSRMLS_D)
 
 PHP_METHOD(RiakBucketProperties, __construct)
 {
-	long nVal, allowMult;
+	long nVal;
+	zend_bool allowMult;
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lb", &nVal, &allowMult) == FAILURE) {
 		return;
 	}

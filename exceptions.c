@@ -18,6 +18,9 @@
 #include <zend_exceptions.h>
 #include "exceptions.h"
 
+zend_class_entry *riak_exception_ce;
+
+zend_class_entry *riak_badarguments_exception_ce;
 zend_class_entry *riak_connection_exception_ce;
 zend_class_entry *riak_communication_exception_ce;
 zend_class_entry *riak_response_exception_ce;
@@ -31,27 +34,35 @@ static zend_function_entry riak_conflicted_exception_methods[] = {
 
 void riak_exceptions_init(TSRMLS_D) 
 {
-	zend_class_entry ceConnExc, ceCommExc, ceRespExc, ceConflict, ceNotFound;
+	zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc, ceConflict, ceNotFound;
+
+	INIT_CLASS_ENTRY(ceRiak, "RiakException", NULL);
+	riak_exception_ce = zend_register_internal_class_ex(&ceRiak, 
+		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+
+	INIT_CLASS_ENTRY(ceBadArgs, "RiakBadArgumentsException", NULL);
+	riak_badarguments_exception_ce = zend_register_internal_class_ex(&ceBadArgs, 
+		riak_exception_ce, NULL TSRMLS_CC);
 
 	INIT_CLASS_ENTRY(ceConnExc, "RiakConnectionException", NULL);
 	riak_connection_exception_ce = zend_register_internal_class_ex(&ceConnExc, 
-		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+		riak_exception_ce, NULL TSRMLS_CC);
 
 	INIT_CLASS_ENTRY(ceCommExc, "RiakCommunicationException", NULL);
 	riak_communication_exception_ce = zend_register_internal_class_ex(&ceCommExc, 
-		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+		riak_exception_ce, NULL TSRMLS_CC);
 
 	INIT_CLASS_ENTRY(ceRespExc, "RiakResponseException", NULL);
 	riak_response_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
-		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+		riak_exception_ce, NULL TSRMLS_CC);
 
 	INIT_CLASS_ENTRY(ceNotFound, "RiakNotFoundException", NULL);
 	riak_not_found_exception_ce = zend_register_internal_class_ex(&ceNotFound, 
-		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+		riak_exception_ce, NULL TSRMLS_CC);
 
 	INIT_CLASS_ENTRY(ceConflict, "RiakConflictedObjectException", riak_conflicted_exception_methods);
 	riak_conflicted_object_exception_ce = zend_register_internal_class_ex(&ceConflict, 
-		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+		riak_exception_ce, NULL TSRMLS_CC);
 
 	zend_declare_property_null(riak_conflicted_object_exception_ce, "vclock", sizeof("vclock")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_conflicted_object_exception_ce, "objects", sizeof("objects")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
