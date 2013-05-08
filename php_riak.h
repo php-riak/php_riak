@@ -44,12 +44,12 @@
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 1, param1);
  
 #define CALL_METHOD2(classname, name, retval, thisptr, param1, param2) \
-  PUSH_PARAM(param1);                                                   \
+  PUSH_PARAM(param1);                                                  \
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 2, param2);     \
   POP_PARAM();
  
 #define CALL_METHOD3(classname, name, retval, thisptr, param1, param2, param3) \
-  PUSH_PARAM(param1); PUSH_PARAM(param2);                               \
+  PUSH_PARAM(param1); PUSH_PARAM(param2);                              \
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
   POP_PARAM(); POP_PARAM();
 
@@ -60,13 +60,47 @@
        RIACK_STR.len = Z_STRLEN_P(*ZVAL_PP); \
        RIACK_STR.value = Z_STRVAL_P(*ZVAL_PP); } else
 
+#ifdef ZTS
+#include <TSRM.h>
+# define RIAK_GLOBAL(v) TSRMG(riak_globals_id, zend_riak_globals *, v)
+#else
+# define RIAK_GLOBAL(v) (riak_globals.v)
+#endif
+
 /////////////////////////////////////////////////
-// Functions
+// Structs
+/////////////////////////////////////////////////
+
+typedef struct _riak_connection {
+  struct RIACK_CLIENT *client;
+  zend_bool in_use;
+  // TODO Timestamp
+} riak_connection;
+
+typedef struct _riak_connection_pool {
+  int count;
+  riak_connection *connections;
+} riak_connection_pool;
+
+/////////////////////////////////////////////////
+// Vars
 /////////////////////////////////////////////////
 
 extern struct RIACK_ALLOCATOR riack_php_allocator;
 
+ZEND_BEGIN_MODULE_GLOBALS(riak)
+  int persistent_connections;
+  int persistent_timeout;
+ZEND_END_MODULE_GLOBALS(riak)
+
 /////////////////////////////////////////////////
+// Functions
+/////////////////////////////////////////////////
+
+riak_connection_pool *pool_for_url(char* szUrl TSRMLS_DC);
+struct RIACK_CLIENT *take_connection(char* host, int host_len, int port TSRMLS_DC);
+struct RIACK_CLIENT *take_connection_from_pool(riak_connection_pool *pool);
+riak_connection_pool* initialize_pool(TSRMLS_D);
 
 void *riack_php_alloc(void *allocator_data, size_t size);
 void riack_php_free (void *allocator_data, void *data);
@@ -76,5 +110,5 @@ void riack_php_free (void *allocator_data, void *data);
 PHP_MINIT_FUNCTION(riak);
 PHP_MSHUTDOWN_FUNCTION(riak);
 
-void le_riack_clients_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC);
+void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);

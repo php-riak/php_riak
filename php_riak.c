@@ -16,6 +16,7 @@
 */
 
 #include <php.h>
+#include <php_ini.h>
 #include <riack.h>
 #include "php_riak.h"
 #include "client.h"
@@ -24,7 +25,9 @@
 #include "bucket_properties.h"
 #include "exceptions.h"
 
-int le_riack_clients;
+int le_riak_connection_list;
+
+ZEND_DECLARE_MODULE_GLOBALS(riak)
 
 zend_function_entry riak_functions[] = {
   { NULL, NULL, NULL }
@@ -46,18 +49,28 @@ zend_module_entry riak_module_entry = {
   NULL,
   NULL,
   PHP_RIAK_VERSION,
-  STANDARD_MODULE_PROPERTIES
+  PHP_MODULE_GLOBALS(riak),
+  NULL,
+  NULL, 
+  NULL,
+  STANDARD_MODULE_PROPERTIES_EX
 };
 
 // install module
 ZEND_GET_MODULE(riak)
 
+PHP_INI_BEGIN()
+  STD_PHP_INI_ENTRY("riak.persistent.connections", "20", PHP_INI_ALL, OnUpdateLong, persistent_connections, zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.persistent.timeout", "1000", PHP_INI_ALL,   OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
+PHP_INI_END()
+
 // Module constructor
 PHP_MINIT_FUNCTION(riak) 
 {
+  REGISTER_INI_ENTRIES();
   riack_init();
   // TODO Store persistant connections here
-  le_riack_clients = zend_register_list_destructors_ex(NULL, le_riack_clients_pefree, "Persistent clients", module_number);
+  le_riak_connection_list = zend_register_list_destructors_ex(NULL, le_riak_connections_pefree, "Persistent clients", module_number);
   riak_client_init(TSRMLS_C);
   riak_object_init(TSRMLS_C);
   riak_bucket_init(TSRMLS_C);
@@ -73,12 +86,6 @@ PHP_MSHUTDOWN_FUNCTION(riak)
   return SUCCESS;
 }
 
-void le_riack_clients_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) {
-	/*
-	void *client = rsrc->ptr;
-    pefree(ptr, 1);
-	*/
-}
 
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
 {
@@ -86,12 +93,69 @@ void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
     zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);
   } else if (errorStatus == RIACK_ERROR_RESPONSE) {
     if (client->last_error) {
-      zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC);	
+      zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC); 
     } else {
       zend_throw_exception(riak_response_exception_ce, "Unexpected response from riak", 1002 TSRMLS_CC);
     }
   }
 }
+
+//////////////////////////////////////////////////////////////
+// Connection pooling
+
+struct RIACK_CLIENT *take_connection(char* host, int host_len, int port TSRMLS_DC)
+{
+  char *szHost;
+  char szConnection[512];
+  riak_connection_pool* pool;
+  szHost = pestrndup(host, host_len, 0);
+  snprintf(szConnection, sizeof(szConnection), "%s:%d", szHost, port );
+  pefree(szHost, 0);
+  pool = pool_for_url(szConnection TSRMLS_CC);
+  return take_connection_from_pool(pool);
+}
+
+struct RIACK_CLIENT *take_connection_from_pool(riak_connection_pool *pool)
+{
+  return NULL;
+}
+
+riak_connection_pool *pool_for_url(char* szUrl TSRMLS_DC)
+{
+  zend_rsrc_list_entry *le;
+  riak_connection_pool *pool;
+  zend_rsrc_list_entry nle;
+  if (zend_hash_find(&EG(persistent_list), szUrl, strlen(szUrl)+1, (void**)&le) == FAILURE) {
+    pool = initialize_pool(TSRMLS_C);
+    nle.ptr = pool;
+    nle.type = le_riak_connection_list;
+    nle.refcount = 1;
+    zend_hash_update(&EG(persistent_list), szUrl, strlen(szUrl)+1, (void*)&nle, sizeof(zend_rsrc_list_entry), NULL);
+  } else {
+    pool = (riak_connection_pool*)le->ptr;
+  }
+  return pool;
+}
+
+riak_connection_pool* initialize_pool(TSRMLS_D) 
+{
+  riak_connection_pool* pool;
+  pool = pemalloc(sizeof(riak_connection_pool), 1);
+  pool->count = RIAK_GLOBAL(persistent_connections);
+  memset(pool, 0, sizeof(riak_connection_pool));
+  return NULL;
+}
+
+void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) 
+{
+  /*
+  void *client = rsrc->ptr;
+    pefree(ptr, 1);
+  */
+}
+
+//////////////////////////////////////////////////////////////
+// Riack allocator
 
 void *riack_php_alloc(void *allocator_data, size_t size)
 {
