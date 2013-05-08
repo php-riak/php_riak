@@ -62,9 +62,19 @@
 
 /////////////////////////////////////////////////
 // Functions
+/////////////////////////////////////////////////
+
+extern struct RIACK_ALLOCATOR riack_php_allocator;
+
+/////////////////////////////////////////////////
+
+void *riack_php_alloc(void *allocator_data, size_t size);
+void riack_php_free (void *allocator_data, void *data);
+
+/////////////////////////////////////////////////
 
 PHP_MINIT_FUNCTION(riak);
 PHP_MSHUTDOWN_FUNCTION(riak);
-	
+
 void le_riack_clients_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);

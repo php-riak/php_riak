@@ -95,7 +95,7 @@ PHP_METHOD(RiakClient, __construct)
 
 	data = (client_data*)zend_object_store_get_object(getThis() TSRMLS_CC);
 	// TODO use allocater that uses PHP memory functions
-	data->client = riack_new_client(&riack_default_allocator);
+	data->client = riack_new_client(&riack_php_allocator);
 
 	szHost = estrndup(host, hostLen);
 	connResult = riack_connect(data->client, szHost, port, NULL);

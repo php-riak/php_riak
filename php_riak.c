@@ -16,6 +16,7 @@
 */
 
 #include <php.h>
+#include <riack.h>
 #include "php_riak.h"
 #include "client.h"
 #include "object.h"
@@ -29,9 +30,12 @@ zend_function_entry riak_functions[] = {
   { NULL, NULL, NULL }
 };
 
-// "rlyeh_functions" refers to the struct defined above
-// we'll be filling in more of this later: you can use this to specify
-// globals, php.ini info, startup and teardown functions, etc.
+struct RIACK_ALLOCATOR riack_php_allocator =
+{
+  riack_php_alloc,
+  riack_php_free,
+};
+
 zend_module_entry riak_module_entry = {
   STANDARD_MODULE_HEADER,
   PHP_RIAK_EXTNAME,
@@ -76,7 +80,6 @@ void le_riack_clients_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) {
 	*/
 }
 
-
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
 {
   if (errorStatus == RIACK_ERROR_COMMUNICATION) {
@@ -87,6 +90,23 @@ void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
     } else {
       zend_throw_exception(riak_response_exception_ce, "Unexpected response from riak", 1002 TSRMLS_CC);
     }
+  }
+}
+
+void *riack_php_alloc(void *allocator_data, size_t size)
+{
+  (void) allocator_data;
+  if (size == 0) {
+    return 0;
+  }
+  return pemalloc(size, 0);
+}
+
+void riack_php_free (void *allocator_data, void *data)
+{
+  (void) allocator_data;
+  if (data) {
+    pefree(data, 0);
   }
 }
 
