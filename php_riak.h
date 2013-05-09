@@ -87,28 +87,43 @@ typedef struct _riak_connection_pool {
 /////////////////////////////////////////////////
 
 extern struct RIACK_ALLOCATOR riack_php_allocator;
+extern struct RIACK_ALLOCATOR riack_php_persistent_allocator;
 
 ZEND_BEGIN_MODULE_GLOBALS(riak)
-  int persistent_connections;
-  int persistent_timeout;
+  long persistent_connections;
+  long persistent_timeout;
+#ifdef ZTS
+  MUTEX_T pool_mutex;
+#endif
 ZEND_END_MODULE_GLOBALS(riak)
 
 /////////////////////////////////////////////////
 // Functions
 /////////////////////////////////////////////////
 
+zend_bool lock_pool(TSRMLS_D);
+void unlock_pool(TSRMLS_D);
+
 riak_connection_pool *pool_for_url(char* szUrl TSRMLS_DC);
-struct RIACK_CLIENT *take_connection(char* host, int host_len, int port TSRMLS_DC);
-struct RIACK_CLIENT *take_connection_from_pool(riak_connection_pool *pool);
+void release_client(struct RIACK_CLIENT *client TSRMLS_DC);
+struct RIACK_CLIENT *take_client(char* host, int host_len, int port TSRMLS_DC);
+struct RIACK_CLIENT *take_client_from_pool(riak_connection_pool *pool);
+
 riak_connection_pool* initialize_pool(TSRMLS_D);
 
 void *riack_php_alloc(void *allocator_data, size_t size);
 void riack_php_free (void *allocator_data, void *data);
 
+void *riack_php_persistent_alloc(void *allocator_data, size_t size);
+void riack_php_persistent_free (void *allocator_data, void *data);
+
 /////////////////////////////////////////////////
 
 PHP_MINIT_FUNCTION(riak);
 PHP_MSHUTDOWN_FUNCTION(riak);
+
+PHP_GINIT_FUNCTION(riak);
+PHP_GSHUTDOWN_FUNCTION(riak);
 
 void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);

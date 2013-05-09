@@ -33,10 +33,16 @@ zend_function_entry riak_functions[] = {
   { NULL, NULL, NULL }
 };
 
+struct RIACK_ALLOCATOR riack_php_persistent_allocator = 
+{
+  riack_php_persistent_alloc,
+  riack_php_persistent_free,
+};
+
 struct RIACK_ALLOCATOR riack_php_allocator =
 {
   riack_php_alloc,
-  riack_php_free,
+  riack_php_free
 };
 
 zend_module_entry riak_module_entry = {
@@ -50,8 +56,8 @@ zend_module_entry riak_module_entry = {
   NULL,
   PHP_RIAK_VERSION,
   PHP_MODULE_GLOBALS(riak),
-  NULL,
-  NULL, 
+  PHP_GINIT(riak),
+  PHP_GSHUTDOWN(riak),
   NULL,
   STANDARD_MODULE_PROPERTIES_EX
 };
@@ -83,7 +89,24 @@ PHP_MINIT_FUNCTION(riak)
 PHP_MSHUTDOWN_FUNCTION(riak)
 {
   riack_cleanup();
+  UNREGISTER_INI_ENTRIES();
   return SUCCESS;
+}
+
+PHP_GINIT_FUNCTION(riak)
+{
+  riak_globals->persistent_connections = 20;
+  riak_globals->persistent_timeout = 1000;
+#ifdef ZTS
+  riak_globals->pool_mutex = tsrm_mutex_alloc();
+#endif
+}
+
+PHP_GSHUTDOWN_FUNCTION(riak) 
+{
+#ifdef ZTS
+  tsrm_mutex_free(riak_globals->pool_mutex);
+#endif
 }
 
 
@@ -103,19 +126,52 @@ void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
 //////////////////////////////////////////////////////////////
 // Connection pooling
 
-struct RIACK_CLIENT *take_connection(char* host, int host_len, int port TSRMLS_DC)
+zend_bool lock_pool(TSRMLS_D)
+{
+#ifdef ZTS
+  if (tsrm_mutex_lock(RIAK_GLOBAL(pool_mutex)) == 0) {
+    return 1;
+  } else {
+    return 0;
+  }
+#endif
+}
+
+void unlock_pool(TSRMLS_D)
+{
+#ifdef ZTS
+  tsrm_mutex_unlock(RIAK_GLOBAL(pool_mutex));
+#endif
+}
+
+void release_client(struct RIACK_CLIENT *client TSRMLS_DC)
+{
+  // If we fail to lock we might have a stuck client, find a way to deal with this.
+  if (lock_pool(TSRMLS_C)) {
+    // Release
+    unlock_pool(TSRMLS_C);
+  }
+}
+
+struct RIACK_CLIENT *take_client(char* host, int host_len, int port TSRMLS_DC)
 {
   char *szHost;
   char szConnection[512];
   riak_connection_pool* pool;
+  struct RIACK_CLIENT *client;
   szHost = pestrndup(host, host_len, 0);
   snprintf(szConnection, sizeof(szConnection), "%s:%d", szHost, port );
   pefree(szHost, 0);
-  pool = pool_for_url(szConnection TSRMLS_CC);
-  return take_connection_from_pool(pool);
+
+  if (lock_pool(TSRMLS_C)) {
+    pool = pool_for_url(szConnection TSRMLS_CC);
+    client = take_client_from_pool(pool);
+    unlock_pool(TSRMLS_C);
+  }
+  return client;
 }
 
-struct RIACK_CLIENT *take_connection_from_pool(riak_connection_pool *pool)
+struct RIACK_CLIENT *take_client_from_pool(riak_connection_pool *pool)
 {
   return NULL;
 }
@@ -142,16 +198,24 @@ riak_connection_pool* initialize_pool(TSRMLS_D)
   riak_connection_pool* pool;
   pool = pemalloc(sizeof(riak_connection_pool), 1);
   pool->count = RIAK_GLOBAL(persistent_connections);
-  memset(pool, 0, sizeof(riak_connection_pool));
-  return NULL;
+  pool->connections = pemalloc(pool->count * sizeof(riak_connection), 1);
+  memset(pool->connections, 0, pool->count * sizeof(riak_connection));
+  return pool;
 }
 
 void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) 
 {
-  /*
-  void *client = rsrc->ptr;
-    pefree(ptr, 1);
-  */
+  int i;
+  riak_connection_pool *pool = (riak_connection_pool*)rsrc->ptr;
+  if (pool->connections) {
+    for (i=0; i<pool->count; ++i) {
+      if (pool->connections[i].client) {
+        riack_free(pool->connections[i].client);
+      }
+    }
+    pefree(pool->connections, 1);
+  }
+  pefree(pool, 1);
 }
 
 //////////////////////////////////////////////////////////////
@@ -171,6 +235,23 @@ void riack_php_free (void *allocator_data, void *data)
   (void) allocator_data;
   if (data) {
     pefree(data, 0);
+  }
+}
+
+void *riack_php_persistent_alloc(void *allocator_data, size_t size)
+{
+  (void) allocator_data;
+  if (size == 0) {
+    return 0;
+  }
+  return pemalloc(size, 1);
+}
+
+void riack_php_persistent_free (void *allocator_data, void *data)
+{
+  (void) allocator_data;
+  if (data) {
+    pefree(data, 1);
   }
 }
 
