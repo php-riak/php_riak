@@ -19,12 +19,13 @@
 #define RIAK_POOL__H__
 
 #include <php.h>
+#include <time.h>
 
 typedef struct _riak_connection {
   struct RIACK_CLIENT *client;
   zend_bool needs_reconnect;
   zend_bool persistent;
-  // TODO Timestamp
+  time_t last_used_at;
 } riak_connection;
 
 typedef struct _riak_connection_pool_entry {
@@ -37,7 +38,8 @@ typedef struct _riak_connection_pool {
   riak_connection_pool_entry *entries;
 } riak_connection_pool;
 
-zend_bool ensure_connected(riak_connection *connection, char* host, int host_len, int port);
+zend_bool ensure_connected(riak_connection *connection TSRMLS_DC);
+zend_bool ensure_connected_init(riak_connection *connection, char* host, int host_len, int port TSRMLS_DC);
 void mark_for_reconnect(riak_connection *connection);
 
 void release_connection(riak_connection *connection TSRMLS_DC);

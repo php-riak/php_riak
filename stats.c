@@ -22,9 +22,27 @@ zend_class_entry *riak_stats_ce;
 
 
 static zend_function_entry riak_stats_methods[] = {
-
+	PHP_ME(RiakStats, activeConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+	PHP_ME(RiakStats, activePersistentConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+	PHP_ME(RiakStats, getNumReconnects, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
+
+PHP_METHOD(RiakStats, activeConnections)
+{
+	RETURN_LONG(RIAK_GLOBAL(open_connections));
+}
+
+PHP_METHOD(RiakStats, activePersistentConnections)
+{
+	RETURN_LONG(RIAK_GLOBAL(open_connections_persistent));
+}
+
+PHP_METHOD(RiakStats, getNumReconnects)
+{
+	long reconnects = RIAK_GLOBAL(reconnects);
+	RETURN_LONG(reconnects);
+}
 
 void riak_stats_init(TSRMLS_D)
 {

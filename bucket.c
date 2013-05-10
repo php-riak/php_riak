@@ -22,7 +22,9 @@
 #include "exceptions.h"
 #include "php_riak.h"
 
-#define GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR( VAR ) VAR = get_riack_client(getThis() TSRMLS_CC); \
+riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
+
+#define GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR( VAR ) VAR = get_riak_connection(getThis() TSRMLS_CC); \
   if (!VAR) { \
       zend_throw_exception(riak_not_found_exception_ce, "No client", 500 TSRMLS_CC); \
       return; \
@@ -97,7 +99,8 @@ PHP_METHOD(RiakBucket, __construct)
 
 PHP_METHOD(RiakBucket, applyProperties)
 {
-	struct RIACK_CLIENT *client;
+	riak_connection *connection;
+
 	RIACK_STRING bucketName;
 	zval* zBucketPropsObj, **zTmp;
 	HashTable *htBucketPropsProps;
@@ -108,7 +111,7 @@ PHP_METHOD(RiakBucket, applyProperties)
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zBucketPropsObj) == FAILURE) {
 		return;
 	}
-	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
 	htBucketPropsProps = zend_std_get_properties(zBucketPropsObj TSRMLS_CC);
 
@@ -126,24 +129,25 @@ PHP_METHOD(RiakBucket, applyProperties)
  		zend_throw_exception(riak_badarguments_exception_ce, "allowMult must be boolean", 5001 TSRMLS_CC);
  		return;
  	}
- 	riackResult = riack_set_bucket_props(client, bucketName, nVal, allowMult);
- 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+ 	riackResult = riack_set_bucket_props(connection->client, bucketName, nVal, allowMult);
+ 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
 
 PHP_METHOD(RiakBucket, fetchProperties)
 {
-	struct RIACK_CLIENT *client;
+	riak_connection *connection;
 	RIACK_STRING bucketName;
 	uint32_t nVal = 3;
 	uint8_t allowMult = 0;
 	int riackResult;
 	zval *zBucketProps, *zAllowMult, *zNVal;
 
-	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
 	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
-	riackResult = riack_get_bucket_props(client,  bucketName, &nVal, &allowMult);
-	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+	riackResult = riack_get_bucket_props(connection->client,  bucketName, &nVal, &allowMult);
+
+	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
 	MAKE_STD_ZVAL(zNVal);
 	ZVAL_LONG(zNVal, nVal);
@@ -163,7 +167,7 @@ PHP_METHOD(RiakBucket, fetchProperties)
 PHP_METHOD(RiakBucket, deleteObject)
 {
 	struct RIACK_DEL_PROPERTIES props;
-	struct RIACK_CLIENT *client;
+	riak_connection *connection;
 	zval *zObject, **zTmp;
 	HashTable *htObjectProps;
 	RIACK_STRING bucketName, key;
@@ -173,7 +177,7 @@ PHP_METHOD(RiakBucket, deleteObject)
 	}
 	htObjectProps = zend_std_get_properties(zObject TSRMLS_CC);
 
-	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
 	// Set bucket name
 	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
@@ -184,8 +188,8 @@ PHP_METHOD(RiakBucket, deleteObject)
 	}
 	memset(&props, 0, sizeof(props));
 	// TODO properties
-	riackResult = riack_delete(client, bucketName, key, &props);
-	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+	riackResult = riack_delete(connection->client, bucketName, key, &props);
+	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
 
 PHP_METHOD(RiakBucket, putObject)
@@ -197,7 +201,7 @@ PHP_METHOD(RiakBucket, putObject)
 	struct RIACK_OBJECT obj, returnedObj;
 	struct RIACK_CONTENT riackContent;
 	struct RIACK_PUT_PROPERTIES props;
-	struct RIACK_CLIENT *client;
+	riak_connection *connection;
 	int riackResult;
 	
 	key = NULL;
@@ -207,7 +211,7 @@ PHP_METHOD(RiakBucket, putObject)
 	}
 	zObjectProps = zend_std_get_properties(zObject TSRMLS_CC);
 
-	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
 	memset(&obj, 0, sizeof(obj));
 	memset(&returnedObj, 0, sizeof(returnedObj));
@@ -252,11 +256,11 @@ PHP_METHOD(RiakBucket, putObject)
 		}
 	}
 
-	riackResult = riack_put(client, obj, &returnedObj, &props);
-	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+	riackResult = riack_put(connection->client, obj, &returnedObj, &props);
+	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
 	// TODO Return updated object
-	riack_free_object(client, &returnedObj);
+	riack_free_object(connection->client, &returnedObj);
 }
 
 PHP_METHOD(RiakBucket, getObject)
@@ -268,13 +272,13 @@ PHP_METHOD(RiakBucket, getObject)
 	struct RIACK_GET_PROPERTIES props;
 	struct RIACK_GET_OBJECT getResult;
 	RIACK_STRING rsBucket, rsKey;
-	struct RIACK_CLIENT* client;
+	riak_connection *connection;
 	
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &keyLen) == FAILURE) {
 		return;
 	}
 	
-	GET_RIACK_CLIENT_RETURN_EXC_ON_ERROR(client)
+	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
 	MAKE_STD_ZVAL(zKey);
 	ZVAL_STRINGL(zKey, key, keyLen, 1);
@@ -285,7 +289,7 @@ PHP_METHOD(RiakBucket, getObject)
 
 	rsKey.len = keyLen;
 	rsKey.value = key;
-	riackResult = riack_get(client, rsBucket, rsKey, &props, &getResult);
+	riackResult = riack_get(connection->client, rsBucket, rsKey, &props, &getResult);
 
 	if (riackResult == RIACK_SUCCESS) {
 		MAKE_STD_ZVAL(zVclock);
@@ -316,10 +320,10 @@ PHP_METHOD(RiakBucket, getObject)
 			zend_throw_exception(riak_not_found_exception_ce, "Not Found", 2000 TSRMLS_CC);
 		}
 		zval_ptr_dtor(&zVclock);
-		riack_free_get_object(client, &getResult);
+		riack_free_get_object(connection->client, &getResult);
 	} else {
 		zval_ptr_dtor(&zKey);
-		CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, riackResult);
+		CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 	}
 	zval_ptr_dtor(&zKey);
 }
@@ -347,16 +351,17 @@ RIACK_STRING get_riack_bucket_name(zval* bucket TSRMLS_DC)
 
 }
 
-struct RIACK_CLIENT* get_riack_client(zval *zbucket TSRMLS_DC)
+riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)
 {
 	zval **zTmp;
 	HashTable *zBucketProps;
-	struct RIACK_CLIENT *client;
+	riak_connection *connection;
 	zBucketProps = zend_std_get_properties(zbucket TSRMLS_CC);
 	if (zend_hash_find(zBucketProps, "client", sizeof("client"), (void**)&zTmp) == SUCCESS) {
-		GET_RIACK_CLIENT(*zTmp, client);
+		GET_RIAK_CONNECTION(*zTmp, connection);
+		ensure_connected(connection TSRMLS_CC);
 	} else {
 		return NULL;
 	}
-	return client;
+	return connection;
 }

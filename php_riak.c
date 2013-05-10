@@ -25,6 +25,7 @@
 #include "bucket.h"
 #include "bucket_properties.h"
 #include "exceptions.h"
+#include "stats.h"
 
 int le_riak_connection_list;
 
@@ -83,6 +84,7 @@ PHP_MINIT_FUNCTION(riak)
   riak_bucket_init(TSRMLS_C);
   riak_bucket_props_init(TSRMLS_C);
   riak_exceptions_init(TSRMLS_C);
+  riak_stats_init(TSRMLS_C);
   return SUCCESS;
 }
 
@@ -98,6 +100,9 @@ PHP_GINIT_FUNCTION(riak)
 {
   riak_globals->persistent_connections = 20;
   riak_globals->persistent_timeout = 1000;
+  riak_globals->open_connections = 0;
+  riak_globals->open_connections_persistent = 0;
+  riak_globals->reconnects = 0;
 #ifdef ZTS
   riak_globals->pool_mutex = tsrm_mutex_alloc();
 #endif

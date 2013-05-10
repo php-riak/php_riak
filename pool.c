@@ -19,26 +19,39 @@
 #include <php.h>
 #include <riack.h>
 
-
-zend_bool ensure_connected(riak_connection *connection, char* host, int host_len, int port)
+zend_bool ensure_connected(riak_connection *connection TSRMLS_DC) 
 {
-   char *szHost;
-   zend_bool result;
-   result = 0;
-   szHost = pestrndup(host, host_len, 0);
-   if (connection->client->sockfd <= 0) {
-      if (riack_connect(connection->client, szHost, port, NULL) == RIACK_SUCCESS) {
-         connection->needs_reconnect = 0;
-         result = 1;
-      }
+  zend_bool result = 1;
+  if (difftime(time(NULL), connection->last_used_at)*1000 > RIAK_GLOBAL(persistent_timeout)) {
+      connection->needs_reconnect = 1;
    }
    if (connection->needs_reconnect) {
       if (riack_reconnect(connection->client) == RIACK_SUCCESS) {
          connection->needs_reconnect = 0;
+      } else {
+         result = 0;
+      }
+      RIAK_GLOBAL(reconnects)++;
+   }
+   return result;
+}
+
+zend_bool ensure_connected_init(riak_connection *connection, char* host, int host_len, int port TSRMLS_DC)
+{
+   char *szHost;
+   zend_bool result;
+   result = 0;
+   
+   if (connection->client->sockfd <= 0) {
+      szHost = pestrndup(host, host_len, 0);
+      if (riack_connect(connection->client, szHost, port, NULL) == RIACK_SUCCESS) {
+         connection->needs_reconnect = 0;
          result = 1;
       }
+      pefree(szHost, 0);
+   } else {
+      result = ensure_connected(connection TSRMLS_CC);
    }
-   pefree(szHost, 0);
    return result;
 }
 
@@ -72,10 +85,13 @@ void release_connection(riak_connection *connection TSRMLS_DC)
 {
    char szConnection[512];
    riak_connection_pool* pool = NULL;
+   RIAK_GLOBAL(open_connections)--;
    if (connection->persistent) {
       // If we fail to lock we might have a stuck client, find a way to deal with this.
       if (lock_pool(TSRMLS_C)) {
          // Release
+         connection->last_used_at = time(NULL);
+         RIAK_GLOBAL(open_connections_persistent)--;
          pool = pool_for_host_port(connection->client->host, 
             strlen(connection->client->host), connection->client->port TSRMLS_CC);
          release_connection_from_pool(pool, connection);
@@ -102,21 +118,26 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC)
    }
    if (entry) {
       connection = &entry->connection;
-      if (!ensure_connected(connection, host, host_len, port)) {
+      if (!ensure_connected_init(connection, host, host_len, port TSRMLS_CC)) {
          connection->needs_reconnect = 1;
          release_connection_from_pool(pool, connection);
          return NULL;
       }
+      RIAK_GLOBAL(open_connections_persistent)++;
    } else {
       // We could not get a persistent connection, make a new non persistent connection.
       connection = pemalloc(sizeof(riak_connection), 0);
       memset(connection, 0, sizeof(riak_connection));
       connection->persistent = 0;
       connection->client = riack_new_client(&riack_php_allocator);
-      if (!ensure_connected(connection, host, host_len, port)) {
+      connection->last_used_at = time(NULL);
+      if (!ensure_connected_init(connection, host, host_len, port TSRMLS_CC)) {
          release_connection(connection TSRMLS_CC);
          return NULL;
       }
+   }
+   if (connection) {
+      RIAK_GLOBAL(open_connections)++;
    }
    return connection;
 }
@@ -144,6 +165,7 @@ riak_connection_pool_entry *take_connection_entry_from_pool(riak_connection_pool
       current_entry->in_use = 1;
       current_entry->connection.persistent = 1;
       if (!current_entry->connection.client) {
+         current_entry->connection.last_used_at = time(NULL);
          current_entry->connection.client = riack_new_client(&riack_php_persistent_allocator);
       }
       return current_entry;

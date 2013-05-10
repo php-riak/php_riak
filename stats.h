@@ -20,6 +20,10 @@
 
 extern zend_class_entry *riak_stats_ce;
 
+PHP_METHOD(RiakStats, activeConnections);
+PHP_METHOD(RiakStats, activePersistentConnections);
+PHP_METHOD(RiakStats, getNumReconnects);
+
 void riak_stats_init(TSRMLS_D);
 
 #endif

@@ -19,6 +19,7 @@
 #include "php_riak.h"
 #include "client.h"
 #include "object.h"
+#include "pool.h"
 #include "exceptions.h"
 
 zend_class_entry *riak_client_ce;
@@ -106,10 +107,12 @@ PHP_METHOD(RiakClient, __construct)
 PHP_METHOD(RiakClient, ping)
 {
 	int pingStatus;
-	struct RIACK_CLIENT* client;
-	GET_RIACK_CLIENT(getThis(), client);
+	riak_connection *connection;
 
-	pingStatus = riack_ping(client);
-	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(client, pingStatus);
+	GET_RIAK_CONNECTION(getThis(), connection);
+	ensure_connected(connection TSRMLS_CC);
+
+	pingStatus = riack_ping(connection->client);
+	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, pingStatus);
 }
 

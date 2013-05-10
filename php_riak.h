@@ -53,7 +53,11 @@
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
   POP_PARAM(); POP_PARAM();
 
-#define CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(CLIENT, STATUS) if ( STATUS != RIACK_SUCCESS) { throw_exception(CLIENT,  STATUS TSRMLS_CC); return; }
+#define CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(CONNECTION, STATUS) \
+  if ( STATUS != RIACK_SUCCESS) { \
+    CONNECTION->needs_reconnect = 1; \
+    throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
+  return; }
 
 #define HASH_GET_INTO_RIACK_STRING_OR_ELSE(HT, KEY, ZVAL_PP, RIACK_STR) if ((zend_hash_find(HT, KEY, sizeof(KEY), (void**)&ZVAL_PP) == SUCCESS) \
      && (Z_TYPE_P(*ZVAL_PP) == IS_STRING)) { \
@@ -80,6 +84,11 @@ extern int le_riak_connection_list;
 ZEND_BEGIN_MODULE_GLOBALS(riak)
   long persistent_connections;
   long persistent_timeout;
+
+  long open_connections;
+  long open_connections_persistent;
+
+  long reconnects;
 #ifdef ZTS
   MUTEX_T pool_mutex;
 #endif
