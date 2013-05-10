@@ -19,16 +19,19 @@
 #define RIAK_CLIENT__H__
 
 #include <riack.h>
+#include "pool.h"
 
 extern zend_class_entry *riak_client_ce;
 
 typedef struct _client_data {
   // required
   zend_object std;
-  struct RIACK_CLIENT* client;
+
+  riak_connection *connection;
+//  struct RIACK_CLIENT* client;
 } client_data;
 
-#define GET_RIACK_CLIENT(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->client
+#define GET_RIACK_CLIENT(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->connection->client
 
 /////////////////////////////////////////////////
 // Constants

@@ -74,7 +74,10 @@ void free_client_data(void *object TSRMLS_DC)
 {
 	client_data* data = (client_data*)object;
 	zend_object_std_dtor(&data->std TSRMLS_CC);
-	riack_free(data->client);
+	if (data->connection) {
+		release_connection(data->connection TSRMLS_CC);
+	}
+
 	efree(data);
 }
 
@@ -94,13 +97,8 @@ PHP_METHOD(RiakClient, __construct)
 	zend_update_property_long(riak_client_ce, getThis(), "port", sizeof("port")-1, port TSRMLS_CC);
 
 	data = (client_data*)zend_object_store_get_object(getThis() TSRMLS_CC);
-	// TODO use allocater that uses PHP memory functions
-	data->client = riack_new_client(&riack_php_allocator);
-
-	szHost = estrndup(host, hostLen);
-	connResult = riack_connect(data->client, szHost, port, NULL);
-	efree(szHost);
-	if (connResult != RIACK_SUCCESS) {
+	data->connection = take_connection(host, hostLen, port TSRMLS_CC);
+	if (!data->connection) {
 		zend_throw_exception(riak_connection_exception_ce, "Connection error", 1000 TSRMLS_CC);
 	}
 }

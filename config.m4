@@ -34,7 +34,7 @@ if test "$PHP_RIAK" != "no"; then
   PHP_SUBST(RIAK_SHARED_LIBADD)
 
   dnl this defines the extension
-  PHP_NEW_EXTENSION(riak, php_riak.c client.c bucket.c object.c exceptions.c bucket_properties.c, $ext_shared)
+  PHP_NEW_EXTENSION(riak, php_riak.c client.c bucket.c object.c exceptions.c bucket_properties.c pool.c stats.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in
