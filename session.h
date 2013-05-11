@@ -15,17 +15,14 @@
    limitations under the License.
 */
 
-#ifndef RIAK_OBJECT__H__
-#define RIAK_OBJECT__H__
+#ifndef RIAK_SESSION__H__
+#define RIAK_SESSION__H__
 
-#include "riack.h"
+#ifdef PHP_SESSION
+#include "ext/session/php_session.h"
 
-extern zend_class_entry *riak_object_ce;
+PS_FUNCS(riak);
 
-void riak_object_init(TSRMLS_D);
-void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC);
-void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC);
 
-PHP_METHOD(RiakObject, __construct);
-
+#endif
 #endif

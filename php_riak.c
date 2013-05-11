@@ -145,9 +145,7 @@ void *riack_php_alloc(void *allocator_data, size_t size)
 void riack_php_free (void *allocator_data, void *data)
 {
   (void) allocator_data;
-  if (data) {
-    pefree(data, 0);
-  }
+  pefree(data, 0);
 }
 
 void *riack_php_persistent_alloc(void *allocator_data, size_t size)
@@ -162,8 +160,6 @@ void *riack_php_persistent_alloc(void *allocator_data, size_t size)
 void riack_php_persistent_free (void *allocator_data, void *data)
 {
   (void) allocator_data;
-  if (data) {
-    pefree(data, 1);
-  }
+  pefree(data, 1);
 }
 

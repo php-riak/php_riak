@@ -1,5 +1,5 @@
 --TEST--
-Simple get test
+Test metadata gets read and written
 --FILE--
 <?php
 include_once "connect.inc";
@@ -12,10 +12,14 @@ $obj = new RiakObject("get_test");
 try {
 	$obj->contentType = "text/plain";
 	$obj->data = "test-get plap";
+	$obj->metadata["ost"] = 7;
 	$bucket->putObject($obj);
+
 	$readdenObj = $bucket->getObject("get_test");
-	if (strcmp($readdenObj->data, $obj->data) == 0) {
+	if (isset($readdenObj->metadata["ost"]) && $readdenObj->metadata["ost"] == 7) {
 		echo "success!";
+	} else {
+		var_dump($readdenObj->metadata);
 	}
 } catch (Exception $e) {
 	var_dump($e);

@@ -59,10 +59,10 @@
     throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
   return; }
 
-#define HASH_GET_INTO_RIACK_STRING_OR_ELSE(HT, KEY, ZVAL_PP, RIACK_STR) if ((zend_hash_find(HT, KEY, sizeof(KEY), (void**)&ZVAL_PP) == SUCCESS) \
-     && (Z_TYPE_P(*ZVAL_PP) == IS_STRING)) { \
-       RIACK_STR.len = Z_STRLEN_P(*ZVAL_PP); \
-       RIACK_STR.value = Z_STRVAL_P(*ZVAL_PP); } else
+#define HASH_GET_INTO_RIACK_STRING_OR_ELSE(CE, ZOBJ, KEY, ZVAL, RIACK_STR) ZVAL = zend_read_property(CE, ZOBJ, KEY, sizeof(KEY)-1, 1 TSRMLS_CC); \
+     if (Z_TYPE_P(ZVAL) == IS_STRING) { \
+       RIACK_STR.len = Z_STRLEN_P(ZVAL); \
+       RIACK_STR.value = Z_STRVAL_P(ZVAL); } else
 
 #ifdef ZTS
 #include <TSRM.h>
