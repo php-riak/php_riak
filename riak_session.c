@@ -148,7 +148,15 @@ PS_WRITE_FUNC(riak)
 
 PS_DESTROY_FUNC(riak)
 {
-   // TODO
+	PS_RIAK_DATA;
+	zval *zobject;
+	zobject = create_object_object(key TSRMLS_CC);
+	CALL_METHOD1(RiakBucket, deleteObject, zobject, data->zbucket, zobject);
+	zval_ptr_dtor(&zobject);
+	if (EG(exception)) {
+		zend_clear_exception(TSRMLS_C);
+		return FAILURE;
+	}
 	return SUCCESS;
 }
 
