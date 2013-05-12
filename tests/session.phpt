@@ -9,6 +9,12 @@ session_start();
 $_SESSION['favcolor'] = 'green';
 session_commit();
 session_start();
-echo $_SESSION['favcolor'];
+$readVal1 = $_SESSION['favcolor'];
+session_destroy();
+session_start();
+if (!isset($_SESSION['favcolor']) && $readVal1 == 'green') {
+	echo "success!";
+}
 ?>
 --EXPECT--
+success!
