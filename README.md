@@ -73,4 +73,4 @@ This extension includes a session module that can replace the default PHP sessio
 The session handler does not implement garbage collection, use riak´s key-expire setting instead.
 
 ### PHP Code
-TODO
+Examples of usage can be found in the .phpt files in the test folder.

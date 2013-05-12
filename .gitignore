@@ -7,6 +7,13 @@ autom4te.cache/
 .idea/
 
 .anjuta_sym_db.db
+
+*.config
+*.creator
+*.files
+*.includes
+*.user
+
 .libs/
 .deps
 *.*~

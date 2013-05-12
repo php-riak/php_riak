@@ -26,6 +26,7 @@
 #include "bucket_properties.h"
 #include "exceptions.h"
 #include "stats.h"
+#include "link.h"
 #include "riak_session.h"
 
 #ifdef PHP_SESSION
@@ -86,6 +87,7 @@ PHP_MINIT_FUNCTION(riak)
   le_riak_connection_list = zend_register_list_destructors_ex(NULL, le_riak_connections_pefree, "Persistent clients", module_number);
   riak_client_init(TSRMLS_C);
   riak_object_init(TSRMLS_C);
+  riak_link_init(TSRMLS_C);
   riak_bucket_init(TSRMLS_C);
   riak_bucket_props_init(TSRMLS_C);
   riak_exceptions_init(TSRMLS_C);
