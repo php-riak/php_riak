@@ -18,6 +18,8 @@
 #ifndef RIAK_SESSION__H__
 #define RIAK_SESSION__H__
 
+#include "php_riak.h"
+
 #ifdef PHP_SESSION
 #include "ext/session/php_session.h"
 

@@ -51,6 +51,21 @@ void riak_object_init(TSRMLS_D)
 	zend_declare_property_null(riak_object_ce, "metadata", sizeof("metadata")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
+zval* create_object_object(const char* key TSRMLS_DC)
+{
+	zval *zobject, *zkey;
+	MAKE_STD_ZVAL(zobject);
+	MAKE_STD_ZVAL(zkey);
+
+	ZVAL_STRING(zkey, key, 1);
+
+	object_init_ex(zobject, riak_object_ce);
+	CALL_METHOD1(RiakObject, __construct, zobject, zobject, zkey);
+
+	zval_ptr_dtor(&zkey);
+	return zobject;
+}
+
 /////////////////////////////////////////////////////////////
 
 PHP_METHOD(RiakObject, __construct)

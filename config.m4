@@ -4,6 +4,8 @@ PHP_ARG_ENABLE(riak, whether to enable Riak extension, [  --enable-riak   Enable
 
 if test "$PHP_RIAK" != "no"; then
 
+  AC_DEFINE(PHP_SESSION,1,[riak session])
+
   if test -r $PHP_RIAK/google/protobuf-c/protobuf-c.h; then
     PB_DIR=$PHP_RIAK
   else
@@ -34,7 +36,7 @@ if test "$PHP_RIAK" != "no"; then
   PHP_SUBST(RIAK_SHARED_LIBADD)
 
   dnl this defines the extension
-  PHP_NEW_EXTENSION(riak, php_riak.c client.c bucket.c object.c exceptions.c bucket_properties.c pool.c stats.c session.c, $ext_shared)
+  PHP_NEW_EXTENSION(riak, php_riak.c client.c bucket.c object.c exceptions.c bucket_properties.c pool.c stats.c riak_session.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in

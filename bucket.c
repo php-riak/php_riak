@@ -83,6 +83,21 @@ void riak_bucket_init(TSRMLS_D)
 	zend_declare_property_null(riak_bucket_ce, "allowMult", sizeof("allowMult")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
+zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC)
+{
+	zval *zbucket, *zname;
+	MAKE_STD_ZVAL(zbucket);
+	MAKE_STD_ZVAL(zname);
+
+	ZVAL_STRING(zname, name, 1);
+
+	object_init_ex(zbucket, riak_bucket_ce);
+	CALL_METHOD2(RiakBucket, __construct, zbucket, zbucket, zclient, zname);
+
+	zval_ptr_dtor(&zname);
+	return zbucket;
+}
+
 /////////////////////////////////////////////////////////////
 
 PHP_METHOD(RiakBucket, __construct)

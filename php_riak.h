@@ -17,6 +17,14 @@
 
 #include <riack.h>
 
+#ifndef PHP_RIAK__H__
+#define PHP_RIAK__H__
+
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
+
 #define PHP_RIAK_EXTNAME "riak"
 #define PHP_RIAK_VERSION "0.1"
 
@@ -115,3 +123,5 @@ PHP_GINIT_FUNCTION(riak);
 PHP_GSHUTDOWN_FUNCTION(riak);
 
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
+
+#endif

@@ -26,6 +26,11 @@
 #include "bucket_properties.h"
 #include "exceptions.h"
 #include "stats.h"
+#include "riak_session.h"
+
+#ifdef PHP_SESSION
+  extern ps_module ps_mod_riak;
+#endif
 
 int le_riak_connection_list;
 
@@ -85,6 +90,11 @@ PHP_MINIT_FUNCTION(riak)
   riak_bucket_props_init(TSRMLS_C);
   riak_exceptions_init(TSRMLS_C);
   riak_stats_init(TSRMLS_C);
+
+#ifdef PHP_SESSION
+  php_session_register_module(&ps_mod_riak);
+#endif
+
   return SUCCESS;
 }
 

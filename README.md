@@ -1,7 +1,12 @@
 [![Build Status](https://travis-ci.org/TriKaspar/php_riak.png)](https://travis-ci.org/TriKaspar/php_riak)
 
 # Riak PHP extension
-PHP extension for interfacing with Riak
+PHP extension for interfacing with Riak.  
+## Features
+- Protobuffer client
+- Persistent connections
+- Auto reconnects after errors or timeouts
+- Riak PHP session store replacement, that can be enabled directly in php.ini no code needed.
 
 ## Dependencies
 ### Protobuf & protobuf-c
@@ -59,4 +64,13 @@ You can override the following settings in your php.ini
 
 ## Usage
 
+### Riak session
+This extension includes a session module that can replace the default PHP session handler, no code changes needed just setup the following in your php.ini:
 
+	session.save_handler=riak
+	session.save_path=proto://HOST:PORT/SESSIONBUCKET
+
+The session handler does not implement garbage collection, use riak´s key-expire setting instead.
+
+### PHP Code
+TODO

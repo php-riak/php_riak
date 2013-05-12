@@ -22,7 +22,10 @@
 
 extern zend_class_entry *riak_bucket_ce;
 
+zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC);
+
 void riak_bucket_init(TSRMLS_D);
+
 PHP_METHOD(RiakBucket, __construct);
 PHP_METHOD(RiakBucket, applyProperties);
 PHP_METHOD(RiakBucket, fetchProperties);
