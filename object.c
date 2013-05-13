@@ -14,8 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
-#include <riack.h>
+
 #include "object.h"
 #include "php_riak.h"
 
@@ -49,6 +48,7 @@ void riak_object_init(TSRMLS_D)
 	zend_declare_property_null(riak_object_ce, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
 	zend_declare_property_null(riak_object_ce, "metadata", sizeof("metadata")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "links", sizeof("links")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
 zval* create_object_object(const char* key TSRMLS_DC)
@@ -72,17 +72,23 @@ PHP_METHOD(RiakObject, __construct)
 {
 	char *key;
 	int keyLen;
-	zval *zArrMeta;
+    zval *zarrmeta, *zarrlinks;
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &keyLen) == FAILURE) {
 		return;
 	}
 	zend_update_property_stringl(riak_object_ce, getThis(), "key", sizeof("key")-1, key, keyLen TSRMLS_CC);
 
 	// Create empty array for metadata
-	MAKE_STD_ZVAL(zArrMeta);
-	array_init(zArrMeta);
-	add_property_zval_ex(getThis(), "metadata", sizeof("metadata")-1, zArrMeta TSRMLS_CC);
-	zval_ptr_dtor(&zArrMeta);
+    MAKE_STD_ZVAL(zarrmeta);
+    array_init(zarrmeta);
+    add_property_zval_ex(getThis(), "metadata", sizeof("metadata")-1, zarrmeta TSRMLS_CC);
+    zval_ptr_dtor(&zarrmeta);
+
+    // Create empty array for links
+    MAKE_STD_ZVAL(zarrmeta);
+    array_init(zarrmeta);
+    add_property_zval_ex(getThis(), "links", sizeof("links")-1, zarrlinks TSRMLS_CC);
+    zval_ptr_dtor(&zarrmeta);
 }
 
 /////////////////////////////////////////////////////////////
@@ -140,6 +146,20 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
 	zMetadata = metadata_from_content(content TSRMLS_CC);
 	zend_update_property(riak_object_ce, object, "metadata", sizeof("metadata")-1, zMetadata TSRMLS_CC);
 	zval_ptr_dtor(&zMetadata);
+}
+
+void set_links_from_object(struct RIACK_CONTENT* content, zval* zlinksarr, struct RIACK_CLIENT* client TSRMLS_DC)
+{
+    HashTable *hindex;
+    HashPosition pointer;
+    ulong index;
+    if (zlinksarr && Z_TYPE_P(zlinksarr) == IS_ARRAY) {
+        hindex = Z_ARRVAL_P(zlinksarr);
+        content->link_count = zend_hash_num_elements(hindex);
+        if (content->link_count > 0) {
+            //
+        }
+    }
 }
 
 void set_metadata_from_object(struct RIACK_CONTENT* content, zval* zMetadata, struct RIACK_CLIENT* client TSRMLS_DC) 

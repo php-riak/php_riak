@@ -18,7 +18,8 @@
 #ifndef RIAK_OBJECT__H__
 #define RIAK_OBJECT__H__
 
-#include "riack.h"
+#include <php.h>
+#include <riack.h>
 
 extern zend_class_entry *riak_object_ce;
 
