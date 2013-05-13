@@ -17,6 +17,7 @@
 
 #include "object.h"
 #include "php_riak.h"
+#include "ht_utils.h"
 
 zend_class_entry *riak_object_ce;
 
@@ -85,10 +86,10 @@ PHP_METHOD(RiakObject, __construct)
     zval_ptr_dtor(&zarrmeta);
 
     // Create empty array for links
-    MAKE_STD_ZVAL(zarrmeta);
-    array_init(zarrmeta);
+    MAKE_STD_ZVAL(zarrlinks);
+    array_init(zarrlinks);
     add_property_zval_ex(getThis(), "links", sizeof("links")-1, zarrlinks TSRMLS_CC);
-    zval_ptr_dtor(&zarrmeta);
+    zval_ptr_dtor(&zarrlinks);
 }
 
 /////////////////////////////////////////////////////////////
@@ -148,17 +149,17 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
 	zval_ptr_dtor(&zMetadata);
 }
 
+
+void set_links_from_object_cb(zval* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data TSRMLS_DC)
+{
+    struct RIACK_CONTENT* content = (struct RIACK_CONTENT*)custom_ptr;
+//
+}
+
 void set_links_from_object(struct RIACK_CONTENT* content, zval* zlinksarr, struct RIACK_CLIENT* client TSRMLS_DC)
 {
-    HashTable *hindex;
-    HashPosition pointer;
-    ulong index;
     if (zlinksarr && Z_TYPE_P(zlinksarr) == IS_ARRAY) {
-        hindex = Z_ARRVAL_P(zlinksarr);
-        content->link_count = zend_hash_num_elements(hindex);
-        if (content->link_count > 0) {
-            //
-        }
+        foreach_in_hashtable(NULL, content, Z_ARRVAL_P(zlinksarr), &set_links_from_object_cb TSRMLS_CC);
     }
 }
 
