@@ -97,17 +97,22 @@ PHP_METHOD(RiakObject, __construct)
 
 zval *links_from_content(struct RIACK_CONTENT* content TSRMLS_DC)
 {
-    zval *zlinkarr;
+    struct RIACK_LINK *curr_link;
+    char *tag, *bucket, *key;
+    zval *zlinkarr, *zlink;
     size_t i;
-    RIACK_LINK *curr_link, *zlink;
+
     MAKE_STD_ZVAL(zlinkarr);
     array_init(zlinkarr);
     for (i=0; i<content->link_count; ++i) {
         curr_link = &content->links[i];
         if (curr_link) {
-            //zval* create_link_object(const char* tag, const char *bucket, const char* key TSRMLS_DC)
-            zlink = create_link_object(curr_link->tag, curr_link->bucket, curr_link->key TSRMLS_CC);
-
+            bucket = pestrndup(curr_link->bucket.value, curr_link->bucket.len, 0);
+            key = pestrndup(curr_link->key.value, curr_link->key.len, 0);
+            tag = pestrndup(curr_link->tag.value, curr_link->tag.len, 0);
+            zlink = create_link_object(tag, bucket, key TSRMLS_CC);
+            add_next_index_zval(zlinkarr, zlink);
+            pefree(bucket, 0); pefree(key, 0); pefree(tag, 0);
         }
     }
     return zlinkarr;
@@ -140,7 +145,7 @@ zval *metadata_from_content(struct RIACK_CONTENT* content TSRMLS_DC)
 // Set object properties from returned content
 void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC)
 {
-	zval* zMetadata;
+    zval* zmetadata, *zlinks;
 	zend_update_property_stringl(riak_object_ce, object, "data", sizeof("data")-1, 
 		(const char*)content->data, content->data_len TSRMLS_CC);
 	zend_update_property_stringl(riak_object_ce, object, "contentEncoding", sizeof("contentEncoding")-1, 
@@ -165,9 +170,13 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
 	} else {
 		zend_update_property_null(riak_object_ce, object, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1 TSRMLS_CC);
 	}
-	zMetadata = metadata_from_content(content TSRMLS_CC);
-	zend_update_property(riak_object_ce, object, "metadata", sizeof("metadata")-1, zMetadata TSRMLS_CC);
-	zval_ptr_dtor(&zMetadata);
+    zmetadata = metadata_from_content(content TSRMLS_CC);
+    zend_update_property(riak_object_ce, object, "metadata", sizeof("metadata")-1, zmetadata TSRMLS_CC);
+    zval_ptr_dtor(&zmetadata);
+
+    zlinks = links_from_content(content TSRMLS_CC);
+    zend_update_property(riak_object_ce, object, "links", sizeof("links")-1, zlinks TSRMLS_CC);
+    zval_ptr_dtor(&zlinks);
 }
 
 // Called once for each link in the links property of RiakObject
