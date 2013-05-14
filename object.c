@@ -97,7 +97,20 @@ PHP_METHOD(RiakObject, __construct)
 
 zval *links_from_content(struct RIACK_CONTENT* content TSRMLS_DC)
 {
-    return NULL;
+    zval *zlinkarr;
+    size_t i;
+    RIACK_LINK *curr_link, *zlink;
+    MAKE_STD_ZVAL(zlinkarr);
+    array_init(zlinkarr);
+    for (i=0; i<content->link_count; ++i) {
+        curr_link = &content->links[i];
+        if (curr_link) {
+            //zval* create_link_object(const char* tag, const char *bucket, const char* key TSRMLS_DC)
+            zlink = create_link_object(curr_link->tag, curr_link->bucket, curr_link->key TSRMLS_CC);
+
+        }
+    }
+    return zlinkarr;
 }
 
 // Get metadata array from returned content
