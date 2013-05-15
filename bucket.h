@@ -18,6 +18,7 @@
 #ifndef RIAK_BUCKET__H__
 #define RIAK_BUCKET__H__
 
+#include <php.h>
 #include <riack.h>
 
 extern zend_class_entry *riak_bucket_ce;

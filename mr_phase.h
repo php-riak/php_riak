@@ -15,11 +15,13 @@
    limitations under the License.
 */
 
-#ifndef RIAK_MAP_REDUCE__H__
-#define RIAK_MAP_REDUCE__H__
+#ifndef RIAK_MR_PHASE__H__
+#define RIAK_MR_PHASE__H__
 
 #include <php.h>
 
-extern zend_class_entry *riak_mapreduce_ce;
+extern zend_class_entry *riak_mrphase_ce;
+
+PHP_METHOD(RiakMapreducePhase, __construct);
 
 #endif
