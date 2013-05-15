@@ -15,15 +15,21 @@
    limitations under the License.
 */
 
-#ifndef RIAK_MR_PHASE__H__
-#define RIAK_MR_PHASE__H__
+#ifndef RIAK_MR_FUNCTION__H__
+#define RIAK_MR_FUNCTION__H__
 
 #include <php.h>
 
-extern zend_class_entry *riak_mrphase_ce;
+extern zend_class_entry *riak_mrfunction_ce;
 
-void riak_mrphase_init(TSRMLS_D);
+void riak_mrfunctions_init(TSRMLS_D);
 
-PHP_METHOD(RiakMapreducePhase, __construct);
+zval* create_named_js_function(zend_bool named, const char* source TSRMLS_DC);
+
+PHP_METHOD(RiakJavascriptFunction, __construct);
+PHP_METHOD(RiakJavascriptFunction, named);
+PHP_METHOD(RiakJavascriptFunction, anon);
+
+PHP_METHOD(RiakJavascriptFunction, getLanguage);
 
 #endif

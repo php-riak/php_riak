@@ -28,6 +28,8 @@
 #include "stats.h"
 #include "link.h"
 #include "riak_session.h"
+#include "mr_phase.h"
+#include "mr_functions.h"
 
 #ifdef PHP_SESSION
   extern ps_module ps_mod_riak;
@@ -81,97 +83,95 @@ PHP_INI_END()
 // Module constructor
 PHP_MINIT_FUNCTION(riak) 
 {
-  REGISTER_INI_ENTRIES();
-  riack_init();
-  // TODO Store persistant connections here
-  le_riak_connection_list = zend_register_list_destructors_ex(NULL, le_riak_connections_pefree, "Persistent clients", module_number);
-  riak_client_init(TSRMLS_C);
-  riak_object_init(TSRMLS_C);
-  riak_link_init(TSRMLS_C);
-  riak_bucket_init(TSRMLS_C);
-  riak_bucket_props_init(TSRMLS_C);
-  riak_exceptions_init(TSRMLS_C);
-  riak_stats_init(TSRMLS_C);
+    REGISTER_INI_ENTRIES();
+    riack_init();
+    le_riak_connection_list = zend_register_list_destructors_ex(NULL, le_riak_connections_pefree, "Persistent clients", module_number);
+    riak_client_init(TSRMLS_C);
+    riak_object_init(TSRMLS_C);
+    riak_link_init(TSRMLS_C);
+    riak_bucket_init(TSRMLS_C);
+    riak_bucket_props_init(TSRMLS_C);
+
+    riak_mrphase_init(TSRMLS_C);
+    riak_mrfunctions_init(TSRMLS_C);
+
+    riak_exceptions_init(TSRMLS_C);
+    riak_stats_init(TSRMLS_C);
 
 #ifdef PHP_SESSION
-  php_session_register_module(&ps_mod_riak);
+    php_session_register_module(&ps_mod_riak);
 #endif
-
-  return SUCCESS;
+    return SUCCESS;
 }
 
 // Module destructor
 PHP_MSHUTDOWN_FUNCTION(riak)
 {
-  riack_cleanup();
-  UNREGISTER_INI_ENTRIES();
-  return SUCCESS;
+    riack_cleanup();
+    UNREGISTER_INI_ENTRIES();
+    return SUCCESS;
 }
 
 PHP_GINIT_FUNCTION(riak)
 {
-  riak_globals->persistent_connections = 20;
-  riak_globals->persistent_timeout = 1000;
-  riak_globals->open_connections = 0;
-  riak_globals->open_connections_persistent = 0;
-  riak_globals->reconnects = 0;
+    riak_globals->persistent_connections = 20;
+    riak_globals->persistent_timeout = 1000;
+    riak_globals->open_connections = 0;
+    riak_globals->open_connections_persistent = 0;
+    riak_globals->reconnects = 0;
 #ifdef ZTS
-  riak_globals->pool_mutex = tsrm_mutex_alloc();
+    riak_globals->pool_mutex = tsrm_mutex_alloc();
 #endif
 }
 
 PHP_GSHUTDOWN_FUNCTION(riak) 
 {
 #ifdef ZTS
-  tsrm_mutex_free(riak_globals->pool_mutex);
+    tsrm_mutex_free(riak_globals->pool_mutex);
 #endif
 }
 
 
 void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
 {
-  if (errorStatus == RIACK_ERROR_COMMUNICATION) {
-    zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);
-  } else if (errorStatus == RIACK_ERROR_RESPONSE) {
-    if (client->last_error) {
-      zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC); 
-    } else {
-      zend_throw_exception(riak_response_exception_ce, "Unexpected response from riak", 1002 TSRMLS_CC);
+    if (errorStatus == RIACK_ERROR_COMMUNICATION) {
+        zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);
+    } else if (errorStatus == RIACK_ERROR_RESPONSE) {
+        if (client->last_error) {
+            zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC);
+        } else {
+            zend_throw_exception(riak_response_exception_ce, "Unexpected response from riak", 1002 TSRMLS_CC);
+        }
     }
-  }
 }
 
 
 //////////////////////////////////////////////////////////////
 // Riack allocator
 
-void *riack_php_alloc(void *allocator_data, size_t size)
+void *riack_php_alloc(void* ptr, size_t size)
 {
-  (void) allocator_data;
-  if (size == 0) {
-    return 0;
-  }
-  return pemalloc(size, 0);
+    if (size == 0) {
+        return 0;
+    }
+    return pemalloc(size, 0);
 }
 
-void riack_php_free (void *allocator_data, void *data)
+void riack_php_free (void *ptr, void *data)
 {
-  (void) allocator_data;
-  pefree(data, 0);
+    pefree(data, 0);
 }
 
-void *riack_php_persistent_alloc(void *allocator_data, size_t size)
+void *riack_php_persistent_alloc(void *ptr, size_t size)
 {
-  (void) allocator_data;
-  if (size == 0) {
-    return 0;
-  }
-  return pemalloc(size, 1);
+    if (size == 0) {
+        return 0;
+    }
+    return pemalloc(size, 1);
 }
 
-void riack_php_persistent_free (void *allocator_data, void *data)
+void riack_php_persistent_free (void *ptr, void *data)
 {
-  (void) allocator_data;
-  pefree(data, 1);
+    pefree(data, 1);
 }
 
