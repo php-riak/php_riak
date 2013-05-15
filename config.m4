@@ -46,6 +46,7 @@ if test "$PHP_RIAK" != "no"; then
     link.c \
     stats.c \
     riak_session.c \
+    mapreduce.c \
     ht_utils.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X
