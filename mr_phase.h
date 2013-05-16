@@ -20,6 +20,10 @@
 
 #include <php.h>
 
+#define PHASE_TYPE_MAP    1
+#define PHASE_TYPE_REDUCE 2
+#define PHASE_TYPE_LINK   3
+
 extern zend_class_entry *riak_mrphase_ce;
 
 void riak_mrphase_init(TSRMLS_D);

@@ -38,7 +38,7 @@ void riak_mapreduce_init(TSRMLS_D)
 {
     zend_class_entry ce;
 
-    INIT_CLASS_ENTRY(ce, "RiakMapreduce", NULL);
+    INIT_CLASS_ENTRY(ce, "RiakMapreduce", riak_mrphase_methods);
     riak_mapreduce_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_property_null(riak_mapreduce_ce, "phases", sizeof("phases")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
@@ -54,16 +54,17 @@ PHP_METHOD(RiakMapreduce, __construct)
     zend_update_property(riak_mapreduce_ce, getThis(), "client", sizeof("client")-1, zclient TSRMLS_CC);
     MAKE_STD_ZVAL(zphases);
     array_init(zphases);
-    add_property_zval_ex(getThis(), "phases", sizeof("phases")-1, zphases TSRMLS_CC);
+    zend_update_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, zphases TSRMLS_CC);
     zval_ptr_dtor(&zphases);
 }
 
 PHP_METHOD(RiakMapreduce, addPhase)
 {
-    zval *zphase;
+    zval *zphase, *zphasearr;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zphase) == FAILURE) {
         return;
     }
-    // TODO
+    zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, 1 TSRMLS_CC);
+    add_next_index_zval(zphasearr, zphase);
     RETURN_ZVAL(getThis(), 0, 0);
 }

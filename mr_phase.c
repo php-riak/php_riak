@@ -40,6 +40,10 @@ void riak_mrphase_init(TSRMLS_D)
     INIT_CLASS_ENTRY(ce, "RiakMapreducePhase", riak_mrphase_methods);
     riak_mrphase_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
+    zend_declare_class_constant_long(riak_mrphase_ce, "map", sizeof("map")-1, PHASE_TYPE_MAP TSRMLS_CC);
+    zend_declare_class_constant_long(riak_mrphase_ce, "reduce", sizeof("reduce")-1, PHASE_TYPE_REDUCE TSRMLS_CC);
+    zend_declare_class_constant_long(riak_mrphase_ce, "link", sizeof("link")-1, PHASE_TYPE_LINK TSRMLS_CC);
+
     zend_declare_property_null(riak_mrphase_ce, "type", sizeof("type")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(riak_mrphase_ce, "function", sizeof("functions")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_bool(riak_mrphase_ce, "keep", sizeof("keep")-1, 0, ZEND_ACC_PUBLIC TSRMLS_CC);
@@ -50,17 +54,16 @@ void riak_mrphase_init(TSRMLS_D)
 
 PHP_METHOD(RiakMapreducePhase, __construct)
 {
-    char *type;
-    int typelen;
+    long type;
     zval *zfunction, *zargs;
     zend_bool keep;
     keep = 0;
-    zfunction = zargs = NULL;
-    type = NULL;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "so|ba", &type, &typelen, &zfunction, &keep, &zargs) == FAILURE) {
+    zargs = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lo|ba", &type, &zfunction, &keep, &zargs) == FAILURE) {
         return;
     }
-    zend_update_property_stringl(riak_mrphase_ce, getThis(), "type", sizeof("type")-1, type, typelen TSRMLS_CC);
+    // Validate type is valid
+    zend_update_property_long(riak_mrphase_ce, getThis(), "type", sizeof("type")-1, type TSRMLS_CC);
     zend_update_property(riak_mrphase_ce, getThis(), "function", sizeof("function")-1, zfunction TSRMLS_CC);
     zend_update_property_bool(riak_mrphase_ce, getThis(), "keep", sizeof("keep")-1, keep TSRMLS_CC);
     if (zargs) {
