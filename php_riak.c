@@ -28,6 +28,7 @@
 #include "stats.h"
 #include "link.h"
 #include "riak_session.h"
+#include "mapreduce.h"
 #include "mr_phase.h"
 #include "mr_functions.h"
 
@@ -92,6 +93,7 @@ PHP_MINIT_FUNCTION(riak)
     riak_bucket_init(TSRMLS_C);
     riak_bucket_props_init(TSRMLS_C);
 
+    riak_mapreduce_init(TSRMLS_C);
     riak_mrphase_init(TSRMLS_C);
     riak_mrfunctions_init(TSRMLS_C);
 

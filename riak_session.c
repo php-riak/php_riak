@@ -75,7 +75,6 @@ PS_OPEN_FUNC(riak)
    }
 }
 
-// void **mod_data TSRMLS_DC
 PS_CLOSE_FUNC(riak) 
 {
    PS_RIAK_DATA;
@@ -90,7 +89,6 @@ PS_CLOSE_FUNC(riak)
 	return SUCCESS;
 }
 
-// void **mod_data, const char *key, char **val, int *vallen TSRMLS_DC
 PS_READ_FUNC(riak) 
 {
    zval *zobject, *zkey, *zdata;
@@ -102,9 +100,7 @@ PS_READ_FUNC(riak)
    ZVAL_STRING(zkey, key, 1);
 
    MAKE_STD_ZVAL(zobject);
-   // classname, name, retval, thisptr, param1
    CALL_METHOD1(RiakBucket, getObject, zobject, data->zbucket, zkey);
-
    
    if (!EG(exception)) {
       zdata = zend_read_property(riak_object_ce, zobject, "data", sizeof("data")-1, 1 TSRMLS_CC);
