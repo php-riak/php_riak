@@ -116,25 +116,30 @@ PHP_METHOD(RiakMrFunction, __construct)
 PHP_METHOD(RiakMrFunction, toArray)
 {
     zend_bool named;
-    zval* zarray, *znamed, *zsource, *zlang;
-
-    CALL_METHOD(RiakMrFunction, getLanguage, zlang, getThis());
+    zval *zarray, *znamed, *zsource, zlang, zfuncname;
 
     MAKE_STD_ZVAL(zarray);
     array_init(zarray);
-    add_assoc_stringl_ex(zarray, "language", sizeof("language")-1, Z_STRVAL_P(zlang), Z_STRLEN_P(zlang), 1);
-    zval_ptr_dtor(zlang);
 
-    znamed = zend_read_property(riak_mrfunction_js_ce, getThis(), "named", strlen("named"), 1 TSRMLS_CC);
+    ZVAL_STRING(&zfuncname, "getLanguage", 0);
+    call_user_function(NULL, &getThis(), &zfuncname, &zlang, 0, NULL TSRMLS_CC);
+
+    add_assoc_stringl_ex(zarray, "language", sizeof("language"), Z_STRVAL(zlang), Z_STRLEN(zlang), 1);
+    zval_dtor(&zlang);
+
+    znamed = zend_read_property(riak_mrfunction_ce, getThis(), "named", strlen("named"), 1 TSRMLS_CC);
     named = Z_BVAL_P(znamed);
+    zval_ptr_dtor(&znamed);
 
-    zsource = zend_read_property(riak_mrfunction_js_ce, getThis(), "source", strlen("source"), 1 TSRMLS_CC);
+    zsource = zend_read_property(riak_mrfunction_ce, getThis(), "source", strlen("source"), 1 TSRMLS_CC);
     if (named) {
-        add_assoc_stringl_ex(zarray, "name", sizeof("name")-1, Z_STRVAL_P(zsource), Z_STRLEN_P(zsource), 1);
+        add_assoc_stringl_ex(zarray, "name", sizeof("name"), Z_STRVAL_P(zsource), Z_STRLEN_P(zsource), 1);
     } else  {
-        add_assoc_stringl_ex(zarray, "souce", sizeof("source")-1, Z_STRVAL_P(zsource), Z_STRLEN_P(zsource), 1);
+        add_assoc_stringl_ex(zarray, "source", sizeof("source"), Z_STRVAL_P(zsource), Z_STRLEN_P(zsource), 1);
     }
-    RETURN_ZVAL(zarray, 0, 0);
+    zval_ptr_dtor(&zsource);
+
+    RETURN_ZVAL(zarray, 0, 1);
 }
 
 ////////////////////////////////////////
@@ -149,7 +154,7 @@ PHP_METHOD(RiakMrJavascriptFunction, named)
         return;
     }
     szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_js_ce, 0, szsource TSRMLS_CC);
+    zfunc = create_named_mr_function(riak_mrfunction_js_ce, 1, szsource TSRMLS_CC);
     pefree(szsource, 0);
     RETURN_ZVAL(zfunc, 0, 1);
 }
@@ -163,8 +168,9 @@ PHP_METHOD(RiakMrJavascriptFunction, anon)
         return;
     }
     szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_js_ce, 1, szsource TSRMLS_CC);
+    zfunc = create_named_mr_function(riak_mrfunction_js_ce, 0, szsource TSRMLS_CC);
     pefree(szsource, 0);
+
     RETURN_ZVAL(zfunc, 0, 1);
 }
 
@@ -185,7 +191,7 @@ PHP_METHOD(RiakMrErlangFunction, named)
         return;
     }
     szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_erl_ce, 0, szsource TSRMLS_CC);
+    zfunc = create_named_mr_function(riak_mrfunction_erl_ce, 1, szsource TSRMLS_CC);
     pefree(szsource, 0);
     RETURN_ZVAL(zfunc, 0, 1);
 }
@@ -199,7 +205,7 @@ PHP_METHOD(RiakMrErlangFunction, anon)
         return;
     }
     szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_erl_ce, 1, szsource TSRMLS_CC);
+    zfunc = create_named_mr_function(riak_mrfunction_erl_ce, 0, szsource TSRMLS_CC);
     pefree(szsource, 0);
     RETURN_ZVAL(zfunc, 0, 1);
 }
