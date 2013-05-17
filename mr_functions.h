@@ -24,12 +24,17 @@ extern zend_class_entry *riak_mrfunction_ce;
 
 void riak_mrfunctions_init(TSRMLS_D);
 
-zval* create_named_js_function(zend_bool named, const char* source TSRMLS_DC);
+zval* create_named_mr_function(zend_class_entry *classentry, zend_bool named, const char* source TSRMLS_DC);
 
-PHP_METHOD(RiakJavascriptFunction, __construct);
-PHP_METHOD(RiakJavascriptFunction, named);
-PHP_METHOD(RiakJavascriptFunction, anon);
+PHP_METHOD(RiakMrFunction, __construct);
+PHP_METHOD(RiakMrFunction, toArray);
 
-PHP_METHOD(RiakJavascriptFunction, getLanguage);
+PHP_METHOD(RiakMrJavascriptFunction, named);
+PHP_METHOD(RiakMrJavascriptFunction, anon);
+PHP_METHOD(RiakMrJavascriptFunction, getLanguage);
+
+PHP_METHOD(RiakMrErlangFunction, named);
+PHP_METHOD(RiakMrErlangFunction, anon);
+PHP_METHOD(RiakMrErlangFunction, getLanguage);
 
 #endif

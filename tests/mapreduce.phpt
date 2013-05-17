@@ -5,7 +5,7 @@ Test mapreduce
 include_once "connect.inc";
 try {
     $client = new RiakClient($host, $port);
-    $jsanon = RiakJavascriptFunction::anon("anon_source");
+    $jsanon = RiakMrJavascriptFunction::anon("anon_source");
     $mr = new RiakMapreduce($client);
     $mr->addPhase(new RiakMapreducePhase(RiakMapreducePhase::reduce, $jsanon));
     echo "success!";
