@@ -60,7 +60,7 @@ PS_OPEN_FUNC(riak)
    zbucket = create_bucket_object(zclient, stripped_path TSRMLS_CC);
    php_url_free(purl);
    efree(stripped_path);
-	if (EG(exception)) {
+   if (EG(exception)) {
       zval_ptr_dtor(&zbucket);
       zval_ptr_dtor(&zclient);
       zend_clear_exception(TSRMLS_C);
@@ -91,16 +91,15 @@ PS_CLOSE_FUNC(riak)
 
 PS_READ_FUNC(riak) 
 {
-   zval *zobject, *zkey, *zdata;
+   zval *zobject, zkey, *zdata;
    PS_RIAK_DATA;
    
    *vallen = 0;
 
-   MAKE_STD_ZVAL(zkey);
-   ZVAL_STRING(zkey, key, 1);
-
+   ZVAL_STRING(&zkey, key, 0);
    MAKE_STD_ZVAL(zobject);
-   CALL_METHOD1(RiakBucket, getObject, zobject, data->zbucket, zkey);
+   object_init(zobject);
+   CALL_METHOD1(RiakBucket, getObject, zobject, data->zbucket, &zkey);
    
    if (!EG(exception)) {
       zdata = zend_read_property(riak_object_ce, zobject, "data", sizeof("data")-1, 1 TSRMLS_CC);
@@ -115,7 +114,6 @@ PS_READ_FUNC(riak)
    if (*vallen == 0) {
       *val = STR_EMPTY_ALLOC();
    }
-   zval_ptr_dtor(&zkey);
    zval_ptr_dtor(&zobject);
    
    return SUCCESS;
@@ -134,11 +132,11 @@ PS_WRITE_FUNC(riak)
    zend_update_property_stringl(riak_object_ce, zobject, "data", sizeof("data")-1, val, vallen TSRMLS_CC);
    CALL_METHOD1(RiakBucket, putObject, zobject, data->zbucket, zobject);
    zval_ptr_dtor(&zobject);
-	if (EG(exception)) {
-      zend_clear_exception(TSRMLS_C);
-     return FAILURE;
+   if (EG(exception)) {
+       zend_clear_exception(TSRMLS_C);
+       return FAILURE;
    } else {
-      return SUCCESS;
+       return SUCCESS;
    }
 }
 

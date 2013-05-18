@@ -80,22 +80,17 @@ void riak_mrfunctions_init(TSRMLS_D)
     riak_mrfunction_erl_ce = zend_register_internal_class_ex(&erlce, riak_mrfunction_ce, NULL TSRMLS_CC);
 }
 
-zval* create_named_mr_function(zend_class_entry *classentry, zend_bool named, const char* source TSRMLS_DC)
+void create_named_mr_function(zend_class_entry *classentry, zval* result,
+                               zend_bool named, const char* source, int sourcelen TSRMLS_DC)
 {
-    zval *znamed, *zsource, *zfunc;
-    MAKE_STD_ZVAL(zfunc);
-    MAKE_STD_ZVAL(znamed);
+    zval znamed, *zsource;
+
     MAKE_STD_ZVAL(zsource);
-
-    ZVAL_STRING(zsource, source, 1);
-    ZVAL_BOOL(znamed, named);
-
-    object_init_ex(zfunc, classentry);
-    CALL_METHOD2(RiakMrFunction, __construct, zfunc, zfunc, znamed, zsource);
-
+    ZVAL_STRINGL(zsource, source, sourcelen, 1);
+    ZVAL_BOOL(&znamed, named);
+    object_init_ex(result, classentry);
+    CALL_METHOD2(RiakMrFunction, __construct, result, result, &znamed, zsource);
     zval_ptr_dtor(&zsource);
-    zval_ptr_dtor(&znamed);
-    return zfunc;
 }
 
 /////////////////////////////////////////////////////////////
@@ -108,24 +103,25 @@ PHP_METHOD(RiakMrFunction, __construct)
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "bs", &named, &source, &sourcelen) == FAILURE) {
         return;
     }
-    zend_update_property_bool(riak_mrfunction_js_ce, getThis(), "named", sizeof("named")-1, named TSRMLS_CC);
-    zend_update_property_stringl(riak_mrfunction_js_ce, getThis(), "source", sizeof("source")-1, source, sourcelen TSRMLS_CC);
+    zend_update_property_bool(riak_mrfunction_ce, getThis(), "named", sizeof("named")-1, named TSRMLS_CC);
+    zend_update_property_stringl(riak_mrfunction_ce, getThis(), "source", sizeof("source")-1, source, sourcelen TSRMLS_CC);
 }
 
 
 PHP_METHOD(RiakMrFunction, toArray)
 {
     zend_bool named;
-    zval *zarray, *znamed, *zsource, zlang, zfuncname;
+    zval *zarray, *znamed, *zsource, *zlang, zfuncname;
 
+    MAKE_STD_ZVAL(zlang);
     MAKE_STD_ZVAL(zarray);
     array_init(zarray);
 
     ZVAL_STRING(&zfuncname, "getLanguage", 0);
-    call_user_function(NULL, &getThis(), &zfuncname, &zlang, 0, NULL TSRMLS_CC);
+    call_user_function(NULL, &getThis(), &zfuncname, zlang, 0, NULL TSRMLS_CC);
 
-    add_assoc_stringl_ex(zarray, "language", sizeof("language"), Z_STRVAL(zlang), Z_STRLEN(zlang), 1);
-    zval_dtor(&zlang);
+    add_assoc_stringl_ex(zarray, "language", sizeof("language"), Z_STRVAL_P(zlang), Z_STRLEN_P(zlang), 1);
+    zval_ptr_dtor(&zlang);
 
     znamed = zend_read_property(riak_mrfunction_ce, getThis(), "named", strlen("named"), 1 TSRMLS_CC);
     named = Z_BVAL_P(znamed);
@@ -147,31 +143,20 @@ PHP_METHOD(RiakMrFunction, toArray)
 
 PHP_METHOD(RiakMrJavascriptFunction, named)
 {
-    char* source, *szsource;
-    int sourcelen;
-    zval* zfunc;
+    char* source; int sourcelen;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
         return;
     }
-    szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_js_ce, 1, szsource TSRMLS_CC);
-    pefree(szsource, 0);
-    RETURN_ZVAL(zfunc, 0, 1);
+    create_named_mr_function(riak_mrfunction_js_ce, return_value, 1, source, sourcelen TSRMLS_CC);
 }
 
 PHP_METHOD(RiakMrJavascriptFunction, anon)
 {
-    char* source, *szsource;
-    int sourcelen;
-    zval* zfunc;
+    char* source; int sourcelen;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
         return;
     }
-    szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_js_ce, 0, szsource TSRMLS_CC);
-    pefree(szsource, 0);
-
-    RETURN_ZVAL(zfunc, 0, 1);
+    create_named_mr_function(riak_mrfunction_js_ce, return_value, 0, source, sourcelen TSRMLS_CC);
 }
 
 PHP_METHOD(RiakMrJavascriptFunction, getLanguage)
@@ -184,30 +169,20 @@ PHP_METHOD(RiakMrJavascriptFunction, getLanguage)
 
 PHP_METHOD(RiakMrErlangFunction, named)
 {
-    char* source, *szsource;
-    int sourcelen;
-    zval* zfunc;
+    char* source; int sourcelen;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
         return;
     }
-    szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_erl_ce, 1, szsource TSRMLS_CC);
-    pefree(szsource, 0);
-    RETURN_ZVAL(zfunc, 0, 1);
+    create_named_mr_function(riak_mrfunction_erl_ce, return_value, 1, source, sourcelen TSRMLS_CC);
 }
 
 PHP_METHOD(RiakMrErlangFunction, anon)
 {
-    char* source, *szsource;
-    int sourcelen;
-    zval* zfunc;
+    char* source; int sourcelen;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
         return;
     }
-    szsource = pestrndup(source, sourcelen, 0);
-    zfunc = create_named_mr_function(riak_mrfunction_erl_ce, 0, szsource TSRMLS_CC);
-    pefree(szsource, 0);
-    RETURN_ZVAL(zfunc, 0, 1);
+    create_named_mr_function(riak_mrfunction_erl_ce, return_value, 0, source, sourcelen TSRMLS_CC);
 }
 
 PHP_METHOD(RiakMrErlangFunction, getLanguage)

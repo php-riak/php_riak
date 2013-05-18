@@ -24,7 +24,8 @@ extern zend_class_entry *riak_mrfunction_ce;
 
 void riak_mrfunctions_init(TSRMLS_D);
 
-zval* create_named_mr_function(zend_class_entry *classentry, zend_bool named, const char* source TSRMLS_DC);
+void create_named_mr_function(zend_class_entry *classentry, zval* result,
+                               zend_bool named, const char* source, int sourcelen TSRMLS_DC);
 
 PHP_METHOD(RiakMrFunction, __construct);
 PHP_METHOD(RiakMrFunction, toArray);
