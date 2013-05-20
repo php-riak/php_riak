@@ -29,5 +29,6 @@ extern zend_class_entry *riak_mrphase_ce;
 void riak_mrphase_init(TSRMLS_D);
 
 PHP_METHOD(RiakMapreducePhase, __construct);
+PHP_METHOD(RiakMapreducePhase, toArray);
 
 #endif
