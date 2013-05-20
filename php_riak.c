@@ -78,7 +78,7 @@ ZEND_GET_MODULE(riak)
 
 PHP_INI_BEGIN()
   STD_PHP_INI_ENTRY("riak.persistent.connections", "20", PHP_INI_ALL, OnUpdateLong, persistent_connections, zend_riak_globals, riak_globals)
-  STD_PHP_INI_ENTRY("riak.persistent.timeout", "1000", PHP_INI_ALL,   OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.persistent.timeout", "2000", PHP_INI_ALL,   OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
 PHP_INI_END()
 
 // Module constructor
@@ -117,7 +117,7 @@ PHP_MSHUTDOWN_FUNCTION(riak)
 PHP_GINIT_FUNCTION(riak)
 {
     riak_globals->persistent_connections = 20;
-    riak_globals->persistent_timeout = 1000;
+    riak_globals->persistent_timeout = 2000;
     riak_globals->open_connections = 0;
     riak_globals->open_connections_persistent = 0;
     riak_globals->reconnects = 0;
@@ -161,7 +161,9 @@ void *riack_php_alloc(void* ptr, size_t size)
 
 void riack_php_free (void *ptr, void *data)
 {
-    pefree(data, 0);
+    if (data) {
+        pefree(data, 0);
+    }
 }
 
 void *riack_php_persistent_alloc(void *ptr, size_t size)
@@ -174,6 +176,8 @@ void *riack_php_persistent_alloc(void *ptr, size_t size)
 
 void riack_php_persistent_free (void *ptr, void *data)
 {
-    pefree(data, 1);
+    if (data) {
+        pefree(data, 1);
+    }
 }
 

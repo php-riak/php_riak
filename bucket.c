@@ -266,7 +266,7 @@ PHP_METHOD(RiakBucket, getObject)
 	char *key;
 	int i, keyLen, riackResult;
 	size_t contentCount;
-	zval *zBucket, *zKey, *zVclock, *zExc, *zObjArr, *zObj;
+    zval *zKey, *zVclock, *zExc, *zObjArr, *zObj;
 	struct RIACK_GET_PROPERTIES props;
 	struct RIACK_GET_OBJECT getResult;
 	RIACK_STRING rsBucket, rsKey;
@@ -315,7 +315,7 @@ PHP_METHOD(RiakBucket, getObject)
 			RETVAL_ZVAL(zObj, 0, 1);
 		} else {
 			// Throw not found exception
-			zend_throw_exception(riak_not_found_exception_ce, "Not Found", 2000 TSRMLS_CC);
+            zend_throw_exception(riak_not_found_exception_ce, "Not Found", 2000 TSRMLS_CC);
 		}
 		zval_ptr_dtor(&zVclock);
 		riack_free_get_object(connection->client, &getResult);

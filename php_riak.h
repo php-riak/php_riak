@@ -37,7 +37,8 @@
 #define POP_EO_PARAM()
  
 #define CALL_METHOD_BASE(classname, name) zim_##classname##_##name
- 
+
+
 #define CALL_METHOD_HELPER(classname, name, retval, thisptr, num, param) \
   PUSH_PARAM(param); PUSH_PARAM((void*)num);                            \
   PUSH_EO_PARAM();                                                      \

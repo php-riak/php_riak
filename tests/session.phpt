@@ -1,13 +1,14 @@
 --TEST--
 Riak session handler test
+--INI--
+riak.persistent.timeout=10000
+inisession.use_cookies=0
+session.cache_limiter=
+session.serialize_handler=php
+session.save_handler=riak
 --FILE--
 <?php
 include_once "connect.inc";
-
-ini_set('inisession.use_cookies','0');
-ini_set('session.cache_limiter','');
-ini_set('session.serialize_handler','php');
-ini_set('session.save_handler','riak');
 ini_set('session.save_path',"proto://$host:$port/sessions?n=3");
 
 session_start();

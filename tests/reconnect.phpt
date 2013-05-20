@@ -5,7 +5,7 @@ Test that client auto reconnect if timeout passed
 include_once "connect.inc";
 $c = new RiakClient($host, $port);
 $c->ping();
-sleep(2);
+sleep(3);
 $c->ping();
 echo RiakStats::getNumReconnects().PHP_EOL;
 ?>

@@ -55,17 +55,17 @@ void riak_object_init(TSRMLS_D)
 
 zval* create_object_object(const char* key TSRMLS_DC)
 {
-	zval *zobject, *zkey;
-	MAKE_STD_ZVAL(zobject);
-	MAKE_STD_ZVAL(zkey);
+    zval *zobject, *zkey;
+    MAKE_STD_ZVAL(zobject);
+    MAKE_STD_ZVAL(zkey);
 
-	ZVAL_STRING(zkey, key, 1);
+    ZVAL_STRING(zkey, key, 1);
 
 	object_init_ex(zobject, riak_object_ce);
-	CALL_METHOD1(RiakObject, __construct, zobject, zobject, zkey);
+    CALL_METHOD1(RiakObject, __construct, zobject, zobject, zkey);
 
-	zval_ptr_dtor(&zkey);
-	return zobject;
+    zval_ptr_dtor(&zkey);
+    return zobject;
 }
 
 /////////////////////////////////////////////////////////////
