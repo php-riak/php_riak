@@ -1,5 +1,5 @@
 --TEST--
-Test map reduce phase object
+Test map reduce function objects
 --FILE--
 <?php
 $js1 = new RiakMrJavascriptFunction(true, "source_name");

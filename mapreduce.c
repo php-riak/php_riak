@@ -65,6 +65,7 @@ PHP_METHOD(RiakMapreduce, addPhase)
         return;
     }
     zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, 1 TSRMLS_CC);
+    zval_add_ref(&zphase);
     add_next_index_zval(zphasearr, zphase);
     RETURN_ZVAL(getThis(), 0, 0);
 }

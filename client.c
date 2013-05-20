@@ -84,20 +84,14 @@ void free_client_data(void *object TSRMLS_DC)
 
 zval* create_client_object(char* host, long port TSRMLS_DC)
 {
-	zval *zclient, *zhost, *zport;
-	
-	MAKE_STD_ZVAL(zhost);
-	ZVAL_STRING(zhost, host, 1);
+    zval *zclient, zhost, zport;
 
-	MAKE_STD_ZVAL(zport);
-	ZVAL_LONG(zport, port);
+    ZVAL_STRING(&zhost, host, 0);
+    ZVAL_LONG(&zport, port);
 
 	MAKE_STD_ZVAL(zclient);
 	object_init_ex(zclient, riak_client_ce);
-	CALL_METHOD2(RiakClient, __construct, zclient, zclient, zhost, zport);
-
-	zval_ptr_dtor(&zhost);
-	zval_ptr_dtor(&zport);
+    CALL_METHOD2(RiakClient, __construct, zclient, zclient, &zhost, &zport);
 
 	return zclient;
 }

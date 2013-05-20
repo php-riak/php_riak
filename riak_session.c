@@ -45,6 +45,9 @@ PS_OPEN_FUNC(riak)
    char* stripped_path;
 
    purl = php_url_parse(save_path);
+   if (!purl) {
+       return FAILURE;
+   }
    
    if (purl->query) {
       // TODO Parse n, dw etc.
@@ -54,6 +57,7 @@ PS_OPEN_FUNC(riak)
    if (EG(exception)) {
       php_url_free(purl);
       zval_ptr_dtor(&zclient);
+      PS_SET_MOD_DATA(NULL);
       return FAILURE;
    }
    stripped_path = php_trim(purl->path, strlen(purl->path), "/", 1, NULL, 3 TSRMLS_CC);
@@ -64,6 +68,7 @@ PS_OPEN_FUNC(riak)
       zval_ptr_dtor(&zbucket);
       zval_ptr_dtor(&zclient);
       zend_clear_exception(TSRMLS_C);
+      PS_SET_MOD_DATA(NULL);
       return FAILURE;
    } else {
       session_data = ecalloc(1, sizeof(riak_session_data));
@@ -91,7 +96,7 @@ PS_CLOSE_FUNC(riak)
 
 PS_READ_FUNC(riak) 
 {
-   zval *zobject, zkey, *zdata;
+   zval *zobject, zkey, *zdata, *zex;
    PS_RIAK_DATA;
    
    *vallen = 0;
@@ -101,7 +106,8 @@ PS_READ_FUNC(riak)
    object_init(zobject);
    CALL_METHOD1(RiakBucket, getObject, zobject, data->zbucket, &zkey);
    
-   if (!EG(exception)) {
+   zex = EG(exception);
+   if (!zex) {
       zdata = zend_read_property(riak_object_ce, zobject, "data", sizeof("data")-1, 1 TSRMLS_CC);
       if (zdata->type == IS_STRING && Z_STRLEN_P(zdata) > 0) {
          *vallen = Z_STRLEN_P(zdata);
@@ -109,7 +115,7 @@ PS_READ_FUNC(riak)
          memcpy(*val, Z_STRVAL_P(zdata), Z_STRLEN_P(zdata));
       }
    } else {
-      zend_clear_exception(TSRMLS_C);
+       zend_clear_exception(TSRMLS_C);
    }
    if (*vallen == 0) {
       *val = STR_EMPTY_ALLOC();
@@ -127,6 +133,7 @@ PS_WRITE_FUNC(riak)
    zobject = create_object_object(key TSRMLS_CC);
    if (EG(exception)) {
       zend_clear_exception(TSRMLS_C);
+      zval_ptr_dtor(&zobject);
       return FAILURE;
    }
    zend_update_property_stringl(riak_object_ce, zobject, "data", sizeof("data")-1, val, vallen TSRMLS_CC);
@@ -148,7 +155,7 @@ PS_DESTROY_FUNC(riak)
 	CALL_METHOD1(RiakBucket, deleteObject, zobject, data->zbucket, zobject);
 	zval_ptr_dtor(&zobject);
 	if (EG(exception)) {
-		zend_clear_exception(TSRMLS_C);
+        zend_clear_exception(TSRMLS_C);
 		return FAILURE;
 	}
 	return SUCCESS;

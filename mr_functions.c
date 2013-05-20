@@ -125,7 +125,6 @@ PHP_METHOD(RiakMrFunction, toArray)
 
     znamed = zend_read_property(riak_mrfunction_ce, getThis(), "named", strlen("named"), 1 TSRMLS_CC);
     named = Z_BVAL_P(znamed);
-    zval_ptr_dtor(&znamed);
 
     zsource = zend_read_property(riak_mrfunction_ce, getThis(), "source", strlen("source"), 1 TSRMLS_CC);
     if (named) {
@@ -133,7 +132,6 @@ PHP_METHOD(RiakMrFunction, toArray)
     } else  {
         add_assoc_stringl_ex(zarray, "source", sizeof("source"), Z_STRVAL_P(zsource), Z_STRLEN_P(zsource), 1);
     }
-    zval_ptr_dtor(&zsource);
 
     RETURN_ZVAL(zarray, 0, 1);
 }
