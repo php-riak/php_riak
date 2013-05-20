@@ -1,5 +1,8 @@
 --TEST--
 Test riak stats class
+--INI--
+riak.persistent.timeout=10000
+riak.persistent.connections=20
 --FILE--
 <?php
 include_once "connect.inc";

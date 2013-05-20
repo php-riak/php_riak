@@ -44,8 +44,6 @@ PS_OPEN_FUNC(riak)
    php_url *purl;
    char* stripped_path;
 
-//   php_printf("Open\n");
-
    purl = php_url_parse(save_path);
    if (!purl) {
        return FAILURE;
@@ -132,7 +130,6 @@ PS_WRITE_FUNC(riak)
 {
    zval *zobject;
    PS_RIAK_DATA;
-//   php_printf("Write\n");
    zobject = create_object_object(key TSRMLS_CC);
    if (EG(exception)) {
       zend_clear_exception(TSRMLS_C);
@@ -143,7 +140,6 @@ PS_WRITE_FUNC(riak)
    CALL_METHOD1(RiakBucket, putObject, NULL, data->zbucket, zobject);
    zval_ptr_dtor(&zobject);
    if (EG(exception)) {
-       //zend_clear_exception(TSRMLS_C);
        return FAILURE;
    } else {
        return SUCCESS;
@@ -153,13 +149,11 @@ PS_WRITE_FUNC(riak)
 PS_DESTROY_FUNC(riak)
 {
 	PS_RIAK_DATA;
-	zval *zobject;
-//    php_printf("Destroy\n");
+    zval *zobject;
 	zobject = create_object_object(key TSRMLS_CC);
 	CALL_METHOD1(RiakBucket, deleteObject, zobject, data->zbucket, zobject);
 	zval_ptr_dtor(&zobject);
-	if (EG(exception)) {
-        //zend_clear_exception(TSRMLS_C);
+    if (EG(exception)) {
 		return FAILURE;
 	}
 	return SUCCESS;
