@@ -27,5 +27,7 @@ void riak_mapreduce_init(TSRMLS_D);
 PHP_METHOD(RiakMapreduce, __construct);
 PHP_METHOD(RiakMapreduce, addPhase);
 PHP_METHOD(RiakMapreduce, setInput);
+PHP_METHOD(RiakMapreduce, run);
+PHP_METHOD(RiakMapreduce, toArray);
 
 #endif

@@ -27,4 +27,6 @@ void riak_mrinputs_init(TSRMLS_D);
 PHP_METHOD(RiakMrInputBucket, __construct);
 PHP_METHOD(RiakMrInputBucket, getValue);
 
+PHP_METHOD(RiakMrInput, toArray);
+
 #endif

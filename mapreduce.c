@@ -15,10 +15,10 @@
    limitations under the License.
 */
 #include "mapreduce.h"
+#include "mr_inputs.h"
 #include "php_riak.h"
 
 zend_class_entry *riak_mapreduce_ce;
-
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mapred_ctor, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, client)
@@ -32,10 +32,15 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_setinput, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, input)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mr_run, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_mrphase_methods[] = {
     PHP_ME(RiakMapreduce, __construct, arginfo_mapred_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     PHP_ME(RiakMapreduce, addPhase, arginfo_addphase, ZEND_ACC_PUBLIC)
     PHP_ME(RiakMapreduce, setInput, arginfo_setinput, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMapreduce, toArray, arginfo_mr_run, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMapreduce, run, arginfo_mr_run, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -73,7 +78,7 @@ PHP_METHOD(RiakMapreduce, addPhase)
     zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, 1 TSRMLS_CC);
     zval_add_ref(&zphase);
     add_next_index_zval(zphasearr, zphase);
-    RETURN_ZVAL(getThis(), 0, 0);
+    RETURN_ZVAL(getThis(), 1, 0);
 }
 
 PHP_METHOD(RiakMapreduce, setInput)
@@ -82,6 +87,32 @@ PHP_METHOD(RiakMapreduce, setInput)
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zinput) == FAILURE) {
         return;
     }
-    zend_update_property(riak_mapreduce_ce, getThis(), "input", sizeof("input"), zinput TSRMLS_CC);
-    RETURN_ZVAL(getThis(), 0, 0);
+    zend_update_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, zinput TSRMLS_CC);
+    RETURN_ZVAL(getThis(), 1, 0);
+}
+
+PHP_METHOD(RiakMapreduce, run)
+{
+
+}
+
+PHP_METHOD(RiakMapreduce, toArray)
+{
+    zval *zinput, *zinputval, *zphasearr, *zarray, zfuncname;
+
+    // TODO Make sure input and phases are set
+    zinput = zend_read_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, 1 TSRMLS_CC);
+    MAKE_STD_ZVAL(zinputval);
+
+    ZVAL_STRING(&zfuncname, "getValue", 0);
+    call_user_function(NULL, &zinput, &zfuncname, zinputval, 0, NULL TSRMLS_CC);
+
+    zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, 1 TSRMLS_CC);
+
+    // Build result array
+    MAKE_STD_ZVAL(zarray);
+    array_init(zarray);
+    add_assoc_zval_ex(zarray, "inputs", sizeof("inputs"), zinputval);
+
+    RETURN_ZVAL(zarray, 0, 1);
 }

@@ -43,7 +43,7 @@ void riak_mrinputs_init(TSRMLS_D)
     zend_class_entry ce, bucket_ce;
 
     INIT_CLASS_ENTRY(ce, "RiakMrInput", riak_mrinput_methods);
-    riak_mrinput_ce = zend_register_internal_interface(&ce TSRMLS_CC);
+    riak_mrinput_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     INIT_CLASS_ENTRY(bucket_ce, "RiakMrInputBucket", riak_mrinputbucket_methods);
     riak_mrinput_bucket_ce = zend_register_internal_class_ex(&bucket_ce, riak_mrinput_ce, NULL TSRMLS_CC);
@@ -65,6 +65,6 @@ PHP_METHOD(RiakMrInputBucket, __construct)
 
 PHP_METHOD(RiakMrInputBucket, getValue)
 {
-    zval* name = zend_read_property(riak_mrinput_bucket_ce, getThis(), "name", strlen("name")-1, 1 TSRMLS_CC);
+    zval* name = zend_read_property(riak_mrinput_bucket_ce, getThis(), "name", sizeof("name")-1, 1 TSRMLS_CC);
     RETURN_ZVAL(name, 1, 0);
 }
