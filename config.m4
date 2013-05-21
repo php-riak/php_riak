@@ -49,6 +49,7 @@ if test "$PHP_RIAK" != "no"; then
     mapreduce.c \
     mr_phase.c \
     mr_functions.c \
+    mr_inputs.c \
     ht_utils.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X

@@ -15,17 +15,16 @@
    limitations under the License.
 */
 
-#ifndef RIAK_MAP_REDUCE__H__
-#define RIAK_MAP_REDUCE__H__
+#ifndef RIAK_MR_INPUTS__H__
+#define RIAK_MR_INPUTS__H__
 
 #include <php.h>
 
-extern zend_class_entry *riak_mapreduce_ce;
+extern zend_class_entry *riak_mrinput_ce;
 
-void riak_mapreduce_init(TSRMLS_D);
+void riak_mrinputs_init(TSRMLS_D);
 
-PHP_METHOD(RiakMapreduce, __construct);
-PHP_METHOD(RiakMapreduce, addPhase);
-PHP_METHOD(RiakMapreduce, setInput);
+PHP_METHOD(RiakMrInputBucket, __construct);
+PHP_METHOD(RiakMrInputBucket, getValue);
 
 #endif
