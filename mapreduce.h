@@ -29,5 +29,6 @@ PHP_METHOD(RiakMapreduce, addPhase);
 PHP_METHOD(RiakMapreduce, setInput);
 PHP_METHOD(RiakMapreduce, run);
 PHP_METHOD(RiakMapreduce, toArray);
+PHP_METHOD(RiakMapreduce, toJson);
 
 #endif

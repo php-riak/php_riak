@@ -24,9 +24,11 @@ extern zend_class_entry *riak_mrinput_ce;
 
 void riak_mrinputs_init(TSRMLS_D);
 
+PHP_METHOD(RiakMrInput, toArray);
+
 PHP_METHOD(RiakMrInputBucket, __construct);
 PHP_METHOD(RiakMrInputBucket, getValue);
 
-PHP_METHOD(RiakMrInput, toArray);
+PHP_METHOD(RiakMrInputKeyList, __construct);
 
 #endif

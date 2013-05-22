@@ -16,7 +16,10 @@
 */
 #include "mapreduce.h"
 #include "mr_inputs.h"
+#include "mr_phase.h"
+#include "ht_utils.h"
 #include "php_riak.h"
+#include "ext/json/php_json.h"
 
 zend_class_entry *riak_mapreduce_ce;
 
@@ -40,6 +43,7 @@ static zend_function_entry riak_mrphase_methods[] = {
     PHP_ME(RiakMapreduce, addPhase, arginfo_addphase, ZEND_ACC_PUBLIC)
     PHP_ME(RiakMapreduce, setInput, arginfo_setinput, ZEND_ACC_PUBLIC)
     PHP_ME(RiakMapreduce, toArray, arginfo_mr_run, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMapreduce, toJson, arginfo_mr_run, ZEND_ACC_PUBLIC)
     PHP_ME(RiakMapreduce, run, arginfo_mr_run, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
@@ -93,13 +97,24 @@ PHP_METHOD(RiakMapreduce, setInput)
 
 PHP_METHOD(RiakMapreduce, run)
 {
+}
 
+
+void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)
+{
+    zval *zarr, *ztargetarr;
+    ztargetarr = (zval*)custom_ptr;
+    MAKE_STD_ZVAL(zarr);
+    CALL_METHOD(RiakMapreducePhase, toArray, zarr, *data);
+    if (zarr && Z_TYPE_P(zarr) == IS_ARRAY) {
+        add_next_index_zval(ztargetarr, zarr);
+    }
 }
 
 PHP_METHOD(RiakMapreduce, toArray)
 {
     zval *zinput, *zinputval, *zphasearr, *zarray, zfuncname;
-
+    zval *zqueryarr;
     // TODO Make sure input and phases are set
     zinput = zend_read_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, 1 TSRMLS_CC);
     MAKE_STD_ZVAL(zinputval);
@@ -107,12 +122,31 @@ PHP_METHOD(RiakMapreduce, toArray)
     ZVAL_STRING(&zfuncname, "getValue", 0);
     call_user_function(NULL, &zinput, &zfuncname, zinputval, 0, NULL TSRMLS_CC);
 
-    zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, 1 TSRMLS_CC);
+    MAKE_STD_ZVAL(zqueryarr);
+    array_init(zqueryarr);
+    zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, 1 TSRMLS_CC);
+    foreach_in_hashtable(getThis(), zqueryarr, Z_ARRVAL_P(zphasearr), &riak_mr_to_array_cb TSRMLS_CC);
 
     // Build result array
     MAKE_STD_ZVAL(zarray);
     array_init(zarray);
     add_assoc_zval_ex(zarray, "inputs", sizeof("inputs"), zinputval);
+    add_assoc_zval_ex(zarray, "query", sizeof("query"), zqueryarr);
 
     RETURN_ZVAL(zarray, 0, 1);
+}
+
+PHP_METHOD(RiakMapreduce, toJson)
+{
+    zval *zarr;
+    smart_str buff;
+
+    memset(&buff, 0, sizeof(smart_str));
+    MAKE_STD_ZVAL(zarr);
+    CALL_METHOD(RiakMapreduce, toArray, zarr, getThis());
+
+    php_json_encode(&buff, zarr, PHP_JSON_PRETTY_PRINT TSRMLS_CC);
+    RETVAL_STRINGL(buff.c, buff.len, 1);
+    smart_str_free(&buff);
+    zval_ptr_dtor(&zarr);
 }
