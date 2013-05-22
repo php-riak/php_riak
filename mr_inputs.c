@@ -16,6 +16,7 @@
 */
 #include "mr_inputs.h"
 #include "php_riak.h"
+#include "ext/standard/php_array.h"
 
 zend_class_entry *riak_mrinput_ce;
 zend_class_entry *riak_mrinput_bucket_ce;
@@ -45,6 +46,8 @@ static zend_function_entry riak_mrinputbucket_methods[] = {
 
 static zend_function_entry riak_mrinputlist_methods[] = {
     PHP_ME(RiakMrInputKeyList, __construct, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakMrInputKeyList, add, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMrInputKeyList, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -83,6 +86,7 @@ PHP_METHOD(RiakMrInputBucket, getValue)
 }
 
 /////////////////////////////////////////////////////////////
+
 PHP_METHOD(RiakMrInputKeyList, __construct)
 {
     zval *zarr;
@@ -90,4 +94,29 @@ PHP_METHOD(RiakMrInputKeyList, __construct)
         return;
     }
     zend_update_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, zarr TSRMLS_CC);
+}
+
+PHP_METHOD(RiakMrInputKeyList, add)
+{
+    zval *zarr[2], zfuncname, *zcombinedarr;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &zarr[1]) == FAILURE) {
+        return;
+    }
+    ZVAL_STRING(&zfuncname, "array_merge_recursive", 0);
+    zarr[0] = zend_read_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, 1 TSRMLS_CC);
+
+    MAKE_STD_ZVAL(zcombinedarr);
+    call_user_function(EG(function_table), NULL, &zfuncname, zcombinedarr, 2, zarr TSRMLS_CC);
+
+    zend_update_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, zcombinedarr TSRMLS_CC);
+    zval_ptr_dtor(&zarr[0]);
+    zval_ptr_dtor(&zcombinedarr);
+
+    RETURN_ZVAL(getThis(), 1, 0);
+}
+
+PHP_METHOD(RiakMrInputKeyList, getValue)
+{
+    zval* name = zend_read_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, 1 TSRMLS_CC);
+    RETURN_ZVAL(name, 1, 0);
 }

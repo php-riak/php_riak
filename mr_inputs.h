@@ -30,5 +30,7 @@ PHP_METHOD(RiakMrInputBucket, __construct);
 PHP_METHOD(RiakMrInputBucket, getValue);
 
 PHP_METHOD(RiakMrInputKeyList, __construct);
+PHP_METHOD(RiakMrInputKeyList, add);
+PHP_METHOD(RiakMrInputKeyList, getValue);
 
 #endif
