@@ -16,6 +16,8 @@
 */
 #include "mr_inputs.h"
 #include "php_riak.h"
+#include "ht_utils.h"
+#include "object.h"
 #include "ext/standard/php_array.h"
 
 zend_class_entry *riak_mrinput_ce;
@@ -46,7 +48,8 @@ static zend_function_entry riak_mrinputbucket_methods[] = {
 
 static zend_function_entry riak_mrinputlist_methods[] = {
     PHP_ME(RiakMrInputKeyList, __construct, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakMrInputKeyList, add, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMrInputKeyList, addArray, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMrInputKeyList, addSingle, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
     PHP_ME(RiakMrInputKeyList, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
@@ -64,7 +67,7 @@ void riak_mrinputs_init(TSRMLS_D)
 
     INIT_CLASS_ENTRY(list_ce, "RiakMrInputKeyList", riak_mrinputlist_methods);
     riak_mrinput_keylist_ce = zend_register_internal_class_ex(&list_ce, riak_mrinput_ce, NULL TSRMLS_CC);
-    zend_declare_property_null(riak_mrinput_bucket_ce, "bucketKeys", sizeof("bucketKeys")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_mrinput_bucket_ce, "inputList", sizeof("inputList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 
 /////////////////////////////////////////////////////////////
@@ -87,36 +90,126 @@ PHP_METHOD(RiakMrInputBucket, getValue)
 
 /////////////////////////////////////////////////////////////
 
+zval *riak_create_kv_pair(char* bucket, int bucketlen, char* key, int keylen)
+{
+    zval *pair;
+    MAKE_STD_ZVAL(pair);
+    array_init(pair);
+    add_next_index_stringl(pair, bucket, bucketlen, 1);
+    add_next_index_stringl(pair, key, keylen, 1);
+    return pair;
+}
+
+void riak_array_to_tupple_array_deep_cb(void* callingObj, void* custom_ptr, char* key,
+                                   uint keylen, uint index, zval** data, int cnt TSRMLS_DC)
+{
+    zval *add;
+    char* addkey;
+    int addkeylen;
+    zval *bucket = (zval*)callingObj;
+    zval *to = (zval*)custom_ptr;
+
+    if (Z_TYPE_PP(data) == IS_STRING) {
+        add = riak_create_kv_pair(Z_STRVAL_P(bucket), Z_STRLEN_P(bucket), Z_STRVAL_PP(data), Z_STRLEN_PP(data));
+        add_next_index_zval(to, add);
+    } else if (Z_TYPE_PP(data) == IS_OBJECT) {
+        riak_key_from_object(*data, &addkey, &addkeylen TSRMLS_CC);
+        add = riak_create_kv_pair(Z_STRVAL_P(bucket), Z_STRLEN_P(bucket), addkey, addkeylen);
+        add_next_index_zval(to, add);
+    }
+}
+
+void riak_array_to_tupple_array_cb(void* callingObj, void* custom_ptr, char* arraykey,
+                                   uint arraykeylen, uint index, zval** data, int cnt TSRMLS_DC)
+{
+    char* riakkey;
+    int riakkeylen;
+    zval *add, bucket;
+    zval *to = (zval*)custom_ptr;
+
+    // arraykey is actually the bucket name
+    if (arraykey == NULL || arraykeylen == 0) {
+        return;
+    }
+    if (Z_TYPE_PP(data) == IS_ARRAY) {
+        // Data is array of keys, iterate those aswell
+        ZVAL_STRINGL(&bucket, arraykey, arraykeylen, 0);
+        foreach_in_hashtable(&bucket, to, Z_ARRVAL_PP(data), &riak_array_to_tupple_array_deep_cb TSRMLS_CC);
+    } else if (Z_TYPE_PP(data) == IS_STRING) {
+        // Data is a string with the riak key
+        add = riak_create_kv_pair(arraykey, arraykeylen, Z_STRVAL_PP(data), Z_STRLEN_PP(data));
+        add_next_index_zval(to, add);
+    } else if (Z_TYPE_PP(data) == IS_OBJECT) {
+        // Data is RiakObject
+        riak_key_from_object(*data, &riakkey, &riakkeylen TSRMLS_CC);
+        add = riak_create_kv_pair(arraykey, arraykeylen, riakkey, riakkeylen);
+        add_next_index_zval(to, add);
+    }
+}
+
+zval* riak_array_to_tupple_array(HashTable* from TSRMLS_DC)
+{
+    zval *to;
+    MAKE_STD_ZVAL(to);
+    array_init(to);
+    foreach_in_hashtable(NULL, to, from, &riak_array_to_tupple_array_cb TSRMLS_CC);
+    return to;
+}
+
 PHP_METHOD(RiakMrInputKeyList, __construct)
 {
     zval *zarr;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &zarr) == FAILURE) {
         return;
     }
-    zend_update_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, zarr TSRMLS_CC);
+    zend_update_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, zarr TSRMLS_CC);
 }
 
-PHP_METHOD(RiakMrInputKeyList, add)
+PHP_METHOD(RiakMrInputKeyList, addArray)
 {
     zval *zarr[2], zfuncname, *zcombinedarr;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &zarr[1]) == FAILURE) {
         return;
     }
     ZVAL_STRING(&zfuncname, "array_merge_recursive", 0);
-    zarr[0] = zend_read_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, 1 TSRMLS_CC);
+    zarr[0] = zend_read_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
 
     MAKE_STD_ZVAL(zcombinedarr);
     call_user_function(EG(function_table), NULL, &zfuncname, zcombinedarr, 2, zarr TSRMLS_CC);
 
-    zend_update_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, zcombinedarr TSRMLS_CC);
+    zend_update_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, zcombinedarr TSRMLS_CC);
     zval_ptr_dtor(&zarr[0]);
     zval_ptr_dtor(&zcombinedarr);
 
     RETURN_ZVAL(getThis(), 1, 0);
 }
 
+PHP_METHOD(RiakMrInputKeyList, addSingle)
+{
+    zval *zbucket, *zobject;
+    char *bucket, *key;
+    int bucketlen, keylen;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz", &zbucket, &zobject) == FAILURE) {
+        return;
+    }
+    if (Z_TYPE_P(zbucket) == IS_STRING) {
+        bucket = Z_STRVAL_P(zbucket);
+        bucketlen = Z_STRLEN_P(zbucket);
+    } else if (Z_TYPE_P(zbucket) == IS_OBJECT) {
+        // RiakBucket
+    }
+    if (Z_TYPE_P(zobject) == IS_STRING) {
+        key = Z_STRVAL_P(zobject);
+        keylen = Z_STRLEN_P(zobject);
+    } else if (Z_TYPE_P(zobject) == IS_OBJECT) {
+        // RiakBucket
+    }
+}
+
 PHP_METHOD(RiakMrInputKeyList, getValue)
 {
-    zval* name = zend_read_property(riak_mrinput_keylist_ce, getThis(), "bucketList", sizeof("bucketList")-1, 1 TSRMLS_CC);
-    RETURN_ZVAL(name, 1, 0);
+    zval* zresult;
+    zval* zinputlist = zend_read_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
+    zresult = riak_array_to_tupple_array(Z_ARRVAL_P(zinputlist) TSRMLS_CC);
+    RETURN_ZVAL(zresult, 0, 1);
 }

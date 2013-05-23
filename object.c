@@ -68,6 +68,13 @@ zval* create_object_object(const char* key TSRMLS_DC)
     return zobject;
 }
 
+void riak_key_from_object(zval *zobject, char** key, int* keylen TSRMLS_DC)
+{
+    zval *zkey = zend_read_property(riak_object_ce, zobject, "key", sizeof("key")-1, 1 TSRMLS_CC);
+    *key = Z_STRVAL_P(zkey);
+    *keylen = Z_STRLEN_P(zkey);
+}
+
 /////////////////////////////////////////////////////////////
 
 PHP_METHOD(RiakObject, __construct)

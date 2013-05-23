@@ -29,6 +29,8 @@ void riak_object_init(TSRMLS_D);
 void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC);
 void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC);
 
+void riak_key_from_object(zval *zobject, char** key, int* keylen  TSRMLS_DC);
+
 PHP_METHOD(RiakObject, __construct);
 
 #endif
