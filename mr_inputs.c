@@ -15,10 +15,11 @@
    limitations under the License.
 */
 #include "mr_inputs.h"
+#include "ext/standard/php_array.h"
 #include "php_riak.h"
 #include "ht_utils.h"
 #include "object.h"
-#include "ext/standard/php_array.h"
+#include "bucket.h"
 
 zend_class_entry *riak_mrinput_ce;
 zend_class_entry *riak_mrinput_bucket_ce;
@@ -133,16 +134,16 @@ void riak_array_to_tupple_array_cb(void* callingObj, void* custom_ptr, char* arr
     }
     if (Z_TYPE_PP(data) == IS_ARRAY) {
         // Data is array of keys, iterate those aswell
-        ZVAL_STRINGL(&bucket, arraykey, arraykeylen, 0);
+        ZVAL_STRINGL(&bucket, arraykey, arraykeylen-1, 0);
         foreach_in_hashtable(&bucket, to, Z_ARRVAL_PP(data), &riak_array_to_tupple_array_deep_cb TSRMLS_CC);
     } else if (Z_TYPE_PP(data) == IS_STRING) {
         // Data is a string with the riak key
-        add = riak_create_kv_pair(arraykey, arraykeylen, Z_STRVAL_PP(data), Z_STRLEN_PP(data));
+        add = riak_create_kv_pair(arraykey, arraykeylen-1, Z_STRVAL_PP(data), Z_STRLEN_PP(data));
         add_next_index_zval(to, add);
     } else if (Z_TYPE_PP(data) == IS_OBJECT) {
         // Data is RiakObject
         riak_key_from_object(*data, &riakkey, &riakkeylen TSRMLS_CC);
-        add = riak_create_kv_pair(arraykey, arraykeylen, riakkey, riakkeylen);
+        add = riak_create_kv_pair(arraykey, arraykeylen-1, riakkey, riakkeylen);
         add_next_index_zval(to, add);
     }
 }
@@ -186,23 +187,34 @@ PHP_METHOD(RiakMrInputKeyList, addArray)
 
 PHP_METHOD(RiakMrInputKeyList, addSingle)
 {
-    zval *zbucket, *zobject;
+    zval *zbucket, *zobject, *zarray;
     char *bucket, *key;
     int bucketlen, keylen;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz", &zbucket, &zobject) == FAILURE) {
         return;
     }
+    key = bucket = NULL;
+    keylen = bucketlen = 0;
     if (Z_TYPE_P(zbucket) == IS_STRING) {
         bucket = Z_STRVAL_P(zbucket);
         bucketlen = Z_STRLEN_P(zbucket);
     } else if (Z_TYPE_P(zbucket) == IS_OBJECT) {
-        // RiakBucket
+        riak_name_from_bucket(zbucket, &bucket, &bucketlen TSRMLS_CC);
     }
     if (Z_TYPE_P(zobject) == IS_STRING) {
         key = Z_STRVAL_P(zobject);
         keylen = Z_STRLEN_P(zobject);
     } else if (Z_TYPE_P(zobject) == IS_OBJECT) {
-        // RiakBucket
+        riak_key_from_object(zobject, &key, &keylen TSRMLS_CC);
+    }
+    if (keylen > 0 && bucketlen > 0) {
+        MAKE_STD_ZVAL(zarray);
+        array_init(zarray);
+        add_assoc_stringl_ex(zarray, bucket, bucketlen, key, keylen, 1);
+        CALL_METHOD1(RiakMrInputKeyList, addArray, return_value, getThis(), zarray);
+        zval_ptr_dtor(&zarray);
+    } else {
+        // TODO throw bad arguments error
     }
 }
 

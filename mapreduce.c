@@ -97,6 +97,7 @@ PHP_METHOD(RiakMapreduce, setInput)
 
 PHP_METHOD(RiakMapreduce, run)
 {
+
 }
 
 
