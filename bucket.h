@@ -35,6 +35,7 @@ PHP_METHOD(RiakBucket, getObject);
 PHP_METHOD(RiakBucket, deleteObject);
 
 zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC);
-RIACK_STRING get_riack_bucket_name(zval* bucket TSRMLS_DC);
+RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC);
+void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC);
 
 #endif

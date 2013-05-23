@@ -127,7 +127,7 @@ PHP_METHOD(RiakBucket, applyProperties)
 		return;
 	}
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
-	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
+    bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
 	htBucketPropsProps = zend_std_get_properties(zBucketPropsObj TSRMLS_CC);
 
 	if ((zend_hash_find(htBucketPropsProps, "nVal", sizeof("nVal"), (void**)&zTmp) == SUCCESS)
@@ -159,7 +159,7 @@ PHP_METHOD(RiakBucket, fetchProperties)
 
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
-	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
+    bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
 	riackResult = riack_get_bucket_props(connection->client,  bucketName, &nVal, &allowMult);
 
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
@@ -193,7 +193,7 @@ PHP_METHOD(RiakBucket, deleteObject)
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
 	// Set bucket name
-	bucketName = get_riack_bucket_name(getThis() TSRMLS_CC);
+    bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
 	// Set key
 	HASH_GET_INTO_RIACK_STRING_OR_ELSE(riak_object_ce, zObject, "key", zTmp, key) {
 		zend_throw_exception(riak_badarguments_exception_ce, "key missing from object", 5001 TSRMLS_CC);
@@ -239,7 +239,7 @@ PHP_METHOD(RiakBucket, putObject)
 		obj.vclock.clock = (uint8_t*)Z_STRVAL_P(zTmp);
 	}
 	// Set bucket name
-	obj.bucket = get_riack_bucket_name(getThis() TSRMLS_CC);
+    obj.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 	obj.content_count = 1;
 	obj.content = &riackContent;
 
@@ -283,7 +283,7 @@ PHP_METHOD(RiakBucket, getObject)
 
 	memset(&props, 0, sizeof(props));
 	memset(&getResult, 0, sizeof(getResult));
-	rsBucket = get_riack_bucket_name(getThis() TSRMLS_CC);
+    rsBucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 
 	rsKey.len = keyLen;
 	rsKey.value = key;
@@ -340,16 +340,25 @@ zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_D
 	return object;
 }
 
-RIACK_STRING get_riack_bucket_name(zval* bucket TSRMLS_DC)
+void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC)
 {
-    zval *zTmp;
-    RIACK_STRING bucketName;
-    HASH_GET_INTO_RIACK_STRING_OR_ELSE(riak_bucket_ce, bucket, "name", zTmp, bucketName) {
-    	bucketName.len = 0;
-    	bucketName.value = 0;
+    zval *zname = zend_read_property(riak_bucket_ce, bucket, "name", sizeof("name")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(zname) == IS_STRING) {
+        *name = Z_STRVAL_P(zname);
+        *namelen = Z_STRLEN_P(zname);
+    } else {
+        *name = NULL;
+        *namelen = 0;
     }
-    return bucketName;
+}
 
+RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)
+{
+    RIACK_STRING bucketName;
+    int namelen;
+    riak_name_from_bucket(bucket, &bucketName.value, &namelen TSRMLS_CC);
+    bucketName.len = namelen;
+    return bucketName;
 }
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)
