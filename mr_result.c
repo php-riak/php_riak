@@ -16,6 +16,7 @@
 */
 #include "mr_result.h"
 #include "php_riak.h"
+#include "ext/json/php_json.h"
 
 zend_class_entry *riak_mrresult_ce;
 
@@ -37,6 +38,27 @@ void riak_mrresult_init(TSRMLS_D)
 
     zend_declare_property_null(riak_mrresult_ce, "value", sizeof("value")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(riak_mrresult_ce, "phase", sizeof("phase")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+}
+
+zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESULT *mapresult TSRMLS_DC)
+{
+    zval *zresult, *zvalue, *zphase;
+    MAKE_STD_ZVAL(zresult);
+    MAKE_STD_ZVAL(zvalue);
+
+    php_json_decode(zvalue, (char*)mapresult->data, mapresult->data_size, 1, 10 TSRMLS_CC);
+    object_init_ex(zresult, riak_mrresult_ce);
+
+    if (mapresult->phase_present) {
+        MAKE_STD_ZVAL(zphase);
+        ZVAL_LONG(zphase, mapresult->phase);
+        CALL_METHOD2(RiakMrResult, __construct, zresult, zresult, zvalue, zphase);
+        zval_ptr_dtor(&zphase);
+    } else {
+        CALL_METHOD1(RiakMrResult, __construct, zresult, zresult, zvalue);
+    }
+    zval_ptr_dtor(&zvalue);
+    return zresult;
 }
 
 /////////////////////////////////////////////////////////////

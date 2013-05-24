@@ -17,6 +17,7 @@
 #include "mapreduce.h"
 #include "client.h"
 #include "exceptions.h"
+#include "mr_result.h"
 #include "mr_inputs.h"
 #include "mr_phase.h"
 #include "ht_utils.h"
@@ -98,14 +99,6 @@ PHP_METHOD(RiakMapreduce, setInput)
     RETURN_ZVAL(getThis(), 1, 0);
 }
 
-void riak_decode_and_add_to_array(zval* zarray, char* str, int strlen TSRMLS_DC)
-{
-    zval* zdecoded;
-    MAKE_STD_ZVAL(zdecoded);
-    php_json_decode(zdecoded, str, strlen, true, 5 TSRMLS_CC);
-    add_next_index_zval(zarray, zdecoded);
-}
-
 PHP_METHOD(RiakMapreduce, run)
 {
     zval* zjson, *zclient, *zresult;
@@ -113,11 +106,6 @@ PHP_METHOD(RiakMapreduce, run)
     struct RIACK_MAPRED_RESULT *mapresult;
     struct RIACK_MAPRED_RESULT *mapresult_iter;
     int riackResult;
-    zend_bool decode;
-    decode = true;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|b", &decode) == FAILURE) {
-        return;
-    }
 
     MAKE_STD_ZVAL(zjson);
     CALL_METHOD(RiakMapreduce, toJson, zjson, getThis());
@@ -133,13 +121,9 @@ PHP_METHOD(RiakMapreduce, run)
             array_init(zresult);
             mapresult_iter = mapresult;
             while (mapresult_iter) {
-                // TODO Wrap result in nice class..
                 if (mapresult_iter->data != NULL && mapresult_iter->data_size > 0) {
-                    if (decode) {
-                        riak_decode_and_add_to_array(zresult, (char*)mapresult_iter->data, mapresult_iter->data_size TSRMLS_CC);
-                    } else {
-                        add_next_index_stringl(zresult, (char*)mapresult_iter->data, mapresult_iter->data_size, 1);
-                    }
+                    zval *add = riak_mrresult_from_riack_mapred(mapresult_iter TSRMLS_CC);
+                    add_next_index_zval(zresult, add);
                 }
                 mapresult_iter = mapresult_iter->next_result;
             }

@@ -19,8 +19,11 @@
 #define RIAK_MR_RESULT__H__
 
 #include <php.h>
+#include <riack.h>
 
 extern zend_class_entry *riak_mrresult_ce;
+
+zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESULT *mapresult TSRMLS_DC);
 
 void riak_mrresult_init(TSRMLS_D);
 

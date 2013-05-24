@@ -69,7 +69,7 @@ try {
         ->setInput($mrinput);
     $json = $mr->toJson();
     $result = $mr->run();
-    if ($result[0][0]["the"] !== 8) {
+    if ($result[0]->value[0]["the"] !== 8) {
         var_dump($result);
     }
     echo "success!";
