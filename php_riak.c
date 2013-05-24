@@ -32,6 +32,7 @@
 #include "mr_phase.h"
 #include "mr_functions.h"
 #include "mr_inputs.h"
+#include "mr_result.h"
 
 #ifdef PHP_SESSION
   extern ps_module ps_mod_riak;
@@ -98,6 +99,7 @@ PHP_MINIT_FUNCTION(riak)
     riak_mrphase_init(TSRMLS_C);
     riak_mrfunctions_init(TSRMLS_C);
     riak_mrinputs_init(TSRMLS_C);
+    riak_mrresult_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
     riak_stats_init(TSRMLS_C);

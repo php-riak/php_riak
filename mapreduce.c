@@ -15,6 +15,8 @@
    limitations under the License.
 */
 #include "mapreduce.h"
+#include "client.h"
+#include "exceptions.h"
 #include "mr_inputs.h"
 #include "mr_phase.h"
 #include "ht_utils.h"
@@ -36,6 +38,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_setinput, 0, ZEND_RETURN_VALUE, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mr_run, 0, ZEND_RETURN_VALUE, 0)
+    ZEND_ARG_INFO(0, decode)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_mrphase_methods[] = {
@@ -95,11 +98,59 @@ PHP_METHOD(RiakMapreduce, setInput)
     RETURN_ZVAL(getThis(), 1, 0);
 }
 
-PHP_METHOD(RiakMapreduce, run)
+void riak_decode_and_add_to_array(zval* zarray, char* str, int strlen TSRMLS_DC)
 {
-
+    zval* zdecoded;
+    MAKE_STD_ZVAL(zdecoded);
+    php_json_decode(zdecoded, str, strlen, true, 5 TSRMLS_CC);
+    add_next_index_zval(zarray, zdecoded);
 }
 
+PHP_METHOD(RiakMapreduce, run)
+{
+    zval* zjson, *zclient, *zresult;
+    riak_connection *connection;
+    struct RIACK_MAPRED_RESULT *mapresult;
+    struct RIACK_MAPRED_RESULT *mapresult_iter;
+    int riackResult;
+    zend_bool decode;
+    decode = true;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|b", &decode) == FAILURE) {
+        return;
+    }
+
+    MAKE_STD_ZVAL(zjson);
+    CALL_METHOD(RiakMapreduce, toJson, zjson, getThis());
+
+    zclient = zend_read_property(riak_mapreduce_ce, getThis(), "client", sizeof("client")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(zclient) == IS_OBJECT) {
+        GET_RIAK_CONNECTION(zclient, connection);
+        ensure_connected(connection TSRMLS_CC);
+
+        riackResult = riack_map_redue(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &mapresult);
+        if (riackResult == RIACK_SUCCESS) {
+            MAKE_STD_ZVAL(zresult);
+            array_init(zresult);
+            mapresult_iter = mapresult;
+            while (mapresult_iter) {
+                // TODO Wrap result in nice class..
+                if (mapresult_iter->data != NULL && mapresult_iter->data_size > 0) {
+                    if (decode) {
+                        riak_decode_and_add_to_array(zresult, (char*)mapresult_iter->data, mapresult_iter->data_size TSRMLS_CC);
+                    } else {
+                        add_next_index_stringl(zresult, (char*)mapresult_iter->data, mapresult_iter->data_size, 1);
+                    }
+                }
+                mapresult_iter = mapresult_iter->next_result;
+            }
+            riack_free_mapred_result(connection->client, mapresult);
+            RETVAL_ZVAL(zresult, 0, 1);
+        } else {
+            CHECK_RIACK_STATUS_THROW_ON_ERROR(connection, riackResult);
+        }
+    }
+    zval_ptr_dtor(&zjson);
+}
 
 void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)
 {
@@ -116,8 +167,15 @@ PHP_METHOD(RiakMapreduce, toArray)
 {
     zval *zinput, *zinputval, *zphasearr, *zarray, zfuncname;
     zval *zqueryarr;
-    // TODO Make sure input and phases are set
+
     zinput = zend_read_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, 1 TSRMLS_CC);
+    zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(zinput) != IS_OBJECT || Z_TYPE_P(zphasearr) != IS_ARRAY ||
+            zend_hash_num_elements(Z_ARRVAL_P(zphasearr)) <= 0) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Missing input or phases", 5001 TSRMLS_CC);
+        return;
+    }
+
     MAKE_STD_ZVAL(zinputval);
 
     ZVAL_STRING(&zfuncname, "getValue", 0);
@@ -125,7 +183,6 @@ PHP_METHOD(RiakMapreduce, toArray)
 
     MAKE_STD_ZVAL(zqueryarr);
     array_init(zqueryarr);
-    zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, 1 TSRMLS_CC);
     foreach_in_hashtable(getThis(), zqueryarr, Z_ARRVAL_P(zphasearr), &riak_mr_to_array_cb TSRMLS_CC);
 
     // Build result array

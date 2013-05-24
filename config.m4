@@ -50,6 +50,7 @@ if test "$PHP_RIAK" != "no"; then
     mr_phase.c \
     mr_functions.c \
     mr_inputs.c \
+    mr_result.c \
     ht_utils.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X

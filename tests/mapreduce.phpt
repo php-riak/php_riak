@@ -68,7 +68,10 @@ try {
         ->addPhase(new RiakMapreducePhase(RiakMapreducePhase::reduce, $jsredfunc))
         ->setInput($mrinput);
     $json = $mr->toJson();
-    // var_dump($json);
+    $result = $mr->run();
+    if ($result[0][0]["the"] !== 8) {
+        var_dump($result);
+    }
     echo "success!";
 } catch (Exception $e) {
   echo $e->getMessage();

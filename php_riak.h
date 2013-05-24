@@ -62,6 +62,12 @@
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
   POP_PARAM(); POP_PARAM();
 
+#define CHECK_RIACK_STATUS_THROW_ON_ERROR(CONNECTION, STATUS) \
+  if ( STATUS != RIACK_SUCCESS) { \
+    CONNECTION->needs_reconnect = 1; \
+    throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
+  }
+
 #define CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(CONNECTION, STATUS) \
   if ( STATUS != RIACK_SUCCESS) { \
     CONNECTION->needs_reconnect = 1; \
