@@ -52,7 +52,7 @@ static zend_function_entry riak_mrphase_methods[] = {
     {NULL, NULL, NULL}
 };
 
-void riak_mapreduce_init(TSRMLS_D)
+void riak_mapreduce_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
@@ -63,7 +63,10 @@ void riak_mapreduce_init(TSRMLS_D)
     zend_declare_property_null(riak_mapreduce_ce, "client", sizeof("client")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_mapreduce_ce, "input", sizeof("input")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto void RiakMapreduce->__construct(RiakClient $client)
+Create a new RiakMapreduce */
 PHP_METHOD(RiakMapreduce, __construct)
 {
     zval *zclient, *zphases;
@@ -76,7 +79,10 @@ PHP_METHOD(RiakMapreduce, __construct)
     zend_update_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, zphases TSRMLS_CC);
     zval_ptr_dtor(&zphases);
 }
+/* }}} */
 
+/* {{{ proto RiakMapreduce RiakMapreduce->addPhase(RiakMapreducePhase $phase)
+Add a new phase to this map reduce job, atleast one phase needs to be added before a mapreduce query can succeed */
 PHP_METHOD(RiakMapreduce, addPhase)
 {
     zval *zphase, *zphasearr;
@@ -88,7 +94,10 @@ PHP_METHOD(RiakMapreduce, addPhase)
     add_next_index_zval(zphasearr, zphase);
     RETURN_ZVAL(getThis(), 1, 0);
 }
+/* }}} */
 
+/* {{{ proto RiakMapreduce RiakMapreduce->setInput(RiakMrInput $input)
+Set mapreduce input, needs to be set for a mapreduce query to succeed */
 PHP_METHOD(RiakMapreduce, setInput)
 {
     zval *zinput;
@@ -98,7 +107,10 @@ PHP_METHOD(RiakMapreduce, setInput)
     zend_update_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, zinput TSRMLS_CC);
     RETURN_ZVAL(getThis(), 1, 0);
 }
+/* }}} */
 
+/* {{{ proto array RiakMapreduce->run()
+Runs the mapreduce query and returns the results as an array of RiakMrResult */
 PHP_METHOD(RiakMapreduce, run)
 {
     zval* zjson, *zclient, *zresult;
@@ -135,8 +147,9 @@ PHP_METHOD(RiakMapreduce, run)
     }
     zval_ptr_dtor(&zjson);
 }
+/* }}} */
 
-void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)
+void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
 {
     zval *zarr, *ztargetarr;
     ztargetarr = (zval*)custom_ptr;
@@ -146,7 +159,10 @@ void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint key
         add_next_index_zval(ztargetarr, zarr);
     }
 }
+/* }}} */
 
+/* {{{ proto array RiakMapreduce->toArray()
+Returns the current mapreduce query as an array, this is mostly usefull when debugging failing mr queries */
 PHP_METHOD(RiakMapreduce, toArray)
 {
     zval *zinput, *zinputval, *zphasearr, *zarray, zfuncname;
@@ -177,7 +193,10 @@ PHP_METHOD(RiakMapreduce, toArray)
 
     RETURN_ZVAL(zarray, 0, 1);
 }
+/* }}} */
 
+/* {{{ proto string RiakMapreduce->toJson()
+Returns the current mapreduce query as an json string, this is mostly usefull when debugging failing mr queries */
 PHP_METHOD(RiakMapreduce, toJson)
 {
     zval *zarr;
@@ -192,3 +211,4 @@ PHP_METHOD(RiakMapreduce, toJson)
     smart_str_free(&buff);
     zval_ptr_dtor(&zarr);
 }
+/* }}} */

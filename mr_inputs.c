@@ -55,7 +55,7 @@ static zend_function_entry riak_mrinputlist_methods[] = {
     {NULL, NULL, NULL}
 };
 
-void riak_mrinputs_init(TSRMLS_D)
+void riak_mrinputs_init(TSRMLS_D) /* {{{ */
 {
     zend_class_entry ce, bucket_ce, list_ce;
 
@@ -70,9 +70,10 @@ void riak_mrinputs_init(TSRMLS_D)
     riak_mrinput_keylist_ce = zend_register_internal_class_ex(&list_ce, riak_mrinput_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "inputList", sizeof("inputList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakMrInputBucket->__construct(string $bucketName)
+Create a RiakMrInputBucket an RiakMrInput that uses a bucket as input */
 PHP_METHOD(RiakMrInputBucket, __construct)
 {
     char *name;
@@ -82,16 +83,19 @@ PHP_METHOD(RiakMrInputBucket, __construct)
     }
     zend_update_property_stringl(riak_mrinput_bucket_ce, getThis(), "name", sizeof("name")-1, name, namelen TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto string RiakMrInputBucket->getValue()
+Returns value to use in Mapreduce */
 PHP_METHOD(RiakMrInputBucket, getValue)
 {
     zval* name = zend_read_property(riak_mrinput_bucket_ce, getThis(), "name", sizeof("name")-1, 1 TSRMLS_CC);
     RETURN_ZVAL(name, 1, 0);
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
 
-zval *riak_create_kv_pair(char* bucket, int bucketlen, char* key, int keylen)
+zval *riak_create_kv_pair(char* bucket, int bucketlen, char* key, int keylen)/* {{{{ */
 {
     zval *pair;
     MAKE_STD_ZVAL(pair);
@@ -100,9 +104,10 @@ zval *riak_create_kv_pair(char* bucket, int bucketlen, char* key, int keylen)
     add_next_index_stringl(pair, key, keylen, 1);
     return pair;
 }
+/* }}} */
 
 void riak_array_to_tupple_array_deep_cb(void* callingObj, void* custom_ptr, char* key,
-                                   uint keylen, uint index, zval** data, int cnt TSRMLS_DC)
+                                   uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{{ */
 {
     zval *add;
     char* addkey;
@@ -119,36 +124,38 @@ void riak_array_to_tupple_array_deep_cb(void* callingObj, void* custom_ptr, char
         add_next_index_zval(to, add);
     }
 }
+/* }}} */
 
 void riak_array_to_tupple_array_cb(void* callingObj, void* custom_ptr, char* arraykey,
-                                   uint arraykeylen, uint index, zval** data, int cnt TSRMLS_DC)
+                                   uint arraykeylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{{ */
 {
     char* riakkey;
     int riakkeylen;
     zval *add, bucket;
     zval *to = (zval*)custom_ptr;
 
-    // arraykey is actually the bucket name
+    /* arraykey is actually the bucket name */
     if (arraykey == NULL || arraykeylen == 0) {
         return;
     }
     if (Z_TYPE_PP(data) == IS_ARRAY) {
-        // Data is array of keys, iterate those aswell
+        /* Data is array of keys, iterate those aswell */
         ZVAL_STRINGL(&bucket, arraykey, arraykeylen-1, 0);
         foreach_in_hashtable(&bucket, to, Z_ARRVAL_PP(data), &riak_array_to_tupple_array_deep_cb TSRMLS_CC);
     } else if (Z_TYPE_PP(data) == IS_STRING) {
-        // Data is a string with the riak key
+        /* Data is a string with the riak key */
         add = riak_create_kv_pair(arraykey, arraykeylen-1, Z_STRVAL_PP(data), Z_STRLEN_PP(data));
         add_next_index_zval(to, add);
     } else if (Z_TYPE_PP(data) == IS_OBJECT) {
-        // Data is RiakObject
+        /* Data is RiakObject */
         riak_key_from_object(*data, &riakkey, &riakkeylen TSRMLS_CC);
         add = riak_create_kv_pair(arraykey, arraykeylen-1, riakkey, riakkeylen);
         add_next_index_zval(to, add);
     }
 }
+/* }}} */
 
-zval* riak_array_to_tupple_array(HashTable* from TSRMLS_DC)
+zval* riak_array_to_tupple_array(HashTable* from TSRMLS_DC)/* {{{{ */
 {
     zval *to;
     MAKE_STD_ZVAL(to);
@@ -156,7 +163,10 @@ zval* riak_array_to_tupple_array(HashTable* from TSRMLS_DC)
     foreach_in_hashtable(NULL, to, from, &riak_array_to_tupple_array_cb TSRMLS_CC);
     return to;
 }
+/* }}} */
 
+/* {{{ proto void RiakMrInputKeyList->__construct(array $bucketKeys)
+Create a RiakMrInputBucket, input should be an array with ["bucket" => "key", "bucket2" => "key2"] or ["bucket" => ["key1", "key2"]] */
 PHP_METHOD(RiakMrInputKeyList, __construct)
 {
     zval *zarr;
@@ -165,7 +175,10 @@ PHP_METHOD(RiakMrInputKeyList, __construct)
     }
     zend_update_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, zarr TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto RiakMrInputKeyList RiakMrInputKeyList->addArray(array $bucketKeys)
+Add bucket/key inputs to the current list, $bucketKeys must be an array with ["bucket" => "key", "bucket2" => "key2"] or ["bucket" => ["key1", "key2"]] */
 PHP_METHOD(RiakMrInputKeyList, addArray)
 {
     zval *zarr[2], zfuncname, *zcombinedarr;
@@ -184,7 +197,10 @@ PHP_METHOD(RiakMrInputKeyList, addArray)
 
     RETURN_ZVAL(getThis(), 1, 0);
 }
+/* }}} */
 
+/* {{{ proto RiakMrInputKeyList RiakMrInputKeyList->addSingle(string $bucket, string $key)
+Add a single bucket/key to the current list of inputs */
 PHP_METHOD(RiakMrInputKeyList, addSingle)
 {
     zval *zbucket, *zobject, *zarray;
@@ -214,10 +230,13 @@ PHP_METHOD(RiakMrInputKeyList, addSingle)
         CALL_METHOD1(RiakMrInputKeyList, addArray, return_value, getThis(), zarray);
         zval_ptr_dtor(&zarray);
     } else {
-        // TODO throw bad arguments error
+        /* TODO throw bad arguments error */
     }
 }
+/* }}} */
 
+/* {{{ proto array RiakMrInputKeyList->getValue()
+Returns value to use in Mapreduce */
 PHP_METHOD(RiakMrInputKeyList, getValue)
 {
     zval* zresult;
@@ -225,3 +244,4 @@ PHP_METHOD(RiakMrInputKeyList, getValue)
     zresult = riak_array_to_tupple_array(Z_ARRVAL_P(zinputlist) TSRMLS_CC);
     RETURN_ZVAL(zresult, 0, 1);
 }
+/* }}} */

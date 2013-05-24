@@ -63,7 +63,7 @@ static zend_function_entry riak_mrfunction_erl_methods[] = {
     {NULL, NULL, NULL}
 };
 
-void riak_mrfunctions_init(TSRMLS_D)
+void riak_mrfunctions_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce, jsce, erlce;
 
@@ -79,9 +79,10 @@ void riak_mrfunctions_init(TSRMLS_D)
     INIT_CLASS_ENTRY(erlce, "RiakMrErlangFunction", riak_mrfunction_erl_methods);
     riak_mrfunction_erl_ce = zend_register_internal_class_ex(&erlce, riak_mrfunction_ce, NULL TSRMLS_CC);
 }
+/* }}} */
 
 void create_named_mr_function(zend_class_entry *classentry, zval* result,
-                               zend_bool named, const char* source, int sourcelen TSRMLS_DC)
+                               zend_bool named, const char* source, int sourcelen TSRMLS_DC)/* {{{ */
 {
     zval znamed, *zsource;
 
@@ -92,9 +93,10 @@ void create_named_mr_function(zend_class_entry *classentry, zval* result,
     CALL_METHOD2(RiakMrFunction, __construct, result, result, &znamed, zsource);
     zval_ptr_dtor(&zsource);
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakMrFunction->__construct(bool $named, string $source)
+Create a new RiakMrFunction */
 PHP_METHOD(RiakMrFunction, __construct)
 {
     zend_bool named;
@@ -106,8 +108,10 @@ PHP_METHOD(RiakMrFunction, __construct)
     zend_update_property_bool(riak_mrfunction_ce, getThis(), "named", sizeof("named")-1, named TSRMLS_CC);
     zend_update_property_stringl(riak_mrfunction_ce, getThis(), "source", sizeof("source")-1, source, sourcelen TSRMLS_CC);
 }
+/* }}} */
 
-
+/* {{{ proto array RiakMrFunction->toArray()
+Returns this RiakMrFunction as an array */
 PHP_METHOD(RiakMrFunction, toArray)
 {
     zend_bool named;
@@ -135,10 +139,10 @@ PHP_METHOD(RiakMrFunction, toArray)
 
     RETURN_ZVAL(zarray, 0, 1);
 }
+/* }}} */
 
-////////////////////////////////////////
-// Javascript function
-
+/* {{{ proto RiakMrJavascriptFunction RiakMrJavascriptFunction::named(string $source)
+Creates a named RiakMrJavascriptFunction */
 PHP_METHOD(RiakMrJavascriptFunction, named)
 {
     char* source; int sourcelen;
@@ -147,7 +151,10 @@ PHP_METHOD(RiakMrJavascriptFunction, named)
     }
     create_named_mr_function(riak_mrfunction_js_ce, return_value, 1, source, sourcelen TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto RiakMrJavascriptFunction RiakMrJavascriptFunction::anon(string $source)
+Creates an anonymous RiakMrJavascriptFunction */
 PHP_METHOD(RiakMrJavascriptFunction, anon)
 {
     char* source; int sourcelen;
@@ -156,15 +163,19 @@ PHP_METHOD(RiakMrJavascriptFunction, anon)
     }
     create_named_mr_function(riak_mrfunction_js_ce, return_value, 0, source, sourcelen TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto string RiakMrJavascriptFunction->getLanguage()
+Gets language of this mr function */
 PHP_METHOD(RiakMrJavascriptFunction, getLanguage)
 {
     RETURN_STRING("javascript", 1);
 }
+/* }}} */
 
-////////////////////////////////////////
-// Erlang function
 
+/* {{{ proto RiakMrErlangFunction RiakMrErlangFunction::named(string $source)
+Creates a named RiakMrErlangFunction */
 PHP_METHOD(RiakMrErlangFunction, named)
 {
     char* source; int sourcelen;
@@ -173,7 +184,10 @@ PHP_METHOD(RiakMrErlangFunction, named)
     }
     create_named_mr_function(riak_mrfunction_erl_ce, return_value, 1, source, sourcelen TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto RiakMrErlangFunction RiakMrErlangFunction::anon(string $source)
+Creates an anonymous RiakMrErlangFunction */
 PHP_METHOD(RiakMrErlangFunction, anon)
 {
     char* source; int sourcelen;
@@ -182,8 +196,12 @@ PHP_METHOD(RiakMrErlangFunction, anon)
     }
     create_named_mr_function(riak_mrfunction_erl_ce, return_value, 0, source, sourcelen TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto string RiakMrErlangFunction->getLanguage()
+Gets language of this mr function */
 PHP_METHOD(RiakMrErlangFunction, getLanguage)
 {
     RETURN_STRING("erlang", 1);
 }
+/* }}} */

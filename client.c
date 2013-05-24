@@ -38,7 +38,7 @@ static zend_function_entry riak_client_methods[] = {
 	{NULL, NULL, NULL}
 };
 
-void riak_client_init(TSRMLS_D) 
+void riak_client_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;
  
@@ -53,8 +53,9 @@ void riak_client_init(TSRMLS_D)
 	zend_declare_property_null(riak_client_ce, "dw", sizeof("dw")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_client_ce, "r", sizeof("r")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
+/* }}} */
 
-zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC) 
+zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC) /* {{{ */
 {
 	zend_object_value retval;
 	client_data *tobj;
@@ -70,8 +71,9 @@ zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC)
 	retval.handlers = zend_get_std_object_handlers();
 	return retval;
 }
+/* }}} */
 
-void free_client_data(void *object TSRMLS_DC)
+void free_client_data(void *object TSRMLS_DC) /* {{{ */
 {
 	client_data* data = (client_data*)object;
 	zend_object_std_dtor(&data->std TSRMLS_CC);
@@ -81,8 +83,9 @@ void free_client_data(void *object TSRMLS_DC)
 
 	efree(data);
 }
+/* }}} */
 
-zval* create_client_object(char* host, long port TSRMLS_DC)
+zval* create_client_object(char* host, long port TSRMLS_DC) /* {{{ */
 {
     zval *zclient, *zhost, *zport;
 
@@ -100,9 +103,10 @@ zval* create_client_object(char* host, long port TSRMLS_DC)
 
 	return zclient;
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakClient->__construct(string $host, [int $port])
+Create a new RiakClient */
 PHP_METHOD(RiakClient, __construct)
 {
 	int connResult;
@@ -122,7 +126,10 @@ PHP_METHOD(RiakClient, __construct)
 		zend_throw_exception(riak_connection_exception_ce, "Connection error", 1000 TSRMLS_CC);
 	}
 }
+/* }}} */
 
+/* {{{ proto void RiakClient->ping()
+Ping riak to see if it is alive, an exception is thrown if no response is received */
 PHP_METHOD(RiakClient, ping)
 {
 	int pingStatus;
@@ -134,4 +141,4 @@ PHP_METHOD(RiakClient, ping)
 	pingStatus = riack_ping(connection->client);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, pingStatus);
 }
-
+/* }}} */

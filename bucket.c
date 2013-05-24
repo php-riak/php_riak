@@ -69,7 +69,7 @@ static zend_function_entry riak_bucket_methods[] = {
 	{NULL, NULL, NULL}
 };
 
-void riak_bucket_init(TSRMLS_D)
+void riak_bucket_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;
 
@@ -82,8 +82,9 @@ void riak_bucket_init(TSRMLS_D)
 	zend_declare_property_null(riak_bucket_ce, "nVal", sizeof("nVal")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_bucket_ce, "allowMult", sizeof("allowMult")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
+/* }}} */
 
-zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC)
+zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC) /* {{{ */
 {
 	zval *zbucket, *zname;
 	MAKE_STD_ZVAL(zbucket);
@@ -97,9 +98,10 @@ zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC)
 	zval_ptr_dtor(&zname);
 	return zbucket;
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakBucket->__construct(RiakClient $client, string $name)
+Create a new RiakBucket */
 PHP_METHOD(RiakBucket, __construct)
 {
 	char *name;
@@ -111,7 +113,10 @@ PHP_METHOD(RiakBucket, __construct)
 	zend_update_property_stringl(riak_bucket_ce, getThis(), "name", sizeof("name")-1, name, nameLen TSRMLS_CC);
 	zend_update_property(riak_bucket_ce, getThis(), "client", sizeof("client")-1, client TSRMLS_CC);
 }
+/* }}} */
 
+/* {{{ proto void RiakBucket->applyProperties(RiakBucketProperties $properties)
+Apply given properties to this bucket */
 PHP_METHOD(RiakBucket, applyProperties)
 {
 	riak_connection *connection;
@@ -147,7 +152,10 @@ PHP_METHOD(RiakBucket, applyProperties)
  	riackResult = riack_set_bucket_props(connection->client, bucketName, nVal, allowMult);
  	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
+/* }}} */
 
+/* {{{ proto RiakBucketProperties RiakBucket->fetchProperties()
+Fetch and return a RiakBucketProperties object with properties for this bucket */
 PHP_METHOD(RiakBucket, fetchProperties)
 {
 	riak_connection *connection;
@@ -178,7 +186,10 @@ PHP_METHOD(RiakBucket, fetchProperties)
 	zval_ptr_dtor(&zNVal);
 	zval_ptr_dtor(&zAllowMult);
 }
+/* }}} */
 
+/* {{{ proto void RiakBucket->deleteObject(RiakObject $object)
+Deletes given object from riak */
 PHP_METHOD(RiakBucket, deleteObject)
 {
 	struct RIACK_DEL_PROPERTIES props;
@@ -204,7 +215,10 @@ PHP_METHOD(RiakBucket, deleteObject)
 	riackResult = riack_delete(connection->client, bucketName, key, &props);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
+/* }}} */
 
+/* {{{ proto void RiakBucket->putObject(RiakObject $object [, string $key])
+Store a RiakObject in riak, if something goes wrong an RiakException is thrown */
 PHP_METHOD(RiakBucket, putObject)
 {
 	char *key, *contentType;
@@ -260,7 +274,10 @@ PHP_METHOD(RiakBucket, putObject)
 	// TODO Return updated object
 	riack_free_object(connection->client, &returnedObj);
 }
+/* }}} */
 
+/* {{{ proto RiakObject RiakBucket->getObject(string $key)
+Retrieve a RiakObject from riak */
 PHP_METHOD(RiakBucket, getObject)
 {
 	char *key;
@@ -325,10 +342,9 @@ PHP_METHOD(RiakBucket, getObject)
 	}
 	zval_ptr_dtor(&zKey);
 }
+/* }}} */
 
-///////////////////////////////////////////////////////////////////////////////
-
-zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC)
+zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
 {
 	zval *object;
 	MAKE_STD_ZVAL(object);
@@ -339,8 +355,9 @@ zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_D
 
 	return object;
 }
+/* }}} */
 
-void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC)
+void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC)/* {{{ */
 {
     zval *zname = zend_read_property(riak_bucket_ce, bucket, "name", sizeof("name")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zname) == IS_STRING) {
@@ -351,8 +368,9 @@ void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC)
         *namelen = 0;
     }
 }
+/* }}} */
 
-RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)
+RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)/* {{{ */
 {
     RIACK_STRING bucketName;
     int namelen;
@@ -360,8 +378,9 @@ RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)
     bucketName.len = namelen;
     return bucketName;
 }
+/* }}} */
 
-riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)
+riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)/* {{{ */
 {
 	zval **zTmp;
 	HashTable *zBucketProps;
@@ -375,3 +394,4 @@ riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)
 	}
 	return connection;
 }
+/* }}} */

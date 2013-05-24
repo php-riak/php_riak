@@ -34,7 +34,7 @@ static zend_function_entry riak_bucket_properties_methods[] = {
 	{NULL, NULL, NULL}
 };
 
-void riak_bucket_props_init(TSRMLS_D)
+void riak_bucket_props_init(TSRMLS_D)/* {{{ */
 {
 	zend_class_entry ce;
 
@@ -44,9 +44,10 @@ void riak_bucket_props_init(TSRMLS_D)
 	zend_declare_property_long(riak_bucket_properties_ce, "nVal", sizeof("nVal")-1, 3, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_bool(riak_bucket_properties_ce, "allowMult", sizeof("allowMult")-1, 0, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakBucketProperties->__construct(int $nVal, bool $allowMult)
+Creates a new RiakBucketProperties */
 PHP_METHOD(RiakBucketProperties, __construct)
 {
 	long nVal;
@@ -57,3 +58,4 @@ PHP_METHOD(RiakBucketProperties, __construct)
 	zend_update_property_long(riak_bucket_properties_ce, getThis(), "nVal", sizeof("nVal")-1, nVal TSRMLS_CC);
 	zend_update_property_bool(riak_bucket_properties_ce, getThis(), "allowMult", sizeof("allowMult")-1, allowMult TSRMLS_CC);
 }
+/* }}} */

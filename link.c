@@ -31,7 +31,7 @@ static zend_function_entry riak_link_methods[] = {
     {NULL, NULL, NULL}
 };
 
-void riak_link_init(TSRMLS_D)
+void riak_link_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
@@ -42,8 +42,9 @@ void riak_link_init(TSRMLS_D)
     zend_declare_property_null(riak_link_ce, "bucket", sizeof("bucket")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(riak_link_ce, "key", sizeof("key")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
+/* }}} */
 
-zval* create_link_object(const char* tag, const char *bucket, const char* key TSRMLS_DC)
+zval* create_link_object(const char* tag, const char *bucket, const char* key TSRMLS_DC)/* {{{ */
 {
     zval *zlink, *zbucket, *ztag, *zkey;
 
@@ -63,9 +64,10 @@ zval* create_link_object(const char* tag, const char *bucket, const char* key TS
     zval_ptr_dtor(&ztag);
     return zlink;
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakClient->__construct(string $tag, string $bucket, string $key)
+Create a new RiakLink */
 PHP_METHOD(RiakLink, __construct)
 {
     char *key, *bucket, *tag;
@@ -78,5 +80,4 @@ PHP_METHOD(RiakLink, __construct)
     zend_update_property_stringl(riak_link_ce, getThis(), "bucket", sizeof("bucket")-1, bucket, bucketlen TSRMLS_CC);
     zend_update_property_stringl(riak_link_ce, getThis(), "key", sizeof("key")-1, key, keylen TSRMLS_CC);
 }
-
-
+/* }}} */
