@@ -39,7 +39,7 @@ static zend_function_entry riak_mrphase_methods[] = {
     {NULL, NULL, NULL}
 };
 
-void riak_mrphase_init(TSRMLS_D)
+void riak_mrphase_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
@@ -55,9 +55,10 @@ void riak_mrphase_init(TSRMLS_D)
     zend_declare_property_bool(riak_mrphase_ce, "keep", sizeof("keep")-1, 0, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(riak_mrphase_ce, "arg", sizeof("arg")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakMapreducePhase->__construct(int $type, RiakMrFunction $function [, bool $keep [, array $arguments]])
+Create a RiakMapreducePhase */
 PHP_METHOD(RiakMapreducePhase, __construct)
 {
     long type;
@@ -76,7 +77,10 @@ PHP_METHOD(RiakMapreducePhase, __construct)
         zend_update_property(riak_mrphase_ce, getThis(), "arg", sizeof("arg")-1, zargs TSRMLS_CC);
     }
 }
+/* }}} */
 
+/* {{{ proto array RiakMapreducePhase->toArray()
+Convert this phase into an array */
 PHP_METHOD(RiakMapreducePhase, toArray)
 {
     zval *zarray, *zfuncarray, *zfunc, *zarg;
@@ -98,7 +102,7 @@ PHP_METHOD(RiakMapreducePhase, toArray)
         add_assoc_zval_ex(zarray, "reduce", sizeof("reduce"), zfuncarray);
         break;
     case PHASE_TYPE_LINK:
-        // TODO
+        /* TODO */
         break;
     }
     keep = Z_BVAL_P(zend_read_property(riak_mrphase_ce, getThis(), "keep", sizeof("keep")-1, 1 TSRMLS_CC));
@@ -111,3 +115,4 @@ PHP_METHOD(RiakMapreducePhase, toArray)
     }
     RETURN_ZVAL(zarray, 0, 1);
 }
+/* }}} */

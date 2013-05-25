@@ -20,7 +20,6 @@
 
 zend_class_entry *riak_stats_ce;
 
-
 static zend_function_entry riak_stats_methods[] = {
 	PHP_ME(RiakStats, activeConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
 	PHP_ME(RiakStats, activePersistentConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
@@ -28,27 +27,36 @@ static zend_function_entry riak_stats_methods[] = {
 	{NULL, NULL, NULL}
 };
 
+/* {{{ proto int RiakStats::activeConnections()
+Returns number of active riak connections */
 PHP_METHOD(RiakStats, activeConnections)
 {
 	RETURN_LONG(RIAK_GLOBAL(open_connections));
 }
+/* }}} */
 
+/* {{{ proto int RiakStats::activePersistentConnections()
+Returns number of active persistent riak connections */
 PHP_METHOD(RiakStats, activePersistentConnections)
 {
 	RETURN_LONG(RIAK_GLOBAL(open_connections_persistent));
 }
+/* }}} */
 
+/* {{{ proto int RiakStats::getNumReconnects()
+How many reconnections has been performed, persistent and nonpersistent */
 PHP_METHOD(RiakStats, getNumReconnects)
 {
 	long reconnects = RIAK_GLOBAL(reconnects);
 	RETURN_LONG(reconnects);
 }
+/* }}} */
 
-void riak_stats_init(TSRMLS_D)
+void riak_stats_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;
  
 	INIT_CLASS_ENTRY(ce, "RiakStats", riak_stats_methods);
 	riak_stats_ce = zend_register_internal_class(&ce TSRMLS_CC);
-
 }
+/* }}} */

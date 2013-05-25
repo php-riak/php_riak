@@ -24,22 +24,23 @@
 extern zend_class_entry *riak_client_ce;
 
 typedef struct _client_data {
-  // required
+  /* required */
   zend_object std;
 
   riak_connection *connection;
 } client_data;
 
 #define GET_RIAK_CONNECTION(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->connection
-  //#define GET_RIACK_CLIENT(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->connection->client
 
-/////////////////////////////////////////////////
-// Constants
+/*************************************************
+* Constants
+*************************************************/
 #define DEFAULT_HOST "127.0.0.1"
 #define DEFAULT_PORT 8087
 
-/////////////////////////////////////////////////
-// Functions
+/*************************************************
+* Functions
+*************************************************/
 
 zval* create_client_object(char* host, long port TSRMLS_DC);
 

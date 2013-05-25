@@ -19,7 +19,7 @@
 #include <php.h>
 #include <riack.h>
 
-zend_bool ensure_connected(riak_connection *connection TSRMLS_DC) 
+zend_bool ensure_connected(riak_connection *connection TSRMLS_DC) /* {{{ */
 {
   zend_bool result = 1;
   if (difftime(time(NULL), connection->last_used_at)*1000 > RIAK_GLOBAL(persistent_timeout)) {
@@ -35,8 +35,9 @@ zend_bool ensure_connected(riak_connection *connection TSRMLS_DC)
    }
    return result;
 }
+/* }}} */
 
-zend_bool ensure_connected_init(riak_connection *connection, char* host, int host_len, int port TSRMLS_DC)
+zend_bool ensure_connected_init(riak_connection *connection, char* host, int host_len, int port TSRMLS_DC) /* {{{ */
 {
    char *szHost;
    zend_bool result;
@@ -54,16 +55,19 @@ zend_bool ensure_connected_init(riak_connection *connection, char* host, int hos
    }
    return result;
 }
+/* }}} */
 
-void mark_for_reconnect(riak_connection *connection)
+void mark_for_reconnect(riak_connection *connection) /* {{{ */
 {
    connection->needs_reconnect = 1;
 }
+/* }}} */
 
-//////////////////////////////////////////////////////////////
-// Connection pooling
+/*************************************************
+* Connection pooling
+*************************************************/
 
-zend_bool lock_pool(TSRMLS_D)
+zend_bool lock_pool(TSRMLS_D) /* {{{ */
 {
 #ifdef ZTS
   if (tsrm_mutex_lock(RIAK_GLOBAL(pool_mutex)) == 0) {
@@ -73,23 +77,23 @@ zend_bool lock_pool(TSRMLS_D)
   }
 #endif
 }
+/* }}} */
 
-void unlock_pool(TSRMLS_D)
+void unlock_pool(TSRMLS_D) /* {{{ */
 {
 #ifdef ZTS
   tsrm_mutex_unlock(RIAK_GLOBAL(pool_mutex));
 #endif
 }
+/* }}} */
 
-void release_connection(riak_connection *connection TSRMLS_DC)
+void release_connection(riak_connection *connection TSRMLS_DC) /* {{{ */
 {
-   char szConnection[512];
    riak_connection_pool* pool = NULL;
    RIAK_GLOBAL(open_connections)--;
    if (connection->persistent) {
-      // If we fail to lock we might have a stuck client, find a way to deal with this.
+      /* If we fail to lock we might have a stuck client, find a way to deal with this. */
       if (lock_pool(TSRMLS_C)) {
-         // Release
          connection->last_used_at = time(NULL);
          RIAK_GLOBAL(open_connections_persistent)--;
          pool = pool_for_host_port(connection->client->host, 
@@ -104,8 +108,9 @@ void release_connection(riak_connection *connection TSRMLS_DC)
       pefree(connection, 0);
    }
 }
+/* }}} */
 
-riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC)
+riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC) /* {{{ */
 {
    riak_connection* connection;
    riak_connection_pool* pool;
@@ -125,7 +130,7 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC)
       }
       RIAK_GLOBAL(open_connections_persistent)++;
    } else {
-      // We could not get a persistent connection, make a new non persistent connection.
+      /* We could not get a persistent connection, make a new non persistent connection. */
       connection = pemalloc(sizeof(riak_connection), 0);
       memset(connection, 0, sizeof(riak_connection));
       connection->persistent = 0;
@@ -141,8 +146,9 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC)
    }
    return connection;
 }
+/* }}} */
 
-void release_connection_from_pool(riak_connection_pool* pool, riak_connection *connection)
+void release_connection_from_pool(riak_connection_pool* pool, riak_connection *connection) /* {{{ */
 {
   int i;
   riak_connection_pool_entry* current_entry;
@@ -152,10 +158,11 @@ void release_connection_from_pool(riak_connection_pool* pool, riak_connection *c
       current_entry->in_use = 0;
     }
   }
-  // Not found we should warn about this.
+  /* Not found we should warn about this. */
 }
+/* }}} */
 
-riak_connection_pool_entry *take_connection_entry_from_pool(riak_connection_pool *pool)
+riak_connection_pool_entry *take_connection_entry_from_pool(riak_connection_pool *pool) /* {{{ */
 {
   int i;
   riak_connection_pool_entry* current_entry;
@@ -173,8 +180,9 @@ riak_connection_pool_entry *take_connection_entry_from_pool(riak_connection_pool
   }
   return NULL;
 }
+/* }}} */
 
-riak_connection_pool *pool_for_host_port(char* host, int host_len, int port TSRMLS_DC)
+riak_connection_pool *pool_for_host_port(char* host, int host_len, int port TSRMLS_DC) /* {{{ */
 {
   char *szHost;
   char szConnection[512];
@@ -197,8 +205,9 @@ riak_connection_pool *pool_for_host_port(char* host, int host_len, int port TSRM
   }
   return pool;
 }
+/* }}} */
 
-riak_connection_pool* initialize_pool(TSRMLS_D) 
+riak_connection_pool* initialize_pool(TSRMLS_D) /* {{{ */
 {
   riak_connection_pool* pool;
   pool = pemalloc(sizeof(riak_connection_pool), 1);
@@ -207,8 +216,9 @@ riak_connection_pool* initialize_pool(TSRMLS_D)
   memset(pool->entries, 0, pool->count * sizeof(riak_connection_pool_entry));
   return pool;
 }
+/* }}} */
 
-void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) 
+void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) /* {{{ */
 {
   int i;
   riak_connection_pool *pool = (riak_connection_pool*)rsrc->ptr;
@@ -222,3 +232,4 @@ void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC)
   }
   pefree(pool, 1);
 }
+/* }}} */

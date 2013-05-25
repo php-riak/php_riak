@@ -15,10 +15,9 @@
    limitations under the License.
 */
 
-#include <php.h>
+#include "php_riak.h"
 #include <php_ini.h>
 #include <riack.h>
-#include "php_riak.h"
 #include "pool.h"
 #include "client.h"
 #include "object.h"
@@ -75,7 +74,6 @@ zend_module_entry riak_module_entry = {
   STANDARD_MODULE_PROPERTIES_EX
 };
 
-// install module
 ZEND_GET_MODULE(riak)
 
 PHP_INI_BEGIN()
@@ -83,8 +81,7 @@ PHP_INI_BEGIN()
   STD_PHP_INI_ENTRY("riak.persistent.timeout", "2000", PHP_INI_ALL,   OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
 PHP_INI_END()
 
-// Module constructor
-PHP_MINIT_FUNCTION(riak) 
+PHP_MINIT_FUNCTION(riak) /* {{{ */
 {
     REGISTER_INI_ENTRIES();
     riack_init();
@@ -109,16 +106,17 @@ PHP_MINIT_FUNCTION(riak)
 #endif
     return SUCCESS;
 }
+/* {{{ */
 
-// Module destructor
-PHP_MSHUTDOWN_FUNCTION(riak)
+PHP_MSHUTDOWN_FUNCTION(riak) /* {{{ */
 {
     riack_cleanup();
     UNREGISTER_INI_ENTRIES();
     return SUCCESS;
 }
+/* {{{ */
 
-PHP_GINIT_FUNCTION(riak)
+PHP_GINIT_FUNCTION(riak) /* {{{ */
 {
     riak_globals->persistent_connections = 20;
     riak_globals->persistent_timeout = 2000;
@@ -129,16 +127,17 @@ PHP_GINIT_FUNCTION(riak)
     riak_globals->pool_mutex = tsrm_mutex_alloc();
 #endif
 }
+/* {{{ */
 
-PHP_GSHUTDOWN_FUNCTION(riak) 
+PHP_GSHUTDOWN_FUNCTION(riak) /* {{{ */
 {
 #ifdef ZTS
     tsrm_mutex_free(riak_globals->pool_mutex);
 #endif
 }
+/* {{{ */
 
-
-void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
+void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)/* {{{ */
 {
     if (errorStatus == RIACK_ERROR_COMMUNICATION) {
         zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);
@@ -150,38 +149,42 @@ void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)
         }
     }
 }
+/* }}} */
 
+/*
+ * Riack allocator
+*/
 
-//////////////////////////////////////////////////////////////
-// Riack allocator
-
-void *riack_php_alloc(void* ptr, size_t size)
+void *riack_php_alloc(void* ptr, size_t size)/* {{{ */
 {
     if (size == 0) {
         return 0;
     }
     return pemalloc(size, 0);
 }
+/* }}} */
 
-void riack_php_free (void *ptr, void *data)
+void riack_php_free (void *ptr, void *data)/* {{{ */
 {
     if (data) {
         pefree(data, 0);
     }
 }
+/* }}} */
 
-void *riack_php_persistent_alloc(void *ptr, size_t size)
+void *riack_php_persistent_alloc(void *ptr, size_t size)/* {{{ */
 {
     if (size == 0) {
         return 0;
     }
     return pemalloc(size, 1);
 }
+/* }}} */
 
-void riack_php_persistent_free (void *ptr, void *data)
+void riack_php_persistent_free (void *ptr, void *data)/* {{{ */
 {
     if (data) {
         pefree(data, 1);
     }
 }
-
+/* }}} */

@@ -29,7 +29,7 @@ static zend_function_entry riak_mrresult_methods[] = {
     {NULL, NULL, NULL}
 };
 
-void riak_mrresult_init(TSRMLS_D)
+void riak_mrresult_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
@@ -39,8 +39,9 @@ void riak_mrresult_init(TSRMLS_D)
     zend_declare_property_null(riak_mrresult_ce, "value", sizeof("value")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(riak_mrresult_ce, "phase", sizeof("phase")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
+/* }}} */
 
-zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESULT *mapresult TSRMLS_DC)
+zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESULT *mapresult TSRMLS_DC)/* {{{ */
 {
     zval *zresult, *zvalue, *zphase;
     MAKE_STD_ZVAL(zresult);
@@ -60,9 +61,10 @@ zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESULT *mapresult TSRM
     zval_ptr_dtor(&zvalue);
     return zresult;
 }
+/* }}} */
 
-/////////////////////////////////////////////////////////////
-
+/* {{{ proto void RiakMrResult->__construct($value, [, int $phase])
+Create a RiakMrResult */
 PHP_METHOD(RiakMrResult, __construct)
 {
     zval* zvalue;
@@ -73,3 +75,4 @@ PHP_METHOD(RiakMrResult, __construct)
     zend_update_property_long(riak_mrresult_ce, getThis(), "phase", sizeof("phase")-1, phase TSRMLS_CC);
     zend_update_property(riak_mrresult_ce, getThis(), "value", sizeof("value")-1, zvalue TSRMLS_CC);
 }
+/* }}} */

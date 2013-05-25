@@ -20,16 +20,17 @@
 #ifndef PHP_RIAK__H__
 #define PHP_RIAK__H__
 
-
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
+#include <php.h>
 
 #define PHP_RIAK_EXTNAME "riak"
 #define PHP_RIAK_VERSION "0.1"
 
-/////////////////////////////////////////////////
-// Macros
+/*************************************************
+* Macros
+*************************************************/
 
 #define PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
 #define POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
@@ -87,9 +88,9 @@
 #endif
 
 
-/////////////////////////////////////////////////
-// Vars
-/////////////////////////////////////////////////
+/*************************************************
+* Vars
+*************************************************/
 
 extern struct RIACK_ALLOCATOR riack_php_allocator;
 extern struct RIACK_ALLOCATOR riack_php_persistent_allocator;
@@ -109,19 +110,17 @@ ZEND_BEGIN_MODULE_GLOBALS(riak)
 #endif
 ZEND_END_MODULE_GLOBALS(riak)
 
-ZEND_EXTERN_MODULE_GLOBALS(riak);
+ZEND_EXTERN_MODULE_GLOBALS(riak)
 
-/////////////////////////////////////////////////
-// Functions
-/////////////////////////////////////////////////
+/*************************************************
+* Functions
+*************************************************/
 
 void *riack_php_alloc(void *allocator_data, size_t size);
 void riack_php_free (void *allocator_data, void *data);
 
 void *riack_php_persistent_alloc(void *allocator_data, size_t size);
 void riack_php_persistent_free (void *allocator_data, void *data);
-
-/////////////////////////////////////////////////
 
 PHP_MINIT_FUNCTION(riak);
 PHP_MSHUTDOWN_FUNCTION(riak);

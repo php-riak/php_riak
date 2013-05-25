@@ -50,7 +50,7 @@ PS_OPEN_FUNC(riak)
    }
    
    if (purl->query) {
-      // TODO Parse n, dw etc.
+      /* TODO Parse n, dw etc. */
    }
    zclient = create_client_object(purl->host, purl->port TSRMLS_CC);
    if (EG(exception)) {
@@ -125,7 +125,6 @@ PS_READ_FUNC(riak)
    return SUCCESS;
 }
 
-// void **mod_data, const char *key, const char *val, const int vallen TSRMLS_DC
 PS_WRITE_FUNC(riak)
 {
    zval *zobject;
@@ -161,7 +160,7 @@ PS_DESTROY_FUNC(riak)
 
 PS_GC_FUNC(riak)
 {
-   // Do nothing riak´s builtin key expire should be used on the session bucket
+    /* Do nothing riak´s builtin key expire should be used on the session bucket */
 	return SUCCESS;
 }
 

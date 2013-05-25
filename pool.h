@@ -47,7 +47,7 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC);
 
 void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 
-// Internal
+/* Internal */
 void release_connection_from_pool(riak_connection_pool* pool, riak_connection *connection);
 riak_connection_pool *pool_for_host_port(char* host, int host_len, int port TSRMLS_DC);
 riak_connection_pool_entry *take_connection_entry_from_pool(riak_connection_pool *pool);
