@@ -185,7 +185,7 @@ PHP_METHOD(RiakMapreduce, toArray)
     array_init(zqueryarr);
     foreach_in_hashtable(getThis(), zqueryarr, Z_ARRVAL_P(zphasearr), &riak_mr_to_array_cb TSRMLS_CC);
 
-    // Build result array
+    /* Build result array */
     MAKE_STD_ZVAL(zarray);
     array_init(zarray);
     add_assoc_zval_ex(zarray, "inputs", sizeof("inputs"), zinputval);

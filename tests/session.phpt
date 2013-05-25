@@ -9,7 +9,7 @@ session.save_handler=riak
 --FILE--
 <?php
 include_once "connect.inc";
-ini_set('session.save_path',"proto://$host:$port/sessions?n=3");
+ini_set('session.save_path',"proto://$host:$port/sessions");
 
 session_start();
 $_SESSION['favcolor'] = 'green';

@@ -68,9 +68,23 @@ You can override the following settings in your php.ini
 This extension includes a session module that can replace the default PHP session handler, no code changes needed just setup the following in your php.ini:
 
 	session.save_handler=riak
-	session.save_path=proto://HOST:PORT/SESSIONBUCKET
+        session.save_path=proto://HOST:PORT/SESSIONBUCKET
 
-The session handler does not implement garbage collection, use riak´s key-expire setting instead.
+You can specify w, dw, pw, r, rw and pr values but adding them to the session.save_path.
+For instance to use a local riak with w and r values of 2:
+
+        proto://127.0.0.1:8098/session?w=2&r=2
+
+Please note that the session handles does NOT set any bucket properties.
+Bucket properties should either be set in app.config or applied manually on the bucket before using this session handler, conflicting writes are not handled so please disable siblings on the bucket.
+Recommended bucket properties:
+
+        n_val=3
+        allow_mult=false
+        last_write_wins=false
+
+The session handler does not implement garbage collection, use riak´s key-expire setting instead
+See http://docs.basho.com/riak/1.3.1/tutorials/choosing-a-backend/Bitcask/ for betails on how to enable automatic key expire.
 
 ### PHP Code
 Examples of usage can be found in the .phpt files in the test folder.
