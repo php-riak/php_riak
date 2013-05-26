@@ -68,9 +68,9 @@ You can override the following settings in your php.ini
 This extension includes a session module that can replace the default PHP session handler, no code changes needed just setup the following in your php.ini:
 
 	session.save_handler=riak
-        session.save_path=proto://HOST:PORT/SESSIONBUCKET
+	session.save_path=proto://HOST:PORT/SESSIONBUCKET
 
-You can specify w, dw, pw, r, rw and pr values but adding them to the session.save_path.
+You can specify w, dw, pw, r, rw and pr values by adding them to the session.save_path.
 For instance to use a local riak with w and r values of 2:
 
         proto://127.0.0.1:8098/session?w=2&r=2
