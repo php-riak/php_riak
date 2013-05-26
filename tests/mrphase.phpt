@@ -15,7 +15,7 @@ $phase2 = new RiakMapreducePhase(RiakMapreducePhase::reduce, $jsnamed, true, arr
 $arr2 = $phase2->toArray();
 $subarr2 = $arr2['reduce'];
 $subarr2arg = $arr2['arg'];
-if ($arr2["keep"] !== true || $subarr2arg["plappe"] !== "pluppe" || $subarr1["language"] !== "javascript" || $subarr1["name"] !== "source_name") {
+if ($subarr2["keep"] !== true || $subarr2arg["plappe"] !== "pluppe" || $subarr1["language"] !== "javascript" || $subarr1["name"] !== "source_name") {
     var_dump($arr2);
 }
 echo "done!";

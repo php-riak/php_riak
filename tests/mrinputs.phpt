@@ -7,7 +7,9 @@ $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_bucket");
 
 $buckeetInput1 = new RiakMrInputBucket("bucket_name");
-if ($buckeetInput1->getValue() !== "bucket_name") {
+$val = $buckeetInput1->getValue();
+$val = $buckeetInput1->getValue();
+if ($val !== "bucket_name") {
     var_dump($buckeetInput1);
 }
 
@@ -29,6 +31,7 @@ $listInput  ->addArray(array("bucket1" => array("key4", "key5")))
             ->addSingle($bucket, $obj2);
 
 $val = $listInput->getValue();
+
 if (count($val) !== 14) {
     var_dump($val);
 }

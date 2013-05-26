@@ -65,6 +65,7 @@ void riak_mrinputs_init(TSRMLS_D) /* {{{ */
     INIT_CLASS_ENTRY(bucket_ce, "RiakMrInputBucket", riak_mrinputbucket_methods);
     riak_mrinput_bucket_ce = zend_register_internal_class_ex(&bucket_ce, riak_mrinput_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_mrinput_bucket_ce, "keyFilters", sizeof("keyFilters")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
     INIT_CLASS_ENTRY(list_ce, "RiakMrInputKeyList", riak_mrinputlist_methods);
     riak_mrinput_keylist_ce = zend_register_internal_class_ex(&list_ce, riak_mrinput_ce, NULL TSRMLS_CC);
@@ -89,8 +90,21 @@ PHP_METHOD(RiakMrInputBucket, __construct)
 Returns value to use in Mapreduce */
 PHP_METHOD(RiakMrInputBucket, getValue)
 {
-    zval* name = zend_read_property(riak_mrinput_bucket_ce, getThis(), "name", sizeof("name")-1, 1 TSRMLS_CC);
-    RETURN_ZVAL(name, 1, 0);
+    zval* zname, *zfilters, *zresult;
+    zname = zend_read_property(riak_mrinput_bucket_ce, getThis(), "name", sizeof("name")-1, 1 TSRMLS_CC);
+    zfilters = zend_read_property(riak_mrinput_bucket_ce, getThis(), "keyFilters", sizeof("keyFilters")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(zfilters) == IS_ARRAY) {
+        MAKE_STD_ZVAL(zresult);
+        array_init(zresult);
+
+        zval_addref_p(zname);
+        add_assoc_zval_ex(zresult, "bucket", sizeof("bucket"), zname);
+        zval_addref_p(zfilters);
+        add_assoc_zval_ex(zresult, "key_filters", sizeof("key_filters"), zfilters);
+        RETURN_ZVAL(zresult, 0, 1);
+    } else {
+        RETURN_ZVAL(zname, 1, 0);
+    }
 }
 /* }}} */
 

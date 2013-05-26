@@ -27,15 +27,12 @@ void riak_mrfunctions_init(TSRMLS_D);
 void create_named_mr_function(zend_class_entry *classentry, zval* result,
                                zend_bool named, const char* source, int sourcelen TSRMLS_DC);
 
-PHP_METHOD(RiakMrFunction, __construct);
-PHP_METHOD(RiakMrFunction, toArray);
-
+PHP_METHOD(RiakMrJavascriptFunction, __construct);
+PHP_METHOD(RiakMrJavascriptFunction, toArray);
 PHP_METHOD(RiakMrJavascriptFunction, named);
 PHP_METHOD(RiakMrJavascriptFunction, anon);
-PHP_METHOD(RiakMrJavascriptFunction, getLanguage);
 
-PHP_METHOD(RiakMrErlangFunction, named);
-PHP_METHOD(RiakMrErlangFunction, anon);
-PHP_METHOD(RiakMrErlangFunction, getLanguage);
+PHP_METHOD(RiakMrErlangFunction, __construct);
+PHP_METHOD(RiakMrErlangFunction, toArray);
 
 #endif

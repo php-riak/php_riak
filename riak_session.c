@@ -17,7 +17,6 @@
 
 #include "riak_session.h"
 
-#define PHP_SESSION
 #ifdef PHP_SESSION
 #include <zend_exceptions.h>
 #include "client.h"

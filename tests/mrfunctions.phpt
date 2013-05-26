@@ -15,16 +15,10 @@ if ($jsnamedarr["language"] !== "javascript" || $jsnamedarr["name"] !== "named_s
     var_dump($jsanonarr);
 }
 
-$erl1 = new RiakMrErlangFunction(true, "source_name");
-$erlanon = RiakMrErlangFunction::anon("anon_source");
-$erlnamed = RiakMrErlangFunction::named("named_source");
+$erl1 = new RiakMrErlangFunction("module", "function");
 
-$erlanonarr = $erlanon->toArray();
-if ($erlanonarr["language"] !== "erlang" || $erlanonarr["source"] !== "anon_source") {
-    var_dump($erlanonarr);
-}
-$erlnamedarr = $erlnamed->toArray();
-if ($erlnamedarr["language"] !== "erlang" || $erlnamedarr["name"] !== "named_source") {
+$erlnarr = $erl1->toArray();
+if ($erlnarr["module"] !== "module" || $erlnarr["function"] !== "function") {
     var_dump($erlanonarr);
 }
 echo "done!";

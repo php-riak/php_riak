@@ -177,7 +177,6 @@ PHP_METHOD(RiakMapreduce, toArray)
     }
 
     MAKE_STD_ZVAL(zinputval);
-
     ZVAL_STRING(&zfuncname, "getValue", 0);
     call_user_function(NULL, &zinput, &zfuncname, zinputval, 0, NULL TSRMLS_CC);
 

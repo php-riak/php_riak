@@ -83,7 +83,7 @@ PHP_METHOD(RiakMapreducePhase, __construct)
 Convert this phase into an array */
 PHP_METHOD(RiakMapreducePhase, toArray)
 {
-    zval *zarray, *zfuncarray, *zfunc, *zarg;
+    zval *zarray, *zfuncarray, *zfunc, *zarg, zname;
     long type;
     zend_bool keep;
     MAKE_STD_ZVAL(zarray);
@@ -91,7 +91,13 @@ PHP_METHOD(RiakMapreducePhase, toArray)
 
     MAKE_STD_ZVAL(zfuncarray);
     zfunc = zend_read_property(riak_mrphase_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC);
-    CALL_METHOD(RiakMrFunction, toArray, zfuncarray, zfunc);
+    ZVAL_STRING(&zname, "toArray", 0);
+    call_user_function(NULL, &zfunc, &zname, zfuncarray, 0, NULL TSRMLS_CC);
+
+    keep = Z_BVAL_P(zend_read_property(riak_mrphase_ce, getThis(), "keep", sizeof("keep")-1, 1 TSRMLS_CC));
+    if (keep) {
+        add_assoc_bool_ex(zfuncarray, "keep", sizeof("keep"), 1);
+    }
 
     type = Z_LVAL_P(zend_read_property(riak_mrphase_ce, getThis(), "type", sizeof("type")-1, 1 TSRMLS_CC));
     switch (type) {
@@ -105,10 +111,7 @@ PHP_METHOD(RiakMapreducePhase, toArray)
         /* TODO */
         break;
     }
-    keep = Z_BVAL_P(zend_read_property(riak_mrphase_ce, getThis(), "keep", sizeof("keep")-1, 1 TSRMLS_CC));
-    if (keep) {
-        add_assoc_bool_ex(zarray, "keep", sizeof("keep"), 1);
-    }
+
     zarg = zend_read_property(riak_mrphase_ce, getThis(), "arg", sizeof("arg")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zarg) != IS_NULL) {
         add_assoc_zval_ex(zarray, "arg", sizeof("arg"), zarg);

@@ -21,9 +21,6 @@ zend_class_entry *riak_mrfunction_ce;
 zend_class_entry *riak_mrfunction_js_ce;
 zend_class_entry *riak_mrfunction_erl_ce;
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mrfunction_getlang, 0, ZEND_RETURN_VALUE, 0)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mrfunction_toarray, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
@@ -32,34 +29,31 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mrfunction_js_ctor, 0, ZEND_RETURN_VALUE, 2)
     ZEND_ARG_INFO(0, source)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_create_anon_ctor, 0, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_create_anon_js, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, source)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_create_named_ctor, 0, ZEND_RETURN_VALUE, 1)
-    ZEND_ARG_INFO(0, source)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_create_erl_named_ctor, 0, ZEND_RETURN_VALUE, 2)
+    ZEND_ARG_INFO(0, module)
+    ZEND_ARG_INFO(0, function)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_mrfunction_methods[] = {
-    PHP_ME(RiakMrFunction, __construct, arginfo_mrfunction_js_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakMrFunction, toArray, arginfo_mrfunction_toarray, ZEND_ACC_PUBLIC)
-    ZEND_ABSTRACT_ME(RiakMrFunction, getLanguage, arginfo_mrfunction_getlang)
-
+    ZEND_ABSTRACT_ME(RiakMrFunction, toArray, arginfo_mrfunction_toarray)
     {NULL, NULL, NULL}
 };
 
 static zend_function_entry riak_mrfunction_js_methods[] = {
-
-    PHP_ME(RiakMrJavascriptFunction, getLanguage, arginfo_mrfunction_getlang, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakMrJavascriptFunction, anon,  arginfo_create_anon_ctor,  ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-    PHP_ME(RiakMrJavascriptFunction, named, arginfo_create_named_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    PHP_ME(RiakMrJavascriptFunction, __construct, arginfo_mrfunction_js_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakMrJavascriptFunction, anon,  arginfo_create_anon_js,  ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    PHP_ME(RiakMrJavascriptFunction, named, arginfo_create_anon_js, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    PHP_ME(RiakMrJavascriptFunction, toArray, arginfo_mrfunction_toarray, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
 static zend_function_entry riak_mrfunction_erl_methods[] = {
-    PHP_ME(RiakMrErlangFunction, getLanguage, arginfo_mrfunction_getlang, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakMrErlangFunction, anon,  arginfo_create_anon_ctor,  ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-    PHP_ME(RiakMrErlangFunction, named, arginfo_create_named_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+    PHP_ME(RiakMrErlangFunction, __construct, arginfo_create_erl_named_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakMrErlangFunction, toArray, arginfo_mrfunction_toarray, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -70,34 +64,34 @@ void riak_mrfunctions_init(TSRMLS_D)/* {{{ */
     INIT_CLASS_ENTRY(ce, "RiakMrFunction", riak_mrfunction_methods);
     riak_mrfunction_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
-    zend_declare_property_null(riak_mrfunction_ce, "named", sizeof("named")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
-    zend_declare_property_null(riak_mrfunction_ce, "source", sizeof("source")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
-
     INIT_CLASS_ENTRY(jsce, "RiakMrJavascriptFunction", riak_mrfunction_js_methods);
     riak_mrfunction_js_ce = zend_register_internal_class_ex(&jsce, riak_mrfunction_ce, NULL TSRMLS_CC);
+    zend_declare_property_null(riak_mrfunction_js_ce, "named", sizeof("named")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_mrfunction_js_ce, "source", sizeof("source")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 
     INIT_CLASS_ENTRY(erlce, "RiakMrErlangFunction", riak_mrfunction_erl_methods);
     riak_mrfunction_erl_ce = zend_register_internal_class_ex(&erlce, riak_mrfunction_ce, NULL TSRMLS_CC);
+    zend_declare_property_null(riak_mrfunction_erl_ce, "module", sizeof("module")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_mrfunction_erl_ce, "function", sizeof("function")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 /* }}} */
 
-void create_named_mr_function(zend_class_entry *classentry, zval* result,
+void create_named_mr_js_function(zend_class_entry *classentry, zval* result,
                                zend_bool named, const char* source, int sourcelen TSRMLS_DC)/* {{{ */
 {
     zval znamed, *zsource;
-
     MAKE_STD_ZVAL(zsource);
     ZVAL_STRINGL(zsource, source, sourcelen, 1);
     ZVAL_BOOL(&znamed, named);
     object_init_ex(result, classentry);
-    CALL_METHOD2(RiakMrFunction, __construct, result, result, &znamed, zsource);
+    CALL_METHOD2(RiakMrJavascriptFunction, __construct, result, result, &znamed, zsource);
     zval_ptr_dtor(&zsource);
 }
 /* }}} */
 
 /* {{{ proto void RiakMrFunction->__construct(bool $named, string $source)
 Create a new RiakMrFunction */
-PHP_METHOD(RiakMrFunction, __construct)
+PHP_METHOD(RiakMrJavascriptFunction, __construct)
 {
     zend_bool named;
     char* source;
@@ -112,20 +106,15 @@ PHP_METHOD(RiakMrFunction, __construct)
 
 /* {{{ proto array RiakMrFunction->toArray()
 Returns this RiakMrFunction as an array */
-PHP_METHOD(RiakMrFunction, toArray)
+PHP_METHOD(RiakMrJavascriptFunction, toArray)
 {
     zend_bool named;
-    zval *zarray, *znamed, *zsource, *zlang, zfuncname;
+    zval *zarray, *znamed, *zsource;
 
-    MAKE_STD_ZVAL(zlang);
     MAKE_STD_ZVAL(zarray);
     array_init(zarray);
 
-    ZVAL_STRING(&zfuncname, "getLanguage", 0);
-    call_user_function(NULL, &getThis(), &zfuncname, zlang, 0, NULL TSRMLS_CC);
-
-    add_assoc_stringl_ex(zarray, "language", sizeof("language"), Z_STRVAL_P(zlang), Z_STRLEN_P(zlang), 1);
-    zval_ptr_dtor(&zlang);
+    add_assoc_string_ex(zarray, "language", sizeof("language"), "javascript", 1);
 
     znamed = zend_read_property(riak_mrfunction_ce, getThis(), "named", strlen("named"), 1 TSRMLS_CC);
     named = Z_BVAL_P(znamed);
@@ -141,7 +130,7 @@ PHP_METHOD(RiakMrFunction, toArray)
 }
 /* }}} */
 
-/* {{{ proto RiakMrJavascriptFunction RiakMrJavascriptFunction::named(string $source)
+/* {{{ proto RiakMrJavascriptFunction RiakMrJavascriptFunction::named(string $name)
 Creates a named RiakMrJavascriptFunction */
 PHP_METHOD(RiakMrJavascriptFunction, named)
 {
@@ -149,7 +138,7 @@ PHP_METHOD(RiakMrJavascriptFunction, named)
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
         return;
     }
-    create_named_mr_function(riak_mrfunction_js_ce, return_value, 1, source, sourcelen TSRMLS_CC);
+    create_named_mr_js_function(riak_mrfunction_js_ce, return_value, 1, source, sourcelen TSRMLS_CC);
 }
 /* }}} */
 
@@ -161,47 +150,42 @@ PHP_METHOD(RiakMrJavascriptFunction, anon)
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
         return;
     }
-    create_named_mr_function(riak_mrfunction_js_ce, return_value, 0, source, sourcelen TSRMLS_CC);
-}
-/* }}} */
-
-/* {{{ proto string RiakMrJavascriptFunction->getLanguage()
-Gets language of this mr function */
-PHP_METHOD(RiakMrJavascriptFunction, getLanguage)
-{
-    RETURN_STRING("javascript", 1);
+    create_named_mr_js_function(riak_mrfunction_js_ce, return_value, 0, source, sourcelen TSRMLS_CC);
 }
 /* }}} */
 
 
-/* {{{ proto RiakMrErlangFunction RiakMrErlangFunction::named(string $source)
-Creates a named RiakMrErlangFunction */
-PHP_METHOD(RiakMrErlangFunction, named)
+/* {{{ proto void RiakMrErlangFunction->__construct(string $module, string $function)
+Creates RiakMrErlangFunction */
+PHP_METHOD(RiakMrErlangFunction, __construct)
 {
-    char* source; int sourcelen;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
+    char *module, *function;
+    int modulelen, functionlen;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &module, &modulelen, &function, &functionlen) == FAILURE) {
         return;
     }
-    create_named_mr_function(riak_mrfunction_erl_ce, return_value, 1, source, sourcelen TSRMLS_CC);
+    zend_update_property_stringl(riak_mrfunction_erl_ce, getThis(), "module", sizeof("module")-1, module, modulelen TSRMLS_CC);
+    zend_update_property_stringl(riak_mrfunction_erl_ce, getThis(), "function", sizeof("function")-1, function, functionlen TSRMLS_CC);
 }
 /* }}} */
 
-/* {{{ proto RiakMrErlangFunction RiakMrErlangFunction::anon(string $source)
-Creates an anonymous RiakMrErlangFunction */
-PHP_METHOD(RiakMrErlangFunction, anon)
+/* {{{ proto array RiakMrErlangFunction->toArray()
+Returns this RiakMrFunction as an array */
+PHP_METHOD(RiakMrErlangFunction, toArray)
 {
-    char* source; int sourcelen;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &source, &sourcelen) == FAILURE) {
-        return;
-    }
-    create_named_mr_function(riak_mrfunction_erl_ce, return_value, 0, source, sourcelen TSRMLS_CC);
-}
-/* }}} */
+    zval *zarray, *zmodule, *zfunc;
 
-/* {{{ proto string RiakMrErlangFunction->getLanguage()
-Gets language of this mr function */
-PHP_METHOD(RiakMrErlangFunction, getLanguage)
-{
-    RETURN_STRING("erlang", 1);
+    MAKE_STD_ZVAL(zarray);
+    array_init(zarray);
+
+    zmodule = zend_read_property(riak_mrfunction_erl_ce, getThis(), "module", sizeof("module")-1, 1 TSRMLS_CC);
+    zfunc = zend_read_property(riak_mrfunction_erl_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC);
+
+    add_assoc_string_ex(zarray, "language", sizeof("language"), "erlang", 1);
+    add_assoc_stringl_ex(zarray, "module", sizeof("module"), Z_STRVAL_P(zmodule), Z_STRLEN_P(zmodule), 1);
+    add_assoc_stringl_ex(zarray, "function", sizeof("function"), Z_STRVAL_P(zfunc), Z_STRLEN_P(zfunc), 1);
+
+    RETURN_ZVAL(zarray, 0, 1);
 }
 /* }}} */
