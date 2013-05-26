@@ -34,4 +34,8 @@ PHP_METHOD(RiakMrInputKeyList, addArray);
 PHP_METHOD(RiakMrInputKeyList, addSingle);
 PHP_METHOD(RiakMrInputKeyList, getValue);
 
+PHP_METHOD(RiakMrInputKeyDataList, __construct);
+PHP_METHOD(RiakMrInputKeyDataList, getValue);
+PHP_METHOD(RiakMrInputKeyDataList, add);
+
 #endif

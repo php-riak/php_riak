@@ -24,6 +24,7 @@
 zend_class_entry *riak_mrinput_ce;
 zend_class_entry *riak_mrinput_bucket_ce;
 zend_class_entry *riak_mrinput_keylist_ce;
+zend_class_entry *riak_mrinput_keydatalist_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mrinput_toarr, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
@@ -34,6 +35,12 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mrinputkeylist_ctor, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, bucketkeys_arr)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mrinputkeydatalist_add, 0, ZEND_RETURN_VALUE, 3)
+    ZEND_ARG_INFO(0, bucket)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_mrinput_methods[] = {
@@ -55,9 +62,16 @@ static zend_function_entry riak_mrinputlist_methods[] = {
     {NULL, NULL, NULL}
 };
 
+static zend_function_entry riak_mrinputkeydatalist_methods[] = {
+    PHP_ME(RiakMrInputKeyDataList, __construct, arginfo_mrinput_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakMrInputKeyDataList, add, arginfo_mrinputkeydatalist_add, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMrInputKeyDataList, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
+    {NULL, NULL, NULL}
+};
+
 void riak_mrinputs_init(TSRMLS_D) /* {{{ */
 {
-    zend_class_entry ce, bucket_ce, list_ce;
+    zend_class_entry ce, bucket_ce, list_ce, list_data_ce;
 
     INIT_CLASS_ENTRY(ce, "RiakMrInput", riak_mrinput_methods);
     riak_mrinput_ce = zend_register_internal_class(&ce TSRMLS_CC);
@@ -70,6 +84,10 @@ void riak_mrinputs_init(TSRMLS_D) /* {{{ */
     INIT_CLASS_ENTRY(list_ce, "RiakMrInputKeyList", riak_mrinputlist_methods);
     riak_mrinput_keylist_ce = zend_register_internal_class_ex(&list_ce, riak_mrinput_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "inputList", sizeof("inputList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+
+    INIT_CLASS_ENTRY(list_data_ce, "RiakMrInputKeyDataList", riak_mrinputkeydatalist_methods);
+    riak_mrinput_keydatalist_ce = zend_register_internal_class_ex(&list_data_ce, riak_mrinput_ce, NULL TSRMLS_CC);
+    zend_declare_property_null(riak_mrinput_keydatalist_ce, "inputList", sizeof("inputList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 /* }}} */
 
@@ -259,3 +277,64 @@ PHP_METHOD(RiakMrInputKeyList, getValue)
     RETURN_ZVAL(zresult, 0, 1);
 }
 /* }}} */
+
+/* {{{ proto void RiakMrInputKeyDataList->__construct()
+Create a RiakMrInputKeyDataList */
+PHP_METHOD(RiakMrInputKeyDataList, __construct)
+{
+}
+/* }}} */
+
+/* {{{ proto void RiakMrInputKeyDataList->add(string|RiakBucket $bucket, string|RiakObject $object, $data)
+Add a bucket/key/data set to input */
+PHP_METHOD(RiakMrInputKeyDataList, add)
+{
+    zval *zbucket, *zkey, *zdata, *zarr, *zlist;
+    char *bucket, *key;
+    int bucketlen, keylen;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zzz", &zbucket, &zkey, &zdata) == FAILURE) {
+        return;
+    }
+    bucket = NULL;
+    bucketlen = 0;
+    if (Z_TYPE_P(zbucket) == IS_STRING) {
+        bucket = Z_STRVAL_P(zbucket);
+        bucketlen = Z_STRLEN_P(zbucket);
+    } else if (Z_TYPE_P(zbucket) == IS_OBJECT) {
+        riak_name_from_bucket(zbucket, &bucket, &bucketlen TSRMLS_CC);
+    }
+    if (Z_TYPE_P(zkey) == IS_STRING) {
+        key = Z_STRVAL_P(zkey);
+        keylen = Z_STRLEN_P(zkey);
+    } else if (Z_TYPE_P(zkey) == IS_OBJECT) {
+        riak_key_from_object(zkey, &key, &keylen TSRMLS_CC);
+    }
+    if (bucket != NULL && bucketlen > 0 && key != NULL && keylen > 0) {
+        MAKE_STD_ZVAL(zarr);
+        array_init(zarr);
+        add_next_index_stringl(zarr, bucket, bucketlen, 1);
+        add_next_index_stringl(zarr, key, keylen, 1);
+        zval_addref_p(zdata);
+        add_next_index_zval(zarr, zdata);
+        zlist = zend_read_property(riak_mrinput_keydatalist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
+        add_next_index_zval(zlist, zarr);
+        zval_ptr_dtor(&zarr);
+    } else {
+        /* TODO */
+    }
+    RETURN_ZVAL(getThis(), 1, 0);
+}
+/* }}} */
+
+
+/* {{{ proto array RiakMrInputKeyDataList->getValue()
+Returns value to use in Mapreduce */
+PHP_METHOD(RiakMrInputKeyDataList, getValue)
+{
+    zval* zresult;
+    zval* zinputlist = zend_read_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
+    //zresult = riak_array_to_tupple_array(Z_ARRVAL_P(zinputlist) TSRMLS_CC);
+    RETURN_ZVAL(zresult, 0, 1);
+}
+/* }}} */
+
