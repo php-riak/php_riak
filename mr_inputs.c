@@ -333,8 +333,10 @@ PHP_METHOD(RiakMrInputKeyDataList, getValue)
 {
     zval* zresult;
     zval* zinputlist = zend_read_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
-    //zresult = riak_array_to_tupple_array(Z_ARRVAL_P(zinputlist) TSRMLS_CC);
-    RETURN_ZVAL(zresult, 0, 1);
+    if (Z_TYPE_P(zinputlist) == IS_ARRAY) {
+        RETURN_ZVAL(zresult, 1, 0);
+    }
+
 }
 /* }}} */
 

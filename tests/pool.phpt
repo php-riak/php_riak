@@ -1,5 +1,8 @@
 --TEST--
 Test connection pool accepts limits
+--INI--
+riak.persistent.connections=20
+riak.persistent.timeout=2000
 --FILE--
 <?php
 include_once "connect.inc";

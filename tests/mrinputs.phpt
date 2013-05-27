@@ -18,7 +18,9 @@ $obj = new RiakObject("object_key");
 $obj2 = new RiakObject("object_key2");
 $obj3 = new RiakObject("object_key3");
 
-
+$keyDataList = new RiakMrInputKeyDataList();
+$keyDataList->add("bucket","key","data");
+//var_dump($keyDataList->getValue());
 
 $listInput = new RiakMrInputKeyList(array("bucket1" => array("key1", "key2", "key3")));
 $listInput  ->addArray(array("bucket1" => array("key4", "key5")))
