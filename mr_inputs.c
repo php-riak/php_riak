@@ -20,6 +20,7 @@
 #include "ht_utils.h"
 #include "object.h"
 #include "bucket.h"
+#include "exceptions.h"
 
 zend_class_entry *riak_mrinput_ce;
 zend_class_entry *riak_mrinput_bucket_ce;
@@ -262,7 +263,7 @@ PHP_METHOD(RiakMrInputKeyList, addSingle)
         CALL_METHOD1(RiakMrInputKeyList, addArray, return_value, getThis(), zarray);
         zval_ptr_dtor(&zarray);
     } else {
-        /* TODO throw bad arguments error */
+        zend_throw_exception(riak_badarguments_exception_ce, "Key or bucketname missing", 5001 TSRMLS_CC);
     }
 }
 /* }}} */
@@ -282,6 +283,11 @@ PHP_METHOD(RiakMrInputKeyList, getValue)
 Create a RiakMrInputKeyDataList */
 PHP_METHOD(RiakMrInputKeyDataList, __construct)
 {
+    zval *list;
+    MAKE_STD_ZVAL(list);
+    array_init(list);
+    zend_update_property(riak_mrinput_keydatalist_ce, getThis(), "inputList", sizeof("inputList")-1, list TSRMLS_CC);
+    zval_ptr_dtor(&list);
 }
 /* }}} */
 
@@ -318,9 +324,8 @@ PHP_METHOD(RiakMrInputKeyDataList, add)
         add_next_index_zval(zarr, zdata);
         zlist = zend_read_property(riak_mrinput_keydatalist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
         add_next_index_zval(zlist, zarr);
-        zval_ptr_dtor(&zarr);
     } else {
-        /* TODO */
+        zend_throw_exception(riak_badarguments_exception_ce, "Key or bucketname missing", 5001 TSRMLS_CC);
     }
     RETURN_ZVAL(getThis(), 1, 0);
 }
@@ -331,10 +336,9 @@ PHP_METHOD(RiakMrInputKeyDataList, add)
 Returns value to use in Mapreduce */
 PHP_METHOD(RiakMrInputKeyDataList, getValue)
 {
-    zval* zresult;
-    zval* zinputlist = zend_read_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
+    zval* zinputlist = zend_read_property(riak_mrinput_keydatalist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zinputlist) == IS_ARRAY) {
-        RETURN_ZVAL(zresult, 1, 0);
+        RETURN_ZVAL(zinputlist, 1, 0);
     }
 
 }
