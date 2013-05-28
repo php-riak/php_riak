@@ -33,6 +33,7 @@ PHP_METHOD(RiakBucket, fetchProperties);
 PHP_METHOD(RiakBucket, putObject);
 PHP_METHOD(RiakBucket, getObject);
 PHP_METHOD(RiakBucket, deleteObject);
+PHP_METHOD(RiakBucket, indexQuery);
 
 zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC);
 RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC);

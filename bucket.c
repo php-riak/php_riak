@@ -70,11 +70,18 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_applyprops, 0, ZEND_RETURN_VALUE, 1)
 	ZEND_ARG_INFO(0, bucket_properties)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_indexq, 0, ZEND_RETURN_VALUE, 2)
+    ZEND_ARG_INFO(0, index)
+    ZEND_ARG_INFO(0, from)
+    ZEND_ARG_INFO(0, to)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_bucket_methods[] = {
 	PHP_ME(RiakBucket, __construct, arginfo_bucket_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(RiakBucket, putObject, arginfo_bucket_put, ZEND_ACC_PUBLIC)
 	PHP_ME(RiakBucket, getObject, arginfo_bucket_get, ZEND_ACC_PUBLIC)
 	PHP_ME(RiakBucket, deleteObject, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, indexQuery, arginfo_bucket_indexq, ZEND_ACC_PUBLIC)
 
 	PHP_ME(RiakBucket, fetchProperties, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
 	PHP_ME(RiakBucket, applyProperties, arginfo_bucket_applyprops, ZEND_ACC_PUBLIC)
@@ -139,6 +146,47 @@ PHP_METHOD(RiakBucket, __construct)
     COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "r", zprop)
     COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "rw", zprop)
     COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "w", zprop)
+}
+/* }}} */
+
+
+/* {{{ proto array RiakBucket->indexQuery(string $index, string $from [, string $to])
+Apply given properties to this bucket */
+PHP_METHOD(RiakBucket, indexQuery)
+{
+    RIACK_STRING rsbucket, rsindex, rsfrom, rsto;
+    RIACK_STRING_LIST resultlist;
+    char *index, *from, *to;
+    int indexlen, fromlen, tolen, riackstatus, i;
+    riak_connection *connection;
+    zval *zresult;
+    tolen = 0; to = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss|s", &index, &indexlen, &from, &fromlen, &to, &tolen) == FAILURE) {
+        return;
+    }
+
+    GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
+    rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
+    rsindex.len = indexlen;
+    rsindex.value = index;
+    rsfrom.len = fromlen;
+    rsfrom.value = from;
+    if (to != NULL && tolen > 0) {
+        rsto.len = tolen;
+        rsto.value = to;
+        riack_2i_query_range(connection->client, rsbucket, rsindex, rsfrom, rsto, &resultlist);
+    } else {
+        riackstatus = riack_2i_query_exact(connection->client, rsbucket, rsindex, rsfrom, &resultlist);
+    }
+    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
+
+    MAKE_STD_ZVAL(zresult);
+    array_init(zresult);
+    for (i=0; i<resultlist.string_count; ++i) {
+        add_next_index_stringl(zresult, resultlist.strings[i].value, resultlist.strings[i].len, 1);
+    }
+    riack_free_string_list(connection->client, &resultlist);
+    RETURN_ZVAL(zresult, 0, 1);
 }
 /* }}} */
 
@@ -434,3 +482,4 @@ riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)/* {{{ */
 	return connection;
 }
 /* }}} */
+

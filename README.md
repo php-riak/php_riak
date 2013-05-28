@@ -73,7 +73,7 @@ This extension includes a session module that can replace the default PHP sessio
 You can specify w, dw, pw, r, rw and pr values by adding them to the session.save_path.
 For instance to use a local riak with w and r values of 2:
 
-        proto://127.0.0.1:8098/session?w=2&r=2
+        proto://127.0.0.1:8087/session?w=2&r=2
 
 Please note that the session handles does NOT set any bucket properties.
 Bucket properties should either be set in app.config or applied manually on the bucket before using this session handler, conflicting writes are not handled so please disable siblings on the bucket.
