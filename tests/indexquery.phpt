@@ -16,12 +16,20 @@ try {
         $bucket->putObject($obj);
     }
     $result = $bucket->indexQuery("tal_int", 1);
-    if ($result !== "obj1") {
+    if ($result[0] !== "obj1") {
         var_dump($result);
     }
+    $result = $bucket->indexQuery("tekst_bin", "text4", "text6");
+    if (count($result) !== 3 ||
+        !in_array("obj4", $result) ||
+        !in_array("obj5", $result) ||
+        !in_array("obj6", $result)) {
+        var_dump($result);
+    }
+    echo "done!";
 } catch (Exception $e) {
     var_dump($e);
 }
 ?>
 --EXPECT--
-success!
+done!

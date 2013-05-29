@@ -136,7 +136,7 @@ zval *links_from_content(struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
 /* }}} */
 
 /* Get metadata array from returned content */
-zval *assoc_array_from_riack_pairs(struct RIACK_PAIR* pairs, size_t pairscnt TSRMLS_CC) /* {{{ */
+zval *assoc_array_from_riack_pairs(struct RIACK_PAIR* pairs, size_t pairscnt TSRMLS_DC) /* {{{ */
 {
     zval *zresultarr;
 	size_t i;
@@ -251,7 +251,7 @@ void set_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uin
     struct RIACK_PAIR* pairs = (struct RIACK_PAIR*)custom_ptr;
     if (key) {
         rkey.value = key;
-        rkey.len = keylen;
+        rkey.len = keylen-1;
         pairs[cnt].key = riack_copy_string(client, rkey);
     } else {
         MAKE_STD_ZVAL(tmp);

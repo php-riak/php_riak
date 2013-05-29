@@ -1,5 +1,5 @@
 --TEST--
-Test mapreduce
+Test key filters
 --FILE--
 <?php
 include_once "connect.inc";
@@ -19,7 +19,6 @@ for ($i=0; $i<20; $i++) {
     $obj->data = "dummy";
     $bucket->putObject($obj);
 }
-
 $function1 = new RiakMrErlangFunction("riak_kv_mapreduce","map_object_value");
 $input = new RiakMrInputBucket("test_keyfilters");
 $input->keyFilters = array( array("tokenize", "_", 2), array("between", "05", "15") );

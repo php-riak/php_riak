@@ -174,7 +174,7 @@ PHP_METHOD(RiakBucket, indexQuery)
     if (to != NULL && tolen > 0) {
         rsto.len = tolen;
         rsto.value = to;
-        riack_2i_query_range(connection->client, rsbucket, rsindex, rsfrom, rsto, &resultlist);
+        riackstatus = riack_2i_query_range(connection->client, rsbucket, rsindex, rsfrom, rsto, &resultlist);
     } else {
         riackstatus = riack_2i_query_exact(connection->client, rsbucket, rsindex, rsfrom, &resultlist);
     }
