@@ -7,11 +7,10 @@ env:
 services: riak
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libprotobuf-dev protobuf-compiler libprotobuf-c0-dev protobuf-c-compiler valgrind
+  - sudo apt-get install -qq valgrind
   - git submodule update --init --recursive
 before_script:
   - "ulimit -n 2048"
-  - ./script/build_riack.sh 127.0.0.1 8087
   - ./script/build_module.sh
 script:
   - ./script/test_riack.sh

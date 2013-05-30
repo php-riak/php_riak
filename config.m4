@@ -6,35 +6,6 @@ if test "$PHP_RIAK" != "no"; then
 
   AC_DEFINE(PHP_SESSION,1,[riak session])
 
-  if test -r $PHP_RIAK/google/protobuf-c/protobuf-c.h; then
-    PB_DIR=$PHP_RIAK
-  else
-    AC_MSG_CHECKING(for protobuf-c in default path)
-    for i in /usr/local /usr; do
-      if test -r $i/include/google/protobuf-c/protobuf-c.h; then
-        PB_DIR=$i
-        AC_MSG_RESULT(found in $i)
-        break
-      fi
-    done
-  fi
-  if test -z "$PB_DIR"; then
-    AC_MSG_RESULT(not found)
-    AC_MSG_ERROR(Please reinstall the libprotobuf-c distribution -
-    protobuf-c.h should be in <protobuf-c dir>/include/google/protobuf-c/)
-  fi
-
-  PHP_SUBST(RIAK_SHARED_LIBADD)
-  PHP_ADD_LIBPATH(riack)
-  PHP_ADD_LIBRARY(riack,, RIAK_SHARED_LIBADD)
-  PHP_ADD_LIBRARY(protobuf-c, 1, RIAK_SHARED_LIBADD)
-
-  PHP_ADD_LIBPATH($PB_DIR/lib, RIAK_SHARED_LIBADD)
-  PHP_ADD_LIBPATH(riack, RIAK_SHARED_LIBADD)
-  PHP_ADD_INCLUDE([riack/src])
-
-  PHP_SUBST(RIAK_SHARED_LIBADD)
-
   dnl this defines the extension
   PHP_NEW_EXTENSION(riak, php_riak.c \
     client.c \
@@ -51,7 +22,18 @@ if test "$PHP_RIAK" != "no"; then
     mr_functions.c \
     mr_inputs.c \
     mr_result.c \
-    ht_utils.c, $ext_shared)
+    ht_utils.c \
+    riack/src/riack_sock.c \
+    riack/src/riack.c \
+    riack/src/riack_kv.c \
+    riack/src/riack_msg.c \
+    riack/src/riack_mem.c \
+    riack/src/riack_helpers.c \
+    riack/src/protocol/riak_msg_codes.c \
+    riack/src/protocol/riak_search.pb-c.c \
+    riack/src/protocol/riak.pb-c.c \
+    riack/src/protocol/riak_kv.pb-c.c \
+    riack/src/google/protobuf-c/protobuf-c.c, $ext_shared)
 
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in
