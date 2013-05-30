@@ -13,6 +13,5 @@ before_script:
   - "ulimit -n 2048"
   - ./script/build_module.sh
 script:
-  - ./script/test_riack.sh
   - PHP=`which php`
   - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q -m --show-diff
