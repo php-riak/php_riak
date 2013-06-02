@@ -15,8 +15,6 @@
    limitations under the License.
 */
 
-#include <riack.h>
-
 #ifndef PHP_RIAK__H__
 #define PHP_RIAK__H__
 
@@ -24,6 +22,7 @@
   #include "config.h"
 #endif
 #include <php.h>
+#include <riack.h>
 
 #define PHP_RIAK_EXTNAME "riak"
 #define PHP_RIAK_VERSION "0.1"
