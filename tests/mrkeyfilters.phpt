@@ -26,9 +26,14 @@ $input->keyFilters = array( array("tokenize", "_", 2), array("between", "05", "1
 $mr = new RiakMapreduce($client);
 $mr ->addPhase(new RiakMapreducePhase(RiakMapreducePhase::map, $function1))
     ->setInput($input);
-$result = $mr->run();
+$mrres = $mr->run();
+
 // Should return 11 objects since we fetch 05-15 both inclusive
-if (count($result) !== 11) {
+$rescnt = 0;
+foreach ($mrres as $resp) {
+    $rescnt += count($resp->value);
+}
+if ($rescnt !== 11) {
     var_dump($result);
 } else {
     echo "success!";
