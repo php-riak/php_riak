@@ -28,6 +28,7 @@ PHP_METHOD(RiakMrInput, toArray);
 
 PHP_METHOD(RiakMrInputBucket, __construct);
 PHP_METHOD(RiakMrInputBucket, getValue);
+PHP_METHOD(RiakMrInputBucket, setIndexFilter);
 
 PHP_METHOD(RiakMrInputKeyList, __construct);
 PHP_METHOD(RiakMrInputKeyList, addArray);

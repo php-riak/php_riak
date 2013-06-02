@@ -13,6 +13,13 @@ if ($val !== "bucket_name") {
     var_dump($buckeetInput1);
 }
 
+$buckeetInput2 = new RiakMrInputBucket("bucket_name2");
+$buckeetInput2->setIndexFilter("test_bin", "s", "e");
+$val = $buckeetInput2->getValue();
+if ($val["bucket"] !== "bucket_name2" || $val["index"] !== "test_bin" || $val["start"] != "s" || $val["end"] !== "e") {
+    var_dump($val);
+}
+
 $obj = new RiakObject("object_key");
 
 $obj2 = new RiakObject("object_key2");
