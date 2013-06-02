@@ -14,13 +14,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
+#include "php_riak.h"
 #include "bucket.h"
 #include "bucket_properties.h"
 #include "client.h"
 #include "object.h"
 #include "exceptions.h"
-#include "php_riak.h"
+
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 

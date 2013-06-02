@@ -27,6 +27,7 @@ php-setup.sh
 run-tests.php
 config.*
 !config.m4
+!config.w32
 configure
 configure.*
 Makefile
