@@ -205,7 +205,11 @@ PHP_METHOD(RiakMapreduce, toJson)
     MAKE_STD_ZVAL(zarr);
     CALL_METHOD(RiakMapreduce, toArray, zarr, getThis());
 
+#ifdef PHP_JSON_PRETTY_PRINT
     php_json_encode(&buff, zarr, PHP_JSON_PRETTY_PRINT TSRMLS_CC);
+#else
+    php_json_encode(&buff, zarr, 0 TSRMLS_CC);
+#endif    
     RETVAL_STRINGL(buff.c, buff.len, 1);
     smart_str_free(&buff);
     zval_ptr_dtor(&zarr);
