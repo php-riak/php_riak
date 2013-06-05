@@ -67,8 +67,14 @@ zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC) /* 
 	memset(tobj, 0, sizeof(client_data));
 
 	zend_object_std_init((zend_object *) &tobj->std, class_type TSRMLS_CC);
+#if ZEND_MODULE_API_NO >= 20100525
 	object_properties_init((zend_object*) &tobj->std, class_type);
- 
+#else
+	{
+		zval *tmp;
+		zend_hash_copy(tobj->std.properties, &class_type->default_properties, (copy_ctor_func_t)zval_add_ref, (void *)&tmp, sizeof(zval *));
+	}
+#endif
 	retval.handle = zend_objects_store_put(tobj, (zend_objects_store_dtor_t) zend_objects_destroy_object, 
 		(zend_objects_free_object_storage_t) free_client_data, NULL TSRMLS_CC);
 	retval.handlers = zend_get_std_object_handlers();
