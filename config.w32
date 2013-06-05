@@ -10,6 +10,8 @@ if (PHP_RIAK != "no") {
     	ADD_SOURCES(configure_module_dirname + "/riack/src/google/protobuf-c", "protobuf-c.c", "riak");
     	ADD_SOURCES(configure_module_dirname + "/riack/src/protocol", "riak_msg_codes.c riak_search.pb-c.c riak.pb-c.c riak_kv.pb-c.c", "riak");
 		AC_DEFINE('HAVE_RIAK', 1);
+		ADD_EXTENSION_DEP('riak', 'json');
+		ADD_EXTENSION_DEP('riak', 'session');
 	} else {
 		WARNING("Riack header not found, did you remember to checkout the riack submodule?");
 	}
