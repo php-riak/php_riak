@@ -138,8 +138,7 @@ PHP_GSHUTDOWN_FUNCTION(riak) /* {{{ */
 #endif
 }
 /* {{{ */
-
-void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)/* {{{ */
+void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)/* {{{ */
 {
     if (errorStatus == RIACK_ERROR_COMMUNICATION) {
         zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);
