@@ -14,6 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
+#include <php.h>
+#include <riack.h>
 #include "php_riak.h"
 #include "bucket.h"
 #include "bucket_properties.h"
@@ -119,7 +122,7 @@ zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC) /* {{{ */
 	ZVAL_STRING(zname, name, 1);
 
 	object_init_ex(zbucket, riak_bucket_ce);
-	CALL_METHOD2(RiakBucket, __construct, zbucket, zbucket, zclient, zname);
+	RIAK_CALL_METHOD2(RiakBucket, __construct, zbucket, zbucket, zclient, zname);
 
 	zval_ptr_dtor(&zname);
 	return zbucket;
@@ -255,7 +258,7 @@ PHP_METHOD(RiakBucket, fetchProperties)
 
 	MAKE_STD_ZVAL(zBucketProps);
 	object_init_ex(zBucketProps, riak_bucket_properties_ce);
-	CALL_METHOD2(RiakBucketProperties, __construct, zBucketProps, zBucketProps, zNVal, zAllowMult);
+	RIAK_CALL_METHOD2(RiakBucketProperties, __construct, zBucketProps, zBucketProps, zNVal, zAllowMult);
 	RETVAL_ZVAL(zBucketProps, 0, 1);
 
 	zval_ptr_dtor(&zNVal);
@@ -281,7 +284,7 @@ PHP_METHOD(RiakBucket, deleteObject)
     /* Set bucket name */
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
     /* Set key */
-	HASH_GET_INTO_RIACK_STRING_OR_ELSE(riak_object_ce, zObject, "key", zTmp, key) {
+    GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zObject, "key", zTmp, key) {
 		zend_throw_exception(riak_badarguments_exception_ce, "key missing from object", 5001 TSRMLS_CC);
  		return;
 	}
@@ -348,7 +351,7 @@ PHP_METHOD(RiakBucket, putObject)
 		obj.key.value = key;
 	} else {
         /* No ket provided on function call, get it from RiakObject */
-		HASH_GET_INTO_RIACK_STRING_OR_ELSE(riak_object_ce, zObject, "key", zTmp, obj.key) {
+        GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zObject, "key", zTmp, obj.key) {
             /* Handle possible errors */
 		}
 	}
@@ -407,7 +410,7 @@ PHP_METHOD(RiakBucket, getObject)
 				add_next_index_zval(zObjArr, zObj);
 			}
 			object_init_ex(zExc, riak_conflicted_object_exception_ce);
-			CALL_METHOD2(RiakConflictedObjectException, __construct, zExc, zExc, zVclock, zObjArr);
+			RIAK_CALL_METHOD2(RiakConflictedObjectException, __construct, zExc, zExc, zVclock, zObjArr);
 			zend_throw_exception_object(zExc TSRMLS_CC);
 			
 			zval_ptr_dtor(&zObjArr);
@@ -436,7 +439,7 @@ zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_D
 	zval *object;
 	MAKE_STD_ZVAL(object);
 	object_init_ex(object, riak_object_ce);
-	CALL_METHOD1(RiakObject, __construct, object, object, key);
+	RIAK_CALL_METHOD1(RiakObject, __construct, object, object, key);
 
 	set_object_from_riak_content(object, content TSRMLS_CC);
 

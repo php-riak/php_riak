@@ -120,7 +120,7 @@ PHP_METHOD(RiakMapreduce, run)
     int riackResult;
 
     MAKE_STD_ZVAL(zjson);
-    CALL_METHOD(RiakMapreduce, toJson, zjson, getThis());
+    RIAK_CALL_METHOD(RiakMapreduce, toJson, zjson, getThis());
 
     zclient = zend_read_property(riak_mapreduce_ce, getThis(), "client", sizeof("client")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zclient) == IS_OBJECT) {
@@ -154,7 +154,7 @@ void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint key
     zval *zarr, *ztargetarr;
     ztargetarr = (zval*)custom_ptr;
     MAKE_STD_ZVAL(zarr);
-    CALL_METHOD(RiakMapreducePhase, toArray, zarr, *data);
+    RIAK_CALL_METHOD(RiakMapreducePhase, toArray, zarr, *data);
     if (zarr && Z_TYPE_P(zarr) == IS_ARRAY) {
         add_next_index_zval(ztargetarr, zarr);
     }
@@ -203,7 +203,7 @@ PHP_METHOD(RiakMapreduce, toJson)
 
     memset(&buff, 0, sizeof(smart_str));
     MAKE_STD_ZVAL(zarr);
-    CALL_METHOD(RiakMapreduce, toArray, zarr, getThis());
+    RIAK_CALL_METHOD(RiakMapreduce, toArray, zarr, getThis());
 
 #ifdef PHP_JSON_PRETTY_PRINT
     php_json_encode(&buff, zarr, PHP_JSON_PRETTY_PRINT TSRMLS_CC);

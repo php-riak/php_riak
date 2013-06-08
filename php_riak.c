@@ -15,9 +15,11 @@
    limitations under the License.
 */
 
-#include "php_riak.h"
+#include <php.h>
 #include <php_ini.h>
 #include <riack.h>
+#include "php_riak.h"
+
 #include "pool.h"
 #include "client.h"
 #include "object.h"

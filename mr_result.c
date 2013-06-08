@@ -53,10 +53,10 @@ zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESULT *mapresult TSRM
     if (mapresult->phase_present) {
         MAKE_STD_ZVAL(zphase);
         ZVAL_LONG(zphase, mapresult->phase);
-        CALL_METHOD2(RiakMrResult, __construct, zresult, zresult, zvalue, zphase);
+        RIAK_CALL_METHOD2(RiakMrResult, __construct, zresult, zresult, zvalue, zphase);
         zval_ptr_dtor(&zphase);
     } else {
-        CALL_METHOD1(RiakMrResult, __construct, zresult, zresult, zvalue);
+        RIAK_CALL_METHOD1(RiakMrResult, __construct, zresult, zresult, zvalue);
     }
     zval_ptr_dtor(&zvalue);
     return zresult;

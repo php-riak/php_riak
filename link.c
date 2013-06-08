@@ -14,6 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include <php.h>
+#include <riack.h>
 #include "link.h"
 #include "php_riak.h"
 
@@ -57,7 +59,7 @@ zval* create_link_object(const char* tag, const char *bucket, const char* key TS
 
     MAKE_STD_ZVAL(zlink);
     object_init_ex(zlink, riak_link_ce);
-    CALL_METHOD3(RiakLink, __construct, zlink, zlink, ztag, zbucket, zkey);
+    RIAK_CALL_METHOD3(RiakLink, __construct, zlink, zlink, ztag, zbucket, zkey);
 
     zval_ptr_dtor(&zkey);
     zval_ptr_dtor(&zbucket);

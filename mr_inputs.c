@@ -14,6 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include <php.h>
+#include <riack.h>
 #include "mr_inputs.h"
 #include "ext/standard/php_array.h"
 #include "php_riak.h"
@@ -307,7 +309,7 @@ PHP_METHOD(RiakMrInputKeyList, addSingle)
         MAKE_STD_ZVAL(zarray);
         array_init(zarray);
         add_assoc_stringl_ex(zarray, bucket, bucketlen, key, keylen, 1);
-        CALL_METHOD1(RiakMrInputKeyList, addArray, return_value, getThis(), zarray);
+        RIAK_CALL_METHOD1(RiakMrInputKeyList, addArray, return_value, getThis(), zarray);
         zval_ptr_dtor(&zarray);
     } else {
         zend_throw_exception(riak_badarguments_exception_ce, "Key or bucketname missing", 5001 TSRMLS_CC);

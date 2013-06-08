@@ -15,6 +15,8 @@
    limitations under the License.
 */
 
+#include <php.h>
+#include <riack.h>
 #include "riak_session.h"
 
 #ifdef PHP_SESSION
@@ -124,7 +126,7 @@ PS_READ_FUNC(riak) /* {{{ */
 
     MAKE_STD_ZVAL(zobject);
     object_init_ex(zobject, riak_object_ce);
-    CALL_METHOD1(RiakBucket, getObject, zobject, data->zbucket, zkey);
+    RIAK_CALL_METHOD1(RiakBucket, getObject, zobject, data->zbucket, zkey);
 
     if (!EG(exception)) {
         zdata = zend_read_property(riak_object_ce, zobject, "data", sizeof("data")-1, 1 TSRMLS_CC);
@@ -156,7 +158,7 @@ PS_WRITE_FUNC(riak) /* {{{ */
         return FAILURE;
     }
     zend_update_property_stringl(riak_object_ce, zobject, "data", sizeof("data")-1, val, vallen TSRMLS_CC);
-    CALL_METHOD1(RiakBucket, putObject, NULL, data->zbucket, zobject);
+    RIAK_CALL_METHOD1(RiakBucket, putObject, NULL, data->zbucket, zobject);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {
         return FAILURE;
@@ -171,7 +173,7 @@ PS_DESTROY_FUNC(riak) /* {{{ */
     PS_RIAK_DATA;
     zval *zobject;
     zobject = create_object_object(key TSRMLS_CC);
-    CALL_METHOD1(RiakBucket, deleteObject, zobject, data->zbucket, zobject);
+    RIAK_CALL_METHOD1(RiakBucket, deleteObject, zobject, data->zbucket, zobject);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {
         return FAILURE;

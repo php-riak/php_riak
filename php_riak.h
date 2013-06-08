@@ -21,8 +21,6 @@
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
-#include <php.h>
-#include <riack.h>
 
 #define PHP_RIAK_EXTNAME "riak"
 #define PHP_RIAK_VERSION "0.1"
@@ -31,50 +29,50 @@
 * Macros
 *************************************************/
 
-#define PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
-#define POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
-#define PUSH_EO_PARAM()
-#define POP_EO_PARAM()
+#define RIAK_PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
+#define RIAK_POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
+#define RIAK_PUSH_EO_PARAM()
+#define RIAK_POP_EO_PARAM()
  
-#define CALL_METHOD_BASE(classname, name) zim_##classname##_##name
+#define RIAK_CALL_METHOD_BASE(classname, name) zim_##classname##_##name
 
 
-#define CALL_METHOD_HELPER(classname, name, retval, thisptr, num, param) \
-  PUSH_PARAM(param); PUSH_PARAM((void*)num);                            \
-  PUSH_EO_PARAM();                                                      \
-  CALL_METHOD_BASE(classname, name)(num, retval, NULL, thisptr, 0 TSRMLS_CC); \
-  POP_EO_PARAM();                       \
-  POP_PARAM(); POP_PARAM();
+#define RIAK_CALL_METHOD_HELPER(classname, name, retval, thisptr, num, param) \
+  RIAK_PUSH_PARAM(param); RIAK_PUSH_PARAM((void*)num);                            \
+  RIAK_PUSH_EO_PARAM();                                                      \
+  RIAK_CALL_METHOD_BASE(classname, name)(num, retval, NULL, thisptr, 0 TSRMLS_CC); \
+  RIAK_POP_EO_PARAM();                       \
+  RIAK_POP_PARAM(); RIAK_POP_PARAM();
  
-#define CALL_METHOD(classname, name, retval, thisptr)                  \
-  CALL_METHOD_BASE(classname, name)(0, retval, NULL, thisptr, 0 TSRMLS_CC);
+#define RIAK_CALL_METHOD(classname, name, retval, thisptr)                  \
+  RIAK_CALL_METHOD_BASE(classname, name)(0, retval, NULL, thisptr, 0 TSRMLS_CC);
  
-#define CALL_METHOD1(classname, name, retval, thisptr, param1)         \
-  CALL_METHOD_HELPER(classname, name, retval, thisptr, 1, param1);
+#define RIAK_CALL_METHOD1(classname, name, retval, thisptr, param1)         \
+  RIAK_CALL_METHOD_HELPER(classname, name, retval, thisptr, 1, param1);
  
-#define CALL_METHOD2(classname, name, retval, thisptr, param1, param2) \
-  PUSH_PARAM(param1);                                                  \
-  CALL_METHOD_HELPER(classname, name, retval, thisptr, 2, param2);     \
-  POP_PARAM();
+#define RIAK_CALL_METHOD2(classname, name, retval, thisptr, param1, param2) \
+  RIAK_PUSH_PARAM(param1);                                                  \
+  RIAK_CALL_METHOD_HELPER(classname, name, retval, thisptr, 2, param2);     \
+  RIAK_POP_PARAM();
  
-#define CALL_METHOD3(classname, name, retval, thisptr, param1, param2, param3) \
-  PUSH_PARAM(param1); PUSH_PARAM(param2);                              \
-  CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
-  POP_PARAM(); POP_PARAM();
+#define RIAK_CALL_METHOD3(classname, name, retval, thisptr, param1, param2, param3) \
+  RIAK_PUSH_PARAM(param1); RIAK_PUSH_PARAM(param2);                              \
+  RIAK_CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
+  RIAK_POP_PARAM(); RIAK_POP_PARAM();
 
 #define CHECK_RIACK_STATUS_THROW_ON_ERROR(CONNECTION, STATUS) \
   if ( STATUS != RIACK_SUCCESS) { \
     CONNECTION->needs_reconnect = 1; \
-    throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
+    riak_throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
   }
 
 #define CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(CONNECTION, STATUS) \
   if ( STATUS != RIACK_SUCCESS) { \
     CONNECTION->needs_reconnect = 1; \
-    throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
+    riak_throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
   return; }
 
-#define HASH_GET_INTO_RIACK_STRING_OR_ELSE(CE, ZOBJ, KEY, ZVAL, RIACK_STR) ZVAL = zend_read_property(CE, ZOBJ, KEY, sizeof(KEY)-1, 1 TSRMLS_CC); \
+#define GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(CE, ZOBJ, KEY, ZVAL, RIACK_STR) ZVAL = zend_read_property(CE, ZOBJ, KEY, sizeof(KEY)-1, 1 TSRMLS_CC); \
      if (Z_TYPE_P(ZVAL) == IS_STRING) { \
        RIACK_STR.len = Z_STRLEN_P(ZVAL); \
        RIACK_STR.value = Z_STRVAL_P(ZVAL); } else
@@ -127,6 +125,6 @@ PHP_MSHUTDOWN_FUNCTION(riak);
 PHP_GINIT_FUNCTION(riak);
 PHP_GSHUTDOWN_FUNCTION(riak);
 
-void throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
+void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
 
 #endif

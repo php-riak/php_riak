@@ -19,9 +19,7 @@
 #define RIAK_SESSION__H__
 
 #include "php_riak.h"
-#include <php.h>
 #include "ext/session/php_session.h"
-
 
 #ifdef PHP_SESSION
 

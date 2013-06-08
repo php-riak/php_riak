@@ -16,6 +16,7 @@
 */
 #include <php.h>
 #include <zend_exceptions.h>
+#include <riack.h>
 #include "php_riak.h"
 #include "client.h"
 #include "object.h"
@@ -105,7 +106,7 @@ zval* create_client_object(char* host, long port TSRMLS_DC) /* {{{ */
 
 	MAKE_STD_ZVAL(zclient);
 	object_init_ex(zclient, riak_client_ce);
-    CALL_METHOD2(RiakClient, __construct, zclient, zclient, zhost, zport);
+    RIAK_CALL_METHOD2(RiakClient, __construct, zclient, zclient, zhost, zport);
 
     zval_ptr_dtor(&zhost);
     zval_ptr_dtor(&zport);

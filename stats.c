@@ -15,6 +15,7 @@
    limitations under the License.
 */
 #include <php.h>
+#include <riack.h>
 #include "php_riak.h"
 #include "stats.h"
 

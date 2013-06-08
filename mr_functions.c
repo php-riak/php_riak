@@ -14,6 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include <php.h>
+#include <riack.h>
 #include "mr_functions.h"
 #include "php_riak.h"
 
@@ -84,7 +86,7 @@ void create_named_mr_js_function(zend_class_entry *classentry, zval* result,
     ZVAL_STRINGL(zsource, source, sourcelen, 1);
     ZVAL_BOOL(&znamed, named);
     object_init_ex(result, classentry);
-    CALL_METHOD2(RiakMrJavascriptFunction, __construct, result, result, &znamed, zsource);
+    RIAK_CALL_METHOD2(RiakMrJavascriptFunction, __construct, result, result, &znamed, zsource);
     zval_ptr_dtor(&zsource);
 }
 /* }}} */

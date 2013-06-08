@@ -64,7 +64,7 @@ zval* create_object_object(const char* key TSRMLS_DC)/* {{{ */
     ZVAL_STRING(zkey, key, 1);
 
 	object_init_ex(zobject, riak_object_ce);
-    CALL_METHOD1(RiakObject, __construct, zobject, zobject, zkey);
+    RIAK_CALL_METHOD1(RiakObject, __construct, zobject, zobject, zkey);
 
     zval_ptr_dtor(&zkey);
     return zobject;
@@ -313,9 +313,9 @@ void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, s
 		content->data = (uint8_t*)Z_STRVAL_P(zTmp);
 	}
 	// Set content type
-	HASH_GET_INTO_RIACK_STRING_OR_ELSE(riak_object_ce, object, "contentType", zTmp, content->content_type) ;
+	GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, object, "contentType", zTmp, content->content_type) ;
 	// Set content encoding
-	HASH_GET_INTO_RIACK_STRING_OR_ELSE(riak_object_ce, object, "contentEncoding", zTmp, content->content_encoding) ;
+	GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, object, "contentEncoding", zTmp, content->content_encoding) ;
 
     zTmp = zend_read_property(riak_object_ce, object, "indexes", sizeof("indexes")-1, 1 TSRMLS_CC);
     set_indexes_from_object(content, zTmp, client TSRMLS_CC);
