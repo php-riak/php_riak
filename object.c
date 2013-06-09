@@ -94,19 +94,19 @@ PHP_METHOD(RiakObject, __construct)
 	// Create empty array for metadata
     MAKE_STD_ZVAL(zarrmeta);
     array_init(zarrmeta);
-    add_property_zval_ex(getThis(), "metadata", sizeof("metadata")-1, zarrmeta TSRMLS_CC);
+    add_property_zval_ex(getThis(), "metadata", sizeof("metadata"), zarrmeta TSRMLS_CC);
     zval_ptr_dtor(&zarrmeta);
 
     // Create empty array for indexes
     MAKE_STD_ZVAL(zarrmeta);
     array_init(zarrmeta);
-    add_property_zval_ex(getThis(), "indexes", sizeof("indexes")-1, zarrmeta TSRMLS_CC);
+    add_property_zval_ex(getThis(), "indexes", sizeof("indexes"), zarrmeta TSRMLS_CC);
     zval_ptr_dtor(&zarrmeta);
 
     // Create empty array for links
     MAKE_STD_ZVAL(zarrlinks);
     array_init(zarrlinks);
-    add_property_zval_ex(getThis(), "links", sizeof("links")-1, zarrlinks TSRMLS_CC);
+    add_property_zval_ex(getThis(), "links", sizeof("links"), zarrlinks TSRMLS_CC);
     zval_ptr_dtor(&zarrlinks);
 }
 /* }}} */
