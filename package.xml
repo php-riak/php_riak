@@ -102,6 +102,27 @@
                     </dir>
                 </dir>
             </dir>
+            <dir name="tests">
+                <file name="bucket_props.phpt" role="test" />
+                <file name="key_not_found.phpt" role="test" />
+                <file name="mrfunctions.phpt" role="test" />
+                <file name="ping.phpt" role="test" />
+                <file name="session.phpt" role="test" />
+                <file name="client_ctor.phpt" role="test" />
+                <file name="links.phpt" role="test" />
+                <file name="mrinputs.phpt" role="test" />
+                <file name="pool.phpt" role="test" />
+                <file name="session_respects_options.phpt" role="test" />
+                <file name="get1.phpt" role="test" />
+                <file name="mapreduce.phpt" role="test" />
+                <file name="mrkeyfilters.phpt" role="test" />
+                <file name="put1.phpt" role="test" />
+                <file name="stats.phpt" role="test" />
+                <file name="indexquery.phpt" role="test" />
+                <file name="metadata.phpt" role="test" />
+                <file name="mrphase.phpt" role="test" />
+                <file name="reconnect.phpt" role="test" />
+            </dir>
         </dir>
     </contents>
     <dependencies>
