@@ -18,7 +18,7 @@
     <date>2013-06-13</date>
     <time>10:40:00</time>
     <version>
-        <release>0.4.1</release>
+        <release>0.4.2</release>
         <api>0.4.0</api>
     </version>
     <stability>
@@ -26,7 +26,7 @@
         <api>alpha</api>
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
-    <notes>Remember to include all files in package.xml</notes>
+    <notes>package.xml is hard trying to make it compile</notes>
     <contents>
         <dir baseinstalldir="/" name="/">
             <file role="src" name="bucket_properties.c"/>
@@ -66,37 +66,40 @@
             <file role="src" name="stats.c"/>
             <file role="src" name="stats.h"/>
             
-            <dir name="riack/src/">
-                <file role="src" name="ints.h"/>
-                <file role="src" name="riack_defines.h"/>
-                <file role="src" name="riack_helpers.c"/>
-                <file role="src" name="riack_helpers.h"/>
-                <file role="src" name="riack_kv.c"/>
-                <file role="src" name="riack_mem.c"/>
-                <file role="src" name="riack_msg.c"/>
-                <file role="src" name="riack_msg.h"/>
-                <file role="src" name="riack_sock.c"/>
-                <file role="src" name="riack_sock.h"/>
-                <file role="src" name="riack-config.h"/>
-                <file role="src" name="riack.c"/>
-                <file role="src" name="riack.h"/>
-                
-                <dir name="protocol/">
-                    <file role="src" name="riak_kv.pb-c.c"/>
-                    <file role="src" name="riak_kv.pb-c.h"/>
-                    <file role="src" name="riak_msg_codes.c"/>
-                    <file role="src" name="riak_msg_codes.h"/>
-                    <file role="src" name="riak_search.pb-c.c"/>
-                    <file role="src" name="riak_search.pb-c.h"/>
-                    <file role="src" name="riak.pb-c.c"/>
-                    <file role="src" name="riak.pb-c.h"/>
-                </dir>
-                <dir name="google/protobuf-c/">
-                    <file role="doc" name="LICENSE"/>
-                    <file role="src" name="protobuf-c-private.h"/>
-                    <file role="src" name="protobuf-c.c"/>
-                    <file role="src" name="protobuf-c.h"/>
-                    <file role="doc" name="README.md"/>
+            <dir name="riack">
+                <dir name="src">
+                    <file role="src" name="ints.h"/>
+                    <file role="src" name="riack_defines.h"/>
+                    <file role="src" name="riack_helpers.c"/>
+                    <file role="src" name="riack_helpers.h"/>
+                    <file role="src" name="riack_kv.c"/>
+                    <file role="src" name="riack_mem.c"/>
+                    <file role="src" name="riack_msg.c"/>
+                    <file role="src" name="riack_msg.h"/>
+                    <file role="src" name="riack_sock.c"/>
+                    <file role="src" name="riack_sock.h"/>
+                    <file role="src" name="riack-config.h"/>
+                    <file role="src" name="riack.c"/>
+                    <file role="src" name="riack.h"/>
+                    <dir name="protocol">
+                        <file role="src" name="riak_kv.pb-c.c"/>
+                        <file role="src" name="riak_kv.pb-c.h"/>
+                        <file role="src" name="riak_search.pb-c.c"/>
+                        <file role="src" name="riak_search.pb-c.h"/>
+                        <file role="src" name="riak.pb-c.c"/>
+                        <file role="src" name="riak.pb-c.h"/>
+                        <file role="src" name="riak_msg_codes.c"/>
+                        <file role="src" name="riak_msg_codes.h"/>
+                    </dir>
+                    <dir name="google">
+                        <dir name="protobuf-c">
+                            <file role="doc" name="LICENSE"/>
+                            <file role="src" name="protobuf-c-private.h"/>
+                            <file role="src" name="protobuf-c.c"/>
+                            <file role="src" name="protobuf-c.h"/>
+                            <file role="doc" name="README.md"/>
+                        </dir>
+                    </dir>
                 </dir>
             </dir>
         </dir>
@@ -115,6 +118,19 @@
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+        <release>
+            <version>
+                <release>0.4.2</release>
+                <api>0.4.0</api>
+            </version>
+            <stability>
+                <release>alpha</release>
+                <api>alpha</api>
+            </stability>
+            <date>2013-06-13</date>
+            <license>Apache2</license>
+            <notes>package.xml is hard trying to make it compile</notes>
+        </release>
         <release>
             <version>
                 <release>0.4.1</release>

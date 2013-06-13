@@ -39,6 +39,14 @@ if test "$PHP_RIAK" != "no"; then
   PHP_ADD_INCLUDE([$ext_builddir/riack/src])
   PHP_ADD_INCLUDE([$ext_srcdir/riack/src])
 
+  PHP_ADD_BUILD_DIR([$ext_builddir/riack/src/protocol], 1)
+  PHP_ADD_INCLUDE([$ext_builddir/riack/src/protocol])
+  PHP_ADD_INCLUDE([$ext_srcdir/riack/src/protocol])
+
+  PHP_ADD_BUILD_DIR([$ext_builddir/riack/src/google/protobuf-c], 1)
+  PHP_ADD_INCLUDE([$ext_builddir/riack/src/google/protobuf-c])
+  PHP_ADD_INCLUDE([$ext_srcdir/riack/src/google/protobuf-c])
+
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in
   darwin1*.*.*)
