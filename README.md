@@ -61,4 +61,5 @@ The session handler does not implement garbage collection, use riak´s key-expir
 See http://docs.basho.com/riak/1.3.1/tutorials/choosing-a-backend/Bitcask/ for betails on how to enable automatic key expire.
 
 ### PHP Code
-Examples of usage can be found in the .phpt files in the test folder.
+Examples of usage can be found in the .phpt files in the test folder...
+
