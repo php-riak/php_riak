@@ -15,18 +15,18 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-06-13</date>
-    <time>10:40:00</time>
+    <date>2013-06-23</date>
+    <time></time>
     <version>
-        <release>0.4.2</release>
-        <api>0.4.0</api>
+        <release>0.5.0</release>
+        <api>0.5.0</api>
     </version>
     <stability>
-        <release>alpha</release>
-        <api>alpha</api>
+        <release>beta</release>
+        <api>beta</api>
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
-    <notes>package.xml is hard trying to make it compile</notes>
+    <notes>issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds</notes>
     <contents>
         <dir baseinstalldir="/" name="/">
             <file role="src" name="bucket_properties.c"/>
@@ -139,6 +139,19 @@
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+        <release>
+            <version>
+                <release>0.5.0</release>
+                <api>0.5.0</api>
+            </version>
+            <stability>
+                <release>beta</release>
+                <api>beta</api>
+            </stability>
+            <date>2013-06-23</date>
+            <license>Apache2</license>
+            <notes>issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds</notes>
+        </release>
         <release>
             <version>
                 <release>0.4.2</release>

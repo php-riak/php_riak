@@ -22,7 +22,7 @@
 zend_bool ensure_connected(riak_connection *connection TSRMLS_DC) /* {{{ */
 {
   zend_bool result = 1;
-  if (difftime(time(NULL), connection->last_used_at)*1000 > RIAK_GLOBAL(persistent_timeout)) {
+  if (difftime(time(NULL), connection->last_used_at) > RIAK_GLOBAL(persistent_timeout)) {
       connection->needs_reconnect = 1;
    }
    if (connection->needs_reconnect) {

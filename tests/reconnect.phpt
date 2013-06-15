@@ -1,5 +1,7 @@
 --TEST--
 Test that client auto reconnect if timeout passed
+--INI--
+riak.persistent.timeout=1
 --FILE--
 <?php
 include_once "connect.inc";

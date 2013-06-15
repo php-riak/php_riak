@@ -80,7 +80,7 @@ ZEND_GET_MODULE(riak)
 
 PHP_INI_BEGIN()
   STD_PHP_INI_ENTRY("riak.persistent.connections", "20", PHP_INI_ALL, OnUpdateLong, persistent_connections, zend_riak_globals, riak_globals)
-  STD_PHP_INI_ENTRY("riak.persistent.timeout", "2000", PHP_INI_ALL,   OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.persistent.timeout", "5", PHP_INI_ALL,   OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
 PHP_INI_END()
 
 PHP_MINIT_FUNCTION(riak) /* {{{ */
@@ -121,7 +121,7 @@ PHP_MSHUTDOWN_FUNCTION(riak) /* {{{ */
 PHP_GINIT_FUNCTION(riak) /* {{{ */
 {
     riak_globals->persistent_connections = 20;
-    riak_globals->persistent_timeout = 2000;
+    riak_globals->persistent_timeout = 5;
     riak_globals->open_connections = 0;
     riak_globals->open_connections_persistent = 0;
     riak_globals->reconnects = 0;
