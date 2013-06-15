@@ -161,17 +161,45 @@ PHP_METHOD(RiakBucket, __construct)
 }
 /* }}} */
 
+struct riak_stream_key_cb_param {/* {{{ */
+    TSRMLS_D;
+    zval *zstreamer;
+};
+/* }}} */
+
+void riak_stream_key_cb(struct RIACK_CLIENT* c, void* p, RIACK_STRING key) {/* {{{ */
+    zval *zkey, zret, zfuncname;
+    struct riak_stream_key_cb_param *param = (struct riak_stream_key_cb_param*)p;
+    MAKE_STD_ZVAL(zkey);
+    ZVAL_STRINGL(zkey, key.value, key.len, 1);
+    ZVAL_STRING(&zfuncname, "key", 0);
+    call_user_function(NULL, &param->zstreamer, &zfuncname, &zret, 1, &zkey, param->tsrm_ls);
+
+    zval_ptr_dtor(&zkey);
+}
+/* }}} */
+
 /* {{{ proto void RiakBucket->streamKeys(RiakKeyStreamer streamer)
 Streams all keys in the bucket */
 PHP_METHOD(RiakBucket, streamKeys)
 {
+    struct riak_stream_key_cb_param cb_params;
+    RIACK_STRING rsbucket;
+    riak_connection *connection;
     zval* zstreamer;
+    int riackstatus;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zstreamer) == FAILURE) {
         return;
     }
-
+    GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
+    rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
+    cb_params.tsrm_ls = TSRMLS_C;
+    cb_params.zstreamer = zstreamer;
+    riackstatus = riack_stream_keys(connection->client, rsbucket, riak_stream_key_cb, &cb_params);
+    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
 }
 /* }}} */
+
 
 /* {{{ proto string[] RiakBucket->listKeys()
 List all keys in the bucket */

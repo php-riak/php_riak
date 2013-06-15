@@ -30,6 +30,8 @@
 - Bugs
     Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
 - Improvements
+    Issue8: RiakBucket->listKey function added
+    RiakBucket->streamKeys function added
     RiakBucket->deleteObject now accept a RiakObject or a string with the key to delete.
         </notes>
     <contents>
@@ -161,6 +163,8 @@
 - Bugs
     Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
 - Improvements
+    Issue8: RiakBucket->listKey function added
+    RiakBucket->streamKeys function added
     RiakBucket->deleteObject now accept a RiakObject or a string with the key to delete.
 </notes>
         </release>
