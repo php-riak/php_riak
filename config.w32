@@ -5,10 +5,10 @@ ARG_ENABLE("riak", "Riak php support", "no");
 if (PHP_RIAK != "no") {
 	if (CHECK_HEADER_ADD_INCLUDE("riack.h", "CFLAGS_RIAK", PHP_RIAK + ";" + configure_module_dirname + "/riack/src"))
 	{
-		EXTENSION("riak", "php_riak.c client.c bucket.c object.c exceptions.c bucket_properties.c pool.c link.c stats.c riak_session.c mapreduce.c mr_phase.c mr_functions.c mr_inputs.c mr_result.c ht_utils.c", true, "/I" + configure_module_dirname + "/riack/src");
-    	ADD_SOURCES(configure_module_dirname + "/riack/src", "riack_sock.c riack.c riack_kv.c riack_msg.c riack_mem.c riack_helpers.c", "riak");
-    	ADD_SOURCES(configure_module_dirname + "/riack/src/google/protobuf-c", "protobuf-c.c", "riak");
-    	ADD_SOURCES(configure_module_dirname + "/riack/src/protocol", "riak_msg_codes.c riak_search.pb-c.c riak.pb-c.c riak_kv.pb-c.c", "riak");
+                EXTENSION("riak", "php_riak.c client.c bucket.c object.c exceptions.c bucket_properties.c pool.c link.c stats.c riak_session.c mapreduce.c mr_phase.c mr_functions.c mr_inputs.c mr_result.c ht_utils.c streaming.c", true, "/I" + configure_module_dirname + "/riack/src");
+                ADD_SOURCES(configure_module_dirname + "/riack/src", "riack_sock.c riack.c riack_kv.c riack_msg.c riack_mem.c riack_helpers.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riack/src/google/protobuf-c", "protobuf-c.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riack/src/protocol", "riak_msg_codes.c riak_search.pb-c.c riak.pb-c.c riak_kv.pb-c.c", "riak");
 		AC_DEFINE('HAVE_RIAK', 1);
 		ADD_EXTENSION_DEP('riak', 'json');
 		ADD_EXTENSION_DEP('riak', 'session');

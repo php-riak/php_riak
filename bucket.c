@@ -79,6 +79,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_indexq, 0, ZEND_RETURN_VALUE, 2)
     ZEND_ARG_INFO(0, to)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_streamkeys, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, keystreamer)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_listkeys, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_bucket_methods[] = {
 	PHP_ME(RiakBucket, __construct, arginfo_bucket_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(RiakBucket, putObject, arginfo_bucket_put, ZEND_ACC_PUBLIC)
@@ -88,6 +95,8 @@ static zend_function_entry riak_bucket_methods[] = {
 
 	PHP_ME(RiakBucket, fetchProperties, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
 	PHP_ME(RiakBucket, applyProperties, arginfo_bucket_applyprops, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, streamKeys, arginfo_bucket_streamkeys, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, listKeys, arginfo_bucket_listkeys, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
@@ -149,6 +158,45 @@ PHP_METHOD(RiakBucket, __construct)
     COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "r", zprop)
     COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "rw", zprop)
     COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "w", zprop)
+}
+/* }}} */
+
+/* {{{ proto void RiakBucket->streamKeys(RiakKeyStreamer streamer)
+Streams all keys in the bucket */
+PHP_METHOD(RiakBucket, streamKeys)
+{
+    zval* zstreamer;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zstreamer) == FAILURE) {
+        return;
+    }
+
+}
+/* }}} */
+
+/* {{{ proto string[] RiakBucket->listKeys()
+List all keys in the bucket */
+PHP_METHOD(RiakBucket, listKeys)
+{
+    struct RIACK_STRING_LINKED_LIST* resultlist, *curr;
+    RIACK_STRING rsbucket;
+    riak_connection *connection;
+    zval* zresultarr;
+    int riackstatus;
+    GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
+    rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
+    riackstatus = riack_list_keys(connection->client, rsbucket, &resultlist);
+    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
+
+    MAKE_STD_ZVAL(zresultarr);
+    array_init(zresultarr);
+    curr = resultlist;
+    while (curr) {
+        add_next_index_stringl(zresultarr, curr->string.value, curr->string.len, 1);
+        curr = curr->next;
+    }
+    riack_free_string_linked_list(connection->client, &resultlist);
+
+    RETURN_ZVAL(zresultarr, 0, 1);
 }
 /* }}} */
 
@@ -266,16 +314,16 @@ PHP_METHOD(RiakBucket, fetchProperties)
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->deleteObject(RiakObject $object)
+/* {{{ proto void RiakBucket->deleteObject(RiakObject|string $object)
 Deletes given object from riak */
 PHP_METHOD(RiakBucket, deleteObject)
 {
 	struct RIACK_DEL_PROPERTIES props;
 	riak_connection *connection;
-	zval *zObject, *zTmp;
+    zval *zparam, *zTmp;
 	RIACK_STRING bucketName, key;
 	int riackResult;
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zObject) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zparam) == FAILURE) {
 		return;
 	}
 
@@ -283,11 +331,17 @@ PHP_METHOD(RiakBucket, deleteObject)
 
     /* Set bucket name */
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
-    /* Set key */
-    GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zObject, "key", zTmp, key) {
-		zend_throw_exception(riak_badarguments_exception_ce, "key missing from object", 5001 TSRMLS_CC);
- 		return;
-	}
+
+    if (Z_TYPE_P(zparam) == IS_STRING) {
+        key.len = Z_STRLEN_P(zparam);
+        key.value = Z_STRVAL_P(zparam);
+    } else {
+        /* If zparam is not a string it should be a RiakObject, get the key from the object. */
+        GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zparam, "key", zTmp, key) {
+            zend_throw_exception(riak_badarguments_exception_ce, "key missing from object", 5001 TSRMLS_CC);
+            return;
+        }
+    }
 	memset(&props, 0, sizeof(props));
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("dw", props.dw_use, props.dw, zTmp)
