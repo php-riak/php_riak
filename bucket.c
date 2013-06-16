@@ -162,18 +162,25 @@ PHP_METHOD(RiakBucket, __construct)
 /* }}} */
 
 struct riak_stream_key_cb_param {/* {{{ */
+#ifdef ZTS
     TSRMLS_D;
+#endif
     zval *zstreamer;
 };
 /* }}} */
 
 void riak_stream_key_cb(struct RIACK_CLIENT* c, void* p, RIACK_STRING key) {/* {{{ */
     zval *zkey, zret, zfuncname;
+
     struct riak_stream_key_cb_param *param = (struct riak_stream_key_cb_param*)p;
     MAKE_STD_ZVAL(zkey);
     ZVAL_STRINGL(zkey, key.value, key.len, 1);
     ZVAL_STRING(&zfuncname, "key", 0);
+#ifdef ZTS
     call_user_function(NULL, &param->zstreamer, &zfuncname, &zret, 1, &zkey, param->tsrm_ls);
+#else
+    call_user_function(NULL, &param->zstreamer, &zfuncname, &zret, 1, &zkey);
+#endif
 
     zval_ptr_dtor(&zkey);
 }
@@ -193,7 +200,9 @@ PHP_METHOD(RiakBucket, streamKeys)
     }
     GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
     rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
+#ifdef ZTS
     cb_params.tsrm_ls = TSRMLS_C;
+#endif
     cb_params.zstreamer = zstreamer;
     riackstatus = riack_stream_keys(connection->client, rsbucket, riak_stream_key_cb, &cb_params);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
