@@ -46,6 +46,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mrinputkeylist_ctor, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, bucketkeys_arr)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mrinputkeylist_single, 0, ZEND_RETURN_VALUE, 2)
+    ZEND_ARG_INFO(0, bucket)
+    ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mrinputkeydatalist_add, 0, ZEND_RETURN_VALUE, 3)
     ZEND_ARG_INFO(0, bucket)
     ZEND_ARG_INFO(0, key)
@@ -67,7 +72,7 @@ static zend_function_entry riak_mrinputbucket_methods[] = {
 static zend_function_entry riak_mrinputlist_methods[] = {
     PHP_ME(RiakMrInputKeyList, __construct, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     PHP_ME(RiakMrInputKeyList, addArray, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakMrInputKeyList, addSingle, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakMrInputKeyList, addSingle, arginfo_mrinputkeylist_single, ZEND_ACC_PUBLIC)
     PHP_ME(RiakMrInputKeyList, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
