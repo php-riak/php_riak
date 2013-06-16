@@ -17,7 +17,7 @@ for ($i=0; $i<20; $i++) {
         $obj = new RiakObject("key_$i");
     }
     $obj->data = "dummy";
-    $bucket->putObject($obj);
+    $bucket->put($obj);
 }
 $function1 = new RiakMrErlangFunction("riak_kv_mapreduce","map_object_value");
 $input = new RiakMrInputBucket("test_keyfilters");

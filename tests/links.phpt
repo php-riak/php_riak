@@ -17,14 +17,14 @@ try {
         $obj2 = new RiakObject("key_with_link_$i");
         $obj2->contentType = "text/plain";
         $obj2->data = "dummy";
-        $bucket->putObject($obj2);
+        $bucket->put($obj2);
 
         // add links to obj
         $obj->links[] = new RiakLink("link$i", "test_bucket", $obj2->key);
     }
-    $bucket->putObject($obj);
+    $bucket->put($obj);
 
-    $readdenObj = $bucket->getObject("key1");
+    $readdenObj = $bucket->get("key1");
     $success = true;
     if (count($readdenObj->links) == 10) {
         $i = 0;

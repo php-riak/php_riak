@@ -32,7 +32,11 @@
 - Improvements
     Issue8: RiakBucket->listKey function added
     RiakBucket->streamKeys function added
-    RiakBucket->deleteObject now accept a RiakObject or a string with the key to delete.
+    RiakBucket->delete now accept a RiakObject or a string with the key to delete.
+- API Changes
+    RiakBucket->getObject renamed to RiakBucket->get
+    RiakBucket->deleteObject renamed to RiakBucket->delete
+    RiakBucket->putObject renamed to RiakBucket->put
         </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -165,7 +169,11 @@
 - Improvements
     Issue8: RiakBucket->listKey function added
     RiakBucket->streamKeys function added
-    RiakBucket->deleteObject now accept a RiakObject or a string with the key to delete.
+    RiakBucket->delete now accept a RiakObject or a string with the key to delete.
+- API Changes
+    RiakBucket->getObject renamed to RiakBucket->get
+    RiakBucket->deleteObject renamed to RiakBucket->delete
+    RiakBucket->putObject renamed to RiakBucket->put
 </notes>
         </release>
         <release>

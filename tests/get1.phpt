@@ -13,8 +13,8 @@ try {
 	$obj->contentType = "text/plain";
 	$obj->data = "test-get plap";
         $obj->metadata["test"] = "test";
-	$bucket->putObject($obj);
-	$readdenObj = $bucket->getObject("get_test");
+        $bucket->put($obj);
+        $readdenObj = $bucket->get("get_test");
         if (strcmp($readdenObj->data, $obj->data) == 0 || strcmp($readdenObj->metadata["test"], "test") !== 0 ) {
 		echo "success!";
 	}

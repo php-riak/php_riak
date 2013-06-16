@@ -88,9 +88,9 @@ ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_bucket_methods[] = {
 	PHP_ME(RiakBucket, __construct, arginfo_bucket_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(RiakBucket, putObject, arginfo_bucket_put, ZEND_ACC_PUBLIC)
-	PHP_ME(RiakBucket, getObject, arginfo_bucket_get, ZEND_ACC_PUBLIC)
-	PHP_ME(RiakBucket, deleteObject, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, put, arginfo_bucket_put, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, get, arginfo_bucket_get, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, delete, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, indexQuery, arginfo_bucket_indexq, ZEND_ACC_PUBLIC)
 
 	PHP_ME(RiakBucket, fetchProperties, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
@@ -351,9 +351,9 @@ PHP_METHOD(RiakBucket, fetchProperties)
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->deleteObject(RiakObject|string $object)
+/* {{{ proto void RiakBucket->delete(RiakObject|string $object)
 Deletes given object from riak */
-PHP_METHOD(RiakBucket, deleteObject)
+PHP_METHOD(RiakBucket, delete)
 {
 	struct RIACK_DEL_PROPERTIES props;
 	riak_connection *connection;
@@ -392,9 +392,9 @@ PHP_METHOD(RiakBucket, deleteObject)
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->putObject(RiakObject $object [, string $key])
+/* {{{ proto void RiakBucket->put(RiakObject $object [, string $key])
 Store a RiakObject in riak, if something goes wrong an RiakException is thrown */
-PHP_METHOD(RiakBucket, putObject)
+PHP_METHOD(RiakBucket, put)
 {
     char *key;
     int keyLen;
@@ -454,9 +454,9 @@ PHP_METHOD(RiakBucket, putObject)
 }
 /* }}} */
 
-/* {{{ proto RiakObject RiakBucket->getObject(string $key)
+/* {{{ proto RiakObject RiakBucket->get(string $key)
 Retrieve a RiakObject from riak */
-PHP_METHOD(RiakBucket, getObject)
+PHP_METHOD(RiakBucket, get)
 {
 	char *key;
     int keyLen, riackResult;

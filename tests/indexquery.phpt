@@ -13,7 +13,7 @@ try {
         $obj = new RiakObject("obj$i");
         $obj->data = "test-idx";
         $obj->indexes = array("tal_int" => $i, "tekst_bin" => "text$i");
-        $bucket->putObject($obj);
+        $bucket->put($obj);
     }
     $result = $bucket->indexQuery("tal_int", 1);
     if ($result[0] !== "obj1") {

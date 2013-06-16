@@ -13,9 +13,9 @@ try {
 	$obj->contentType = "text/plain";
 	$obj->data = "test-get plap";
 	$obj->metadata["ost"] = 7;
-	$bucket->putObject($obj);
+        $bucket->put($obj);
 
-	$readdenObj = $bucket->getObject("get_test");
+        $readdenObj = $bucket->get("get_test");
 	if (isset($readdenObj->metadata["ost"]) && $readdenObj->metadata["ost"] == 7) {
 		echo "success!";
 	} else {

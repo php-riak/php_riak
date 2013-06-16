@@ -30,9 +30,9 @@ void riak_bucket_init(TSRMLS_D);
 PHP_METHOD(RiakBucket, __construct);
 PHP_METHOD(RiakBucket, applyProperties);
 PHP_METHOD(RiakBucket, fetchProperties);
-PHP_METHOD(RiakBucket, putObject);
-PHP_METHOD(RiakBucket, getObject);
-PHP_METHOD(RiakBucket, deleteObject);
+PHP_METHOD(RiakBucket, put);
+PHP_METHOD(RiakBucket, get);
+PHP_METHOD(RiakBucket, delete);
 PHP_METHOD(RiakBucket, indexQuery);
 
 PHP_METHOD(RiakBucket, streamKeys);

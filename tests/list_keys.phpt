@@ -12,7 +12,7 @@ try {
     for ($i=0; $i<20; $i++) {
         $obj = new RiakObject("list$i");
         $obj->data = "test-get plap";
-        $bucket->putObject($obj);
+        $bucket->put($obj);
     }
     $keys = $bucket->listKeys();
     $foundcnt = 0;
@@ -28,7 +28,7 @@ try {
         var_dump($keys);
     }
     for ($i=0; $i<20; $i++) {
-        $bucket->deleteObject("list$i");
+        $bucket->delete("list$i");
     }
 } catch (Exception $e) {
     var_dump($e);

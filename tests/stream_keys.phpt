@@ -22,7 +22,7 @@ try {
     for ($i=0; $i<20; $i++) {
         $obj = new RiakObject("stream$i");
         $obj->data = "test-get plap";
-        $bucket->putObject($obj);
+        $bucket->put($obj);
     }
     $streamer = new KeyStreamer();
     $bucket->streamKeys($streamer);
@@ -32,7 +32,7 @@ try {
         var_dump($streamer);
     }
     for ($i=0; $i<20; $i++) {
-        $bucket->deleteObject("stream$i");
+        $bucket->delete("stream$i");
     }
 } catch (Exception $e) {
     var_dump($e);

@@ -27,15 +27,15 @@ try {
 
     $obj1 = new RiakObject("alice1");
     $obj1->data = $alice1;
-    $alicebucket->putObject($obj1);
+    $alicebucket->put($obj1);
 
     $obj2 = new RiakObject("alice2");
     $obj2->data = $alice2;
-    $alicebucket->putObject($obj2);
+    $alicebucket->put($obj2);
 
     $obj3 = new RiakObject("alice3");
     $obj3->data = $alice3;
-    $alicebucket->putObject($obj3);
+    $alicebucket->put($obj3);
 
     $mrinput = new RiakMrInputKeyList(array("test_alice" => array("alice1", $obj2, $obj3)));
 
