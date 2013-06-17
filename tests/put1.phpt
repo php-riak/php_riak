@@ -9,11 +9,15 @@ try {
   $obj = new RiakObject("dummy");
   $obj->contentType = "text/plain";
   $obj->data = "test value that should get written";
-  $bucket->put($obj, "dummy");
-  echo "success!";
+  $obj = $bucket->put($obj, "dummy");
+  if ($obj->key !== "dummy" || strlen($obj->vclock) == 0) {
+    var_dump($obj);
+  }
+
+  echo "done!";
 } catch (Exception $e) {
   echo $e->getMessage();
 }
 ?>
 --EXPECT--
-success!
+done!

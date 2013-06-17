@@ -158,7 +158,7 @@ PS_WRITE_FUNC(riak) /* {{{ */
         return FAILURE;
     }
     zend_update_property_stringl(riak_object_ce, zobject, "data", sizeof("data")-1, val, vallen TSRMLS_CC);
-    RIAK_CALL_METHOD1(RiakBucket, put, NULL, data->zbucket, zobject);
+    RIAK_CALL_METHOD1(RiakBucket, put, zobject, data->zbucket, zobject);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {
         return FAILURE;

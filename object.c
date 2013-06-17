@@ -79,17 +79,21 @@ void riak_key_from_object(zval *zobject, char** key, int* keylen TSRMLS_DC)/* {{
 }
 /* }}} */
 
-/* {{{ proto void RiakObject->__construct(string $key)
+/* {{{ proto void RiakObject->__construct([string $key])
 Create a new RiakObject */
 PHP_METHOD(RiakObject, __construct)
 {
 	char *key;
 	int keyLen;
     zval *zarrmeta, *zarrlinks;
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &keyLen) == FAILURE) {
+    keyLen = 0;
+    key = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|s", &key, &keyLen) == FAILURE) {
 		return;
 	}
-	zend_update_property_stringl(riak_object_ce, getThis(), "key", sizeof("key")-1, key, keyLen TSRMLS_CC);
+    if (keyLen > 0) {
+        zend_update_property_stringl(riak_object_ce, getThis(), "key", sizeof("key")-1, key, keyLen TSRMLS_CC);
+    }
 
 	// Create empty array for metadata
     MAKE_STD_ZVAL(zarrmeta);

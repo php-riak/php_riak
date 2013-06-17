@@ -392,7 +392,7 @@ PHP_METHOD(RiakBucket, delete)
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->put(RiakObject $object [, string $key])
+/* {{{ proto RiakObject RiakBucket->put(RiakObject $object [, string $key])
 Store a RiakObject in riak, if something goes wrong an RiakException is thrown */
 PHP_METHOD(RiakBucket, put)
 {
@@ -416,6 +416,8 @@ PHP_METHOD(RiakBucket, put)
 	memset(&returnedObj, 0, sizeof(returnedObj));
 	memset(&riackContent, 0, sizeof(riackContent));
 	memset(&props, 0, sizeof(props));
+    props.return_head_use = 1;
+    props.return_head = 1;
 
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("dw", props.dw_use, props.dw, zTmp)
@@ -423,7 +425,6 @@ PHP_METHOD(RiakBucket, put)
 
     /* fill content */
 	set_riak_content_from_object(&riackContent, zObject, connection->client TSRMLS_CC);
-
     /* fill obj */
     /* Set vclock */
 	zTmp = zend_read_property(riak_object_ce, zObject, "vclock", sizeof("vclock")-1, 1 TSRMLS_CC);
@@ -443,14 +444,28 @@ PHP_METHOD(RiakBucket, put)
 	} else {
         /* No ket provided on function call, get it from RiakObject */
         GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zObject, "key", zTmp, obj.key) {
-            /* Handle possible errors */
-		}
+            // Key is null this is ok
+        }
 	}
 	riackResult = riack_put(connection->client, obj, &returnedObj, &props);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
-    /* TODO Return updated object */
-	riack_free_object(connection->client, &returnedObj);
+    if (returnedObj.vclock.len > 0) {
+        MAKE_STD_ZVAL(zTmp);
+        ZVAL_STRINGL(zTmp, (char*)returnedObj.vclock.clock, returnedObj.vclock.len, 1);
+        zend_update_property(riak_object_ce, zObject, "vclock", sizeof("vclock")-1, zTmp TSRMLS_CC);
+        zval_ptr_dtor(&zTmp);
+    }
+    if (returnedObj.key.len > 0) {
+        MAKE_STD_ZVAL(zTmp);
+        ZVAL_STRINGL(zTmp, (char*)returnedObj.key.value, returnedObj.key.len, 1);
+        zend_update_property(riak_object_ce, zObject, "key", sizeof("key")-1, zTmp TSRMLS_CC);
+        zval_ptr_dtor(&zTmp);
+    }
+
+    riack_free_object(connection->client, &returnedObj);
+    RETURN_ZVAL(zObject, 1, 0);
+
 }
 /* }}} */
 

@@ -31,12 +31,14 @@
     Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
 - Improvements
     Issue8: RiakBucket->listKey function added
+    Issue7: Return updated object after put
     RiakBucket->streamKeys function added
     RiakBucket->delete now accept a RiakObject or a string with the key to delete.
 - API Changes
     RiakBucket->getObject renamed to RiakBucket->get
     RiakBucket->deleteObject renamed to RiakBucket->delete
     RiakBucket->putObject renamed to RiakBucket->put
+    RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
         </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -168,13 +170,15 @@
     Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
 - Improvements
     Issue8: RiakBucket->listKey function added
+    Issue7: Return updated object after put
     RiakBucket->streamKeys function added
     RiakBucket->delete now accept a RiakObject or a string with the key to delete.
 - API Changes
     RiakBucket->getObject renamed to RiakBucket->get
     RiakBucket->deleteObject renamed to RiakBucket->delete
     RiakBucket->putObject renamed to RiakBucket->put
-</notes>
+    RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
+        </notes>
         </release>
         <release>
             <version>
