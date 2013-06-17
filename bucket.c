@@ -415,10 +415,7 @@ PHP_METHOD(RiakBucket, put)
 	memset(&obj, 0, sizeof(obj));
 	memset(&returnedObj, 0, sizeof(returnedObj));
 	memset(&riackContent, 0, sizeof(riackContent));
-	memset(&props, 0, sizeof(props));
-    props.return_head_use = 1;
-    props.return_head = 1;
-
+    memset(&props, 0, sizeof(props));
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("dw", props.dw_use, props.dw, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("pw", props.pw_use, props.pw, zTmp)
@@ -445,6 +442,8 @@ PHP_METHOD(RiakBucket, put)
         /* No ket provided on function call, get it from RiakObject */
         GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zObject, "key", zTmp, obj.key) {
             // Key is null this is ok
+            obj.key.len = 0;
+            obj.key.value = 0;
         }
 	}
 	riackResult = riack_put(connection->client, obj, &returnedObj, &props);
@@ -462,10 +461,8 @@ PHP_METHOD(RiakBucket, put)
         zend_update_property(riak_object_ce, zObject, "key", sizeof("key")-1, zTmp TSRMLS_CC);
         zval_ptr_dtor(&zTmp);
     }
-
     riack_free_object(connection->client, &returnedObj);
     RETURN_ZVAL(zObject, 1, 0);
-
 }
 /* }}} */
 

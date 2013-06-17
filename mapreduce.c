@@ -127,7 +127,7 @@ PHP_METHOD(RiakMapreduce, run)
         GET_RIAK_CONNECTION(zclient, connection);
         ensure_connected(connection TSRMLS_CC);
 
-        riackResult = riack_map_redue(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &mapresult);
+        riackResult = riack_map_reduce(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &mapresult);
         if (riackResult == RIACK_SUCCESS) {
             MAKE_STD_ZVAL(zresult);
             array_init(zresult);
