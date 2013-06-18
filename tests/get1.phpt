@@ -8,8 +8,16 @@ $bucket = new RiakBucket($client, "test_bucket");
 $props = new RiakBucketProperties(3, false);
 $bucket->applyProperties($props);
 
-$obj = new RiakObject("get_test");
 try {
+        $obj = new RiakObject("get_head");
+        $obj->data = "test-get plap";
+        $bucket->put($obj);
+        $readdenObj = $bucket->get("get_head", RiakBucket::RETURN_HEAD);
+        if (!is_null($readdenObj->data)) {
+            var_dump($readdenObj);
+        }
+
+        $obj = new RiakObject("get_test");
 	$obj->contentType = "text/plain";
 	$obj->data = "test-get plap";
         $obj->metadata["test"] = "test";

@@ -18,7 +18,7 @@ try {
   $obj = new RiakObject("dummy");
   $obj->contentType = "text/plain";
   $obj->data = "test value that should get written";
-  $bucket->put($obj, "dummy");
+  $bucket->put($obj);
   echo "done!";
 } catch (Exception $e) {
   echo $e->getMessage();

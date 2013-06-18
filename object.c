@@ -169,6 +169,7 @@ zval *assoc_array_from_riack_pairs(struct RIACK_PAIR* pairs, size_t pairscnt TSR
 void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC) /* {{{ */
 {
     zval* zmetadata, *zlinks, *zindexes;
+
 	zend_update_property_stringl(riak_object_ce, object, "data", sizeof("data")-1, 
 		(const char*)content->data, content->data_len TSRMLS_CC);
 	zend_update_property_stringl(riak_object_ce, object, "contentEncoding", sizeof("contentEncoding")-1, 

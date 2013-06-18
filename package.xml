@@ -27,19 +27,22 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
         <notes>
-- Bugs
-    Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
-- Improvements
-    Issue8: RiakBucket->listKey function added
-    Issue7: Return updated object after put
-    RiakBucket->streamKeys function added
-    RiakBucket->delete now accept a RiakObject or a string with the key to delete.
-- API Changes
-    RiakBucket->getObject renamed to RiakBucket->get
-    RiakBucket->deleteObject renamed to RiakBucket->delete
-    RiakBucket->putObject renamed to RiakBucket->put
-    RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
-        </notes>
+        - Bugs
+            Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
+        - Improvements
+            Issue8: RiakBucket->listKey function added
+            Issue7: Return updated object after put
+            Issue11: Implement PBC head support
+            RiakBucket->streamKeys function added
+            RiakBucket->delete now accept a RiakObject or a string with the key to delete.
+        - API Changes
+            RiakBucket->getObject renamed to RiakBucket->get
+            RiakBucket->deleteObject renamed to RiakBucket->delete
+            RiakBucket->putObject renamed to RiakBucket->put
+            RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
+            RiakBucket->put no longer accepts key as second parameter
+            RiakBucket->put & get now takes an optional int with options
+                </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
             <file role="src" name="bucket_properties.c"/>
@@ -171,6 +174,7 @@
 - Improvements
     Issue8: RiakBucket->listKey function added
     Issue7: Return updated object after put
+    Issue11: Implement PBC head support
     RiakBucket->streamKeys function added
     RiakBucket->delete now accept a RiakObject or a string with the key to delete.
 - API Changes
@@ -178,6 +182,8 @@
     RiakBucket->deleteObject renamed to RiakBucket->delete
     RiakBucket->putObject renamed to RiakBucket->put
     RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
+    RiakBucket->put no longer accepts key as second parameter
+    RiakBucket->put & get now takes an optional int with options
         </notes>
         </release>
         <release>
