@@ -109,25 +109,59 @@ PHP_METHOD(RiakMapreduce, setInput)
 }
 /* }}} */
 
-/* {{{ proto array RiakMapreduce->run()
+struct riak_mr_stream_params {/* {{{ */
+#ifdef ZTS
+    TSRMLS_D;
+#endif
+    zval *zstreamer;
+};
+/* }}} */
+
+
+void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPRED_STREAM_RESULT* result) /* {{{ */
+{
+    zval zfuncname;
+    struct riak_mr_stream_params *params = (struct riak_mr_stream_params*)arg;
+    ZVAL_STRING(&zfuncname, "receive", 0);
+    // TODO
+}
+/* }}} */
+
+/* {{{ proto array RiakMapreduce->run([RiakMapreduceStreamer $streamer])
 Runs the mapreduce query and returns the results as an array of RiakMrResult */
 PHP_METHOD(RiakMapreduce, run)
 {
-    zval* zjson, *zclient, *zresult;
+    zval* zjson, *zclient, *zresult, *zstreamer;
     riak_connection *connection;
     struct RIACK_MAPRED_RESULT *mapresult;
     struct RIACK_MAPRED_RESULT *mapresult_iter;
+    struct riak_mr_stream_params stream_params;
     int riackResult;
+
+    zstreamer = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|o", &zstreamer) == FAILURE) {
+        return;
+    }
 
     MAKE_STD_ZVAL(zjson);
     RIAK_CALL_METHOD(RiakMapreduce, toJson, zjson, getThis());
+
 
     zclient = zend_read_property(riak_mapreduce_ce, getThis(), "client", sizeof("client")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zclient) == IS_OBJECT) {
         GET_RIAK_CONNECTION(zclient, connection);
         ensure_connected(connection TSRMLS_CC);
 
-        riackResult = riack_map_reduce(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &mapresult);
+        if (zstreamer) {
+            stream_params.zstreamer = zstreamer;
+            #ifdef ZTS
+                stream_params.tsrm_ls = TSRMLS_C;
+            #endif
+            riack_map_reduce_stream(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &riak_mr_result_cb, &stream_params);
+        } else {
+            riackResult = riack_map_reduce(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &mapresult);
+        }
+
         if (riackResult == RIACK_SUCCESS) {
             MAKE_STD_ZVAL(zresult);
             array_init(zresult);

@@ -17,13 +17,23 @@
 #include "streaming.h"
 
 zend_class_entry *riak_key_streamer_ce;
+zend_class_entry *riak_mr_streamer_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_keystreamer_key, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, key)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mrstreamer_rec, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, result)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_keystreamer_methods[] = {
     ZEND_ABSTRACT_ME(RiakKeyStreamer, key, arginfo_keystreamer_key)
+    {NULL, NULL, NULL}
+};
+
+static zend_function_entry riak_mrstreamer_methods[] = {
+    ZEND_ABSTRACT_ME(RiakMapReduceStreamer, receive, arginfo_mrstreamer_rec)
     {NULL, NULL, NULL}
 };
 
@@ -32,5 +42,8 @@ void riak_streaming_init(TSRMLS_D)/* {{{ */
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce, "RiakKeyStreamer", riak_keystreamer_methods);
     riak_key_streamer_ce = zend_register_internal_interface(&ce TSRMLS_CC);
+
+    INIT_CLASS_ENTRY(ce, "RiakMapReduceStreamer", riak_mrstreamer_methods);
+    riak_mr_streamer_ce = zend_register_internal_interface(&ce TSRMLS_CC);
 }
 /* }}} */
