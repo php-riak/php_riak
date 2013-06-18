@@ -26,7 +26,6 @@ zend_class_entry *riak_mrphase_ce;
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phase_ctor, 0, ZEND_RETURN_VALUE, 2)
     ZEND_ARG_INFO(0, type)
     ZEND_ARG_INFO(0, function)
-    ZEND_ARG_INFO(0, language)
     ZEND_ARG_INFO(0, keep)
     ZEND_ARG_INFO(0, args)
 ZEND_END_ARG_INFO()
