@@ -12,7 +12,9 @@ try {
         $obj = new RiakObject("get_head");
         $obj->data = "test-get plap";
         $bucket->put($obj);
-        $readdenObj = $bucket->get("get_head", RiakBucket::RETURN_HEAD);
+        $cfg = new RiakGetRequestConfiguration();
+        $cfg->setReturnHead(true);
+        $readdenObj = $bucket->get("get_head", $cfg);
         if (!is_null($readdenObj->data)) {
             var_dump($readdenObj);
         }

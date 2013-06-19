@@ -43,7 +43,7 @@
             RiakBucket->putObject renamed to RiakBucket->put
             RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
             RiakBucket->put no longer accepts key as second parameter
-            RiakBucket->put & get now takes an optional int with options
+            RiakBucket->put & get now takes an optional RiakGetRequestConfiguration
                 </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -85,6 +85,8 @@
             <file role="src" name="stats.h"/>
             <file role="src" name="streaming.c"/>
             <file role="src" name="streaming.h"/>
+            <file role="src" name="req_configs.c"/>
+            <file role="src" name="req_configs.h"/>
             
             <dir name="riack">
                 <dir name="src">
@@ -187,7 +189,7 @@
     RiakBucket->putObject renamed to RiakBucket->put
     RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
     RiakBucket->put no longer accepts key as second parameter
-    RiakBucket->put & get now takes an optional int with options
+    RiakBucket->put & get now takes an optional RiakGetRequestConfiguration
         </notes>
         </release>
         <release>

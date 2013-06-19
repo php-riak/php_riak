@@ -24,6 +24,7 @@ if test "$PHP_RIAK" != "no"; then
     mr_result.c \
     ht_utils.c \
     streaming.c \
+    req_configs.c \
     riack/src/riack_sock.c \
     riack/src/riack.c \
     riack/src/riack_kv.c \

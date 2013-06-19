@@ -23,12 +23,11 @@
 #include "client.h"
 #include "object.h"
 #include "exceptions.h"
+#include "req_configs.h"
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 
 zend_class_entry *riak_bucket_ce;
-
-#define RIAK_RETURN_HEAD 0x0001
 
 #define GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR( VAR ) VAR = get_riak_connection(getThis() TSRMLS_CC); \
   if (!VAR) { \
@@ -121,7 +120,6 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
     zend_declare_property_null(riak_bucket_ce, "rw", sizeof("rw")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(riak_bucket_ce, "pr", sizeof("pr")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
-    zend_declare_class_constant_long(riak_bucket_ce, "RETURN_HEAD", sizeof("RETURN_HEAD")-1, RIAK_RETURN_HEAD TSRMLS_CC);
 }
 /* }}} */
 
@@ -395,12 +393,12 @@ PHP_METHOD(RiakBucket, delete)
 }
 /* }}} */
 
-/* {{{ proto RiakObject RiakBucket->put(RiakObject $object [, int $options])
+/* {{{ proto RiakObject RiakBucket->put(RiakObject $object [, RiakPutRequestConfiguration $configuration])
 Store a RiakObject in riak, if something goes wrong an RiakException is thrown */
 PHP_METHOD(RiakBucket, put)
 {
     int riackResult;
-	zval *zObject, *zTmp;
+    zval *zObject, *zTmp, *zconfig;
 	struct RIACK_OBJECT obj, returnedObj;
 	struct RIACK_CONTENT riackContent;
 	struct RIACK_PUT_PROPERTIES props;
@@ -408,7 +406,8 @@ PHP_METHOD(RiakBucket, put)
     long options;
 
     options = 0;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o|l", &zObject, &options) == FAILURE) {
+    zconfig = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o|o", &zObject, &zconfig) == FAILURE) {
 		return;
 	}
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
@@ -417,7 +416,7 @@ PHP_METHOD(RiakBucket, put)
 	memset(&returnedObj, 0, sizeof(returnedObj));
 	memset(&riackContent, 0, sizeof(riackContent));
     memset(&props, 0, sizeof(props));
-    if (options & RIAK_RETURN_HEAD) {
+    if (zconfig != NULL && get_return_head(zconfig TSRMLS_CC)) {
         props.return_head_use = props.return_head = 1;
     }
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
@@ -464,22 +463,21 @@ PHP_METHOD(RiakBucket, put)
 }
 /* }}} */
 
-/* {{{ proto RiakObject RiakBucket->get(string $key [, int $options])
+/* {{{ proto RiakObject RiakBucket->get(string $key [, RiakGetRequestConfiguration $config])
 Retrieve a RiakObject from riak */
 PHP_METHOD(RiakBucket, get)
 {
 	char *key;
     int keyLen, riackResult;
-    long options;
 	size_t contentCount;
-    zval *zKey, *zVclock, *zExc, *zObjArr, *zObj;
+    zval *zKey, *zVclock, *zExc, *zObjArr, *zObj, *zconfig;
 	struct RIACK_GET_PROPERTIES props;
 	struct RIACK_GET_OBJECT getResult;
 	RIACK_STRING rsBucket, rsKey;
 	riak_connection *connection;
 	
-    options = 0;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|l", &key, &keyLen, &options) == FAILURE) {
+    zconfig = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|o", &key, &keyLen, &zconfig) == FAILURE) {
 		return;
 	}
 	
@@ -490,7 +488,8 @@ PHP_METHOD(RiakBucket, get)
 
 	memset(&props, 0, sizeof(props));
 	memset(&getResult, 0, sizeof(getResult));
-    if (options & RIAK_RETURN_HEAD) {
+
+    if (zconfig != NULL && get_return_head(zconfig TSRMLS_CC)) {
         props.head_use = 1;
         props.head = 1;
     }
@@ -526,7 +525,7 @@ PHP_METHOD(RiakBucket, get)
 			zObj = object_from_riak_content(zKey, &getResult.object.content[0] TSRMLS_CC);
 			// Update vclock on RiakObject
 			zend_update_property(riak_object_ce, zObj, "vclock", sizeof("vclock")-1, zVclock TSRMLS_CC);
-            if (options & RIAK_RETURN_HEAD) {
+            if (props.head_use && props.head) {
                 zend_update_property_null(riak_object_ce, zObj, "data", sizeof("data")-1 TSRMLS_CC);
             }
 			RETVAL_ZVAL(zObj, 0, 1);
