@@ -134,7 +134,7 @@ void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPR
 }
 /* }}} */
 
-/* {{{ proto array RiakMapreduce->run([RiakMapreduceStreamer $streamer])
+/* {{{ proto array RiakMapreduce->run([RiakMrStreamer $streamer])
 Runs the mapreduce query and returns the results as an array of RiakMrResult */
 PHP_METHOD(RiakMapreduce, run)
 {

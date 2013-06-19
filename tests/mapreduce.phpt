@@ -76,7 +76,7 @@ try {
     global $streamedsomething;
     $streamedsomething = false;
     // Now do the same but stream it
-    class MrStream implements RiakMapReduceStreamer {
+    class MrStream implements RiakMrStreamer {
         public function receive($response) {
             global $streamedsomething;
             $streamedsomething = true;
