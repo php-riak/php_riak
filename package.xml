@@ -37,6 +37,7 @@
             RiakBucket->streamKeys function added
             RiakBucket->delete now accept a RiakObject or a string with the key to delete.
         - API Changes
+            Issue12: RiakMapreducePhase renamed to RiakMrPhase
             RiakBucket->getObject renamed to RiakBucket->get
             RiakBucket->deleteObject renamed to RiakBucket->delete
             RiakBucket->putObject renamed to RiakBucket->put
@@ -180,6 +181,7 @@
     RiakBucket->streamKeys function added
     RiakBucket->delete now accept a RiakObject or a string with the key to delete.
 - API Changes
+    Issue12: RiakMapreducePhase renamed to RiakMrPhase
     RiakBucket->getObject renamed to RiakBucket->get
     RiakBucket->deleteObject renamed to RiakBucket->delete
     RiakBucket->putObject renamed to RiakBucket->put

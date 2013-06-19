@@ -35,8 +35,8 @@ ZEND_END_ARG_INFO()
 
 
 static zend_function_entry riak_mrphase_methods[] = {
-    PHP_ME(RiakMapreducePhase, __construct, arginfo_phase_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakMapreducePhase, toArray, arginfo_phase_toarr, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakMrPhase, __construct, arginfo_phase_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakMrPhase, toArray, arginfo_phase_toarr, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     {NULL, NULL, NULL}
 };
 
@@ -44,7 +44,7 @@ void riak_mrphase_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
-    INIT_CLASS_ENTRY(ce, "RiakMapreducePhase", riak_mrphase_methods);
+    INIT_CLASS_ENTRY(ce, "RiakMrPhase", riak_mrphase_methods);
     riak_mrphase_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_class_constant_long(riak_mrphase_ce, "map", sizeof("map")-1, PHASE_TYPE_MAP TSRMLS_CC);
@@ -58,9 +58,9 @@ void riak_mrphase_init(TSRMLS_D)/* {{{ */
 }
 /* }}} */
 
-/* {{{ proto void RiakMapreducePhase->__construct(int $type, RiakMrFunction $function [, bool $keep [, array $arguments]])
-Create a RiakMapreducePhase */
-PHP_METHOD(RiakMapreducePhase, __construct)
+/* {{{ proto void RiakMrPhase->__construct(int $type, RiakMrFunction $function [, bool $keep [, array $arguments]])
+Create a RiakMrPhase */
+PHP_METHOD(RiakMrPhase, __construct)
 {
     long type;
     zval *zfunction, *zargs;
@@ -80,9 +80,9 @@ PHP_METHOD(RiakMapreducePhase, __construct)
 }
 /* }}} */
 
-/* {{{ proto array RiakMapreducePhase->toArray()
+/* {{{ proto array RiakMrPhase->toArray()
 Convert this phase into an array */
-PHP_METHOD(RiakMapreducePhase, toArray)
+PHP_METHOD(RiakMrPhase, toArray)
 {
     zval *zarray, *zfuncarray, *zfunc, *zarg, zname;
     long type;

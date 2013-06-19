@@ -81,7 +81,7 @@ PHP_METHOD(RiakMapreduce, __construct)
 }
 /* }}} */
 
-/* {{{ proto RiakMapreduce RiakMapreduce->addPhase(RiakMapreducePhase $phase)
+/* {{{ proto RiakMapreduce RiakMapreduce->addPhase(RiakMrPhase $phase)
 Add a new phase to this map reduce job, atleast one phase needs to be added before a mapreduce query can succeed */
 PHP_METHOD(RiakMapreduce, addPhase)
 {
@@ -195,7 +195,7 @@ void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint key
     zval *zarr, *ztargetarr;
     ztargetarr = (zval*)custom_ptr;
     MAKE_STD_ZVAL(zarr);
-    RIAK_CALL_METHOD(RiakMapreducePhase, toArray, zarr, *data);
+    RIAK_CALL_METHOD(RiakMrPhase, toArray, zarr, *data);
     if (zarr && Z_TYPE_P(zarr) == IS_ARRAY) {
         add_next_index_zval(ztargetarr, zarr);
     }

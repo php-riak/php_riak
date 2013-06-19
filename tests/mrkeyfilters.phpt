@@ -24,7 +24,7 @@ $input = new RiakMrInputBucket("test_keyfilters");
 $input->keyFilters = array( array("tokenize", "_", 2), array("between", "05", "15") );
 
 $mr = new RiakMapreduce($client);
-$mr ->addPhase(new RiakMapreducePhase(RiakMapreducePhase::map, $function1))
+$mr ->addPhase(new RiakMrPhase(RiakMrPhase::map, $function1))
     ->setInput($input);
 $mrres = $mr->run();
 

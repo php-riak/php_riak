@@ -64,8 +64,8 @@ try {
         "}");
 
     $mr = new RiakMapreduce($client);
-    $mr ->addPhase(new RiakMapreducePhase(RiakMapreducePhase::map, $jsmapfunc))
-        ->addPhase(new RiakMapreducePhase(RiakMapreducePhase::reduce, $jsredfunc))
+    $mr ->addPhase(new RiakMrPhase(RiakMrPhase::map, $jsmapfunc))
+        ->addPhase(new RiakMrPhase(RiakMrPhase::reduce, $jsredfunc))
         ->setInput($mrinput);
     $json = $mr->toJson();
     $result = $mr->run();
