@@ -18,8 +18,8 @@
     <date>2013-06-23</date>
     <time></time>
     <version>
-        <release>0.5.0</release>
-        <api>0.5.0</api>
+        <release>0.4.3</release>
+        <api>0.4.3</api>
     </version>
     <stability>
         <release>beta</release>
@@ -30,6 +30,7 @@
         - Bugs
             Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
         - Improvements
+            Issue3: Streaming mapreduce
             Issue8: RiakBucket->listKey function added
             Issue7: Return updated object after put
             Issue11: Implement PBC head support
@@ -159,8 +160,8 @@
     <changelog>
         <release>
             <version>
-                <release>0.5.0</release>
-                <api>0.5.0</api>
+                <release>0.4.3</release>
+                <api>0.4.3</api>
             </version>
             <stability>
                 <release>beta</release>
@@ -172,6 +173,7 @@
 - Bugs
     Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
 - Improvements
+    Issue3: Streaming mapreduce
     Issue8: RiakBucket->listKey function added
     Issue7: Return updated object after put
     Issue11: Implement PBC head support

@@ -72,7 +72,20 @@ try {
     if ($result[0]->value[0]["the"] !== 8) {
         var_dump($result);
     }
-    echo "success!";
+
+    global $streamedsomething;
+    $streamedsomething = false;
+    // Now do the same but stream it
+    class MrStream implements RiakMapReduceStreamer {
+        public function receive($response) {
+            global $streamedsomething;
+            $streamedsomething = true;
+        }
+    };
+    $mr->run(new MrStream());
+    if ($streamedsomething) {
+        echo "success!".PHP_EOL;
+    }
 } catch (Exception $e) {
   echo $e->getMessage();
 }

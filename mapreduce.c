@@ -118,12 +118,19 @@ struct riak_mr_stream_params {/* {{{ */
 /* }}} */
 
 
-void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPRED_STREAM_RESULT* result) /* {{{ */
+void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPRED_RESPONSE* response) /* {{{ */
 {
-    zval zfuncname;
+    zval zfuncname, *zresponse, zret;
     struct riak_mr_stream_params *params = (struct riak_mr_stream_params*)arg;
     ZVAL_STRING(&zfuncname, "receive", 0);
-    // TODO
+#ifdef ZTS
+    zresponse = riak_mrresult_from_riack_mapred(response, params->tsrm_ls);
+    call_user_function(NULL, &params->zstreamer, &zfuncname, &zret, 1, &zresponse, params->tsrm_ls);
+#else
+    zresponse = riak_mrresult_from_riack_mapred(response);
+    call_user_function(NULL, &params->zstreamer, &zfuncname, &zret, 1, &zresponse);
+#endif
+    zval_ptr_dtor(&zresponse);
 }
 /* }}} */
 
@@ -133,8 +140,8 @@ PHP_METHOD(RiakMapreduce, run)
 {
     zval* zjson, *zclient, *zresult, *zstreamer;
     riak_connection *connection;
-    struct RIACK_MAPRED_RESULT *mapresult;
-    struct RIACK_MAPRED_RESULT *mapresult_iter;
+    struct RIACK_MAPRED_RESPONSE_LIST *mapresult;
+    struct RIACK_MAPRED_RESPONSE_LIST *mapresult_iter;
     struct riak_mr_stream_params stream_params;
     int riackResult;
 
@@ -157,26 +164,26 @@ PHP_METHOD(RiakMapreduce, run)
             #ifdef ZTS
                 stream_params.tsrm_ls = TSRMLS_C;
             #endif
-            riack_map_reduce_stream(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &riak_mr_result_cb, &stream_params);
+            riackResult = riack_map_reduce_stream(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &riak_mr_result_cb, &stream_params);
+            CHECK_RIACK_STATUS_THROW_ON_ERROR(connection, riackResult);
         } else {
             riackResult = riack_map_reduce(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &mapresult);
-        }
-
-        if (riackResult == RIACK_SUCCESS) {
-            MAKE_STD_ZVAL(zresult);
-            array_init(zresult);
-            mapresult_iter = mapresult;
-            while (mapresult_iter) {
-                if (mapresult_iter->data != NULL && mapresult_iter->data_size > 0) {
-                    zval *add = riak_mrresult_from_riack_mapred(mapresult_iter TSRMLS_CC);
-                    add_next_index_zval(zresult, add);
+            if (riackResult == RIACK_SUCCESS) {
+                MAKE_STD_ZVAL(zresult);
+                array_init(zresult);
+                mapresult_iter = mapresult;
+                while (mapresult_iter) {
+                    if (mapresult_iter->response.data != NULL && mapresult_iter->response.data_size > 0) {
+                        zval *add = riak_mrresult_from_riack_mapred(&mapresult_iter->response TSRMLS_CC);
+                        add_next_index_zval(zresult, add);
+                    }
+                    mapresult_iter = mapresult_iter->next_result;
                 }
-                mapresult_iter = mapresult_iter->next_result;
+                riack_free_mapred_result(connection->client, mapresult);
+                RETVAL_ZVAL(zresult, 0, 1);
+            } else {
+                CHECK_RIACK_STATUS_THROW_ON_ERROR(connection, riackResult);
             }
-            riack_free_mapred_result(connection->client, mapresult);
-            RETVAL_ZVAL(zresult, 0, 1);
-        } else {
-            CHECK_RIACK_STATUS_THROW_ON_ERROR(connection, riackResult);
         }
     }
     zval_ptr_dtor(&zjson);
