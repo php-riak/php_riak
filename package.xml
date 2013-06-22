@@ -18,33 +18,19 @@
     <date>2013-06-19</date>
     <time>20:26:00</time>
     <version>
-        <release>0.4.3</release>
-        <api>0.4.3</api>
+        <release>0.5.0</release>
+        <api>0.5.0</api>
     </version>
     <stability>
-        <release>alpha</release>
-        <api>alpha</api>
+        <release>beta</release>
+        <api>beta</api>
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
         <notes>
         - Bugs
-            Issue9: riak.persistent.timeout now in seconds, and default changed to 5 seconds
         - Improvements
-            Issue3: Streaming mapreduce
-            Issue8: RiakBucket->listKey function added
-            Issue7: Return updated object after put
-            Issue11: Implement PBC head support
-            RiakBucket->streamKeys function added
-            RiakBucket->delete now accept a RiakObject or a string with the key to delete.
         - API Changes
-            Issue12: RiakMapreducePhase renamed to RiakMrPhase
-            RiakBucket->getObject renamed to RiakBucket->get
-            RiakBucket->deleteObject renamed to RiakBucket->delete
-            RiakBucket->putObject renamed to RiakBucket->put
-            RiakOBject->__constructor key is now optional (if none is set on put, riak will create a random key).
-            RiakBucket->put no longer accepts key as second parameter
-            RiakBucket->put/get now takes an optional RiakGetRequestConfiguration
-                </notes>
+        </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
             <file role="src" name="bucket_properties.c"/>
@@ -81,6 +67,8 @@
             <file role="doc" name="README.md"/>
             <file role="src" name="riak_session.c"/>
             <file role="src" name="riak_session.h"/>
+            <file role="src" name="search.c"/>
+            <file role="src" name="search.h"/>
             <file role="src" name="stats.c"/>
             <file role="src" name="stats.h"/>
             <file role="src" name="streaming.c"/>
@@ -95,6 +83,7 @@
                     <file role="src" name="riack_helpers.c"/>
                     <file role="src" name="riack_helpers.h"/>
                     <file role="src" name="riack_kv.c"/>
+                    <file role="src" name="riack_search.c"/>
                     <file role="src" name="riack_mem.c"/>
                     <file role="src" name="riack_msg.c"/>
                     <file role="src" name="riack_msg.h"/>

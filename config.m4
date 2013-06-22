@@ -23,11 +23,13 @@ if test "$PHP_RIAK" != "no"; then
     mr_inputs.c \
     mr_result.c \
     ht_utils.c \
+    search.c \
     streaming.c \
     req_configs.c \
     riack/src/riack_sock.c \
     riack/src/riack.c \
     riack/src/riack_kv.c \
+    riack/src/riack_search.c \
     riack/src/riack_msg.c \
     riack/src/riack_mem.c \
     riack/src/riack_helpers.c \

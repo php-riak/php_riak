@@ -36,6 +36,7 @@
 #include "mr_result.h"
 #include "streaming.h"
 #include "req_configs.h"
+#include "search.h"
 
 #ifdef PHP_SESSION
   extern ps_module ps_mod_riak;
@@ -106,6 +107,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_stats_init(TSRMLS_C);
     riak_streaming_init(TSRMLS_C);
     riak_req_configs_init(TSRMLS_C);
+    riak_search_init(TSRMLS_C);
 
 #ifdef PHP_SESSION
     php_session_register_module(&ps_mod_riak);
