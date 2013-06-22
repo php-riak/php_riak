@@ -19,8 +19,22 @@
 
 extern zend_class_entry *riak_search_ce;
 
-void riak_search_init(TSRMLS_D);
+/* helpers */
 
-ZEND_NAMED_FUNCTION(zim_Riak_Search__construct);
-ZEND_NAMED_FUNCTION(zim_Riak_Search_test);
+void riak_search_init(TSRMLS_D);
+void riak_search_set_optional_params(zval* zparams, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC);
+
+/* Search */
+
+PHP_METHOD(Riak_Search, __construct);
+PHP_METHOD(Riak_Search, search);
+
+/* Search\Input */
+PHP_METHOD(Riak_Search_Input, setRowLimit);
+PHP_METHOD(Riak_Search_Input, getRowLimit);
+PHP_METHOD(Riak_Search_Input, setStartOffset);
+PHP_METHOD(Riak_Search_Input, getStartOffset);
+PHP_METHOD(Riak_Search_Input, setSort);
+PHP_METHOD(Riak_Search_Input, getSort);
+
 #endif

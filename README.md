@@ -64,3 +64,9 @@ See http://docs.basho.com/riak/1.3.1/tutorials/choosing-a-backend/Bitcask/ for b
 ### PHP Code
 Examples of usage can be found in the .phpt files in the test folder...
 
+## Test requirements
+To make all tests succeed you need a running riak server with eleveldb backend and riak search enabled in app.config.
+You also need to have seach enabled on the ´testsearch´ bucket, this can be done using the riak search-cmd like this:
+```
+bin/search-cmd install testsearch
+```
