@@ -107,8 +107,8 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
 	INIT_CLASS_ENTRY(ce, "RiakBucket", riak_bucket_methods);
 	riak_bucket_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
-	zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_ce, "client", sizeof("client")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_ce, "client", sizeof("client")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 
 	zend_declare_property_null(riak_bucket_ce, "nVal", sizeof("nVal")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 	zend_declare_property_null(riak_bucket_ce, "allowMult", sizeof("allowMult")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
@@ -581,16 +581,13 @@ RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)/* {{{ */
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)/* {{{ */
 {
-	zval **zTmp;
-	HashTable *zBucketProps;
-	riak_connection *connection;
-	zBucketProps = zend_std_get_properties(zbucket TSRMLS_CC);
-	if (zend_hash_find(zBucketProps, "client", sizeof("client"), (void**)&zTmp) == SUCCESS) {
-		GET_RIAK_CONNECTION(*zTmp, connection);
+    zval *zclient;
+    riak_connection *connection = NULL;
+    zclient = zend_read_property(riak_bucket_ce, zbucket, "client", sizeof("client")-1, 1 TSRMLS_CC);
+    if (zclient) {
+        GET_RIAK_CONNECTION(zclient, connection);
 		ensure_connected(connection TSRMLS_CC);
-	} else {
-		return NULL;
-	}
+    }
 	return connection;
 }
 /* }}} */
