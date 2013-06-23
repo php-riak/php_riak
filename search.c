@@ -128,9 +128,13 @@ void riak_search_init(TSRMLS_D) /* {{{ */
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Output", "Output", riak_search_output_methods);
     riak_search_output_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_declare_property_null(riak_search_output_ce, "maxScore", sizeof("maxScore")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_search_output_ce, "numFound", sizeof("numFound")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_search_output_ce, "documents", sizeof("documents")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Output", "Document", riak_search_doc_methods);
     riak_search_doc_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_declare_property_null(riak_search_doc_ce, "fields", sizeof("fields")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 /* }}} */
 
@@ -178,14 +182,9 @@ PHP_METHOD(Riak_Search, search)
     riackstatus = riack_search(connection->client, rsquery, rsindex, &search_params, &search_result);
     riak_search_free_optional_params(connection->client, &search_params TSRMLS_CC);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
-    MAKE_STD_ZVAL(zresult);
-    array_init(zresult);
-    if (search_result.document_count > 0) {
-        //
-    }
-    // TODO Create and return an array of documents
-    //add_next_index_stringl(zresult, resultlist.strings[i].value, resultlist.strings[i].len, 1);
+    zresult = riak_search_output_from_riack_search_result(&search_result TSRMLS_CC);
     riack_free_search_result(connection->client, &search_result);
+
     RETURN_ZVAL(zresult, 0, 1);
 }
 /* }}} */
@@ -194,36 +193,70 @@ PHP_METHOD(Riak_Search, search)
 * Implementation: Riak\Search\Output\Output
 *************************************************************/
 
+zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *search_result TSRMLS_DC)
+{
+    zval *zresult;
+    MAKE_STD_ZVAL(zresult);
+    object_init_ex(zresult, riak_search_output_ce);
+    if (search_result->document_count > 0) {
+        int cnt, i;
+        zval* zdocs;
+        cnt = search_result->document_count;
+        MAKE_STD_ZVAL(zdocs);
+        array_init(zdocs);
+        for (i=0; i<cnt; ++i) {
+            zval* doc = riak_search_document_from_riack_document(&search_result->documents[i] TSRMLS_CC);
+            add_next_index_zval(zdocs, doc);
+        }
+        zend_update_property(riak_search_output_ce, zresult, "documents", sizeof("documents")-1, zdocs TSRMLS_CC);
+        zval_ptr_dtor(&zdocs);
+    }
+    if (search_result->max_score_present) {
+        zend_update_property_double(riak_search_output_ce, zresult, "maxScore", sizeof("maxScore")-1, search_result->max_score TSRMLS_CC);
+    }
+    if (search_result->num_found_present) {
+        zend_update_property_long(riak_search_output_ce, zresult, "numFound", sizeof("numFound")-1, search_result->num_found TSRMLS_CC);
+    }
+    return zresult;
+}
+
+/*************************************************************
+* Implementation: Riak\Search\Output\Document
+*************************************************************/
+zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* document TSRMLS_DC)
+{
+    int cnt, i;
+    zval *zresult, *zarr;
+    MAKE_STD_ZVAL(zarr);
+    array_init(zarr);
+
+    MAKE_STD_ZVAL(zresult);
+    object_init_ex(zresult, riak_search_doc_ce);
+
+    cnt = document->field_count;
+    for (i=0; i<cnt; ++i) {
+        struct RIACK_PAIR *current_pair = &document->fields[i];
+        if (current_pair->value_present) {
+            add_assoc_stringl_ex(zarr, (char*)current_pair->key.value, current_pair->key.len+1,
+                                 (char*)current_pair->value, current_pair->value_len, 1);
+        } else {
+            add_assoc_null_ex(zarr, (char*)current_pair->key.value, current_pair->key.len+1);
+        }
+    }
+    zend_update_property(riak_search_doc_ce, zresult, "fields", sizeof("fields")-1, zarr TSRMLS_CC);
+    zval_ptr_dtor(&zarr);
+    return zresult;
+}
 
 /*************************************************************
 * Implementation: Riak\Search\Input\Parameters
 *************************************************************/
 
-#define RIAK_SEARCH_INPUT_SETTER_LONG(PROPERTY_NAME) \
-    long val; \
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &val) == FAILURE) { return; } \
-    zend_update_property_long(riak_search_input_ce, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val TSRMLS_CC);
-
-#define RIAK_SEARCH_INPUT_GETTER_LONG(PROPERTY_NAME) \
-    zval* ztmp = zend_read_property(riak_search_input_ce, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
-    if (Z_TYPE_P(ztmp) == IS_LONG) { RETURN_LONG(Z_LVAL_P(ztmp)); } \
-    RETURN_NULL();
-
-#define RIAK_SEARCH_INPUT_SETTER_STRING(PROPERTY_NAME) \
-    char* val; int val_len; \
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &val, &val_len) == FAILURE) { return; } \
-    zend_update_property_stringl(riak_search_input_ce, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val, val_len TSRMLS_CC);
-
-#define RIAK_SEARCH_INPUT_GETTER_STRING(PROPERTY_NAME) \
-    zval* ztmp = zend_read_property(riak_search_input_ce, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
-    if (Z_TYPE_P(ztmp) == IS_STRING) { RETURN_ZVAL(ztmp, 1, 0); } \
-    RETURN_NULL();
-
 /* {{{ proto void Riak\Search\Input\Parameters->setRowLimit(int $rowLimit)
 Set row limit for search */
 PHP_METHOD(Riak_Search_Input, setRowLimit)
 {
-    RIAK_SEARCH_INPUT_SETTER_LONG("rowLimit")
+    RIAK_SETTER_LONG(riak_search_input_ce, "rowLimit")
 }
 /* }}} */
 
@@ -231,7 +264,7 @@ PHP_METHOD(Riak_Search_Input, setRowLimit)
 Set row limit for search */
 PHP_METHOD(Riak_Search_Input, getRowLimit)
 {
-    RIAK_SEARCH_INPUT_GETTER_LONG("rowLimit");
+    RIAK_GETTER_LONG(riak_search_input_ce, "rowLimit");
 }
 /* }}} */
 
@@ -239,7 +272,7 @@ PHP_METHOD(Riak_Search_Input, getRowLimit)
 Set start offset for this search */
 PHP_METHOD(Riak_Search_Input, setStartOffset)
 {
-    RIAK_SEARCH_INPUT_SETTER_LONG("start")
+    RIAK_SETTER_LONG(riak_search_input_ce, "start")
 }
 /* }}} */
 
@@ -247,7 +280,7 @@ PHP_METHOD(Riak_Search_Input, setStartOffset)
 Get start offset */
 PHP_METHOD(Riak_Search_Input, getStartOffset)
 {
-    RIAK_SEARCH_INPUT_GETTER_LONG("start");
+    RIAK_GETTER_LONG(riak_search_input_ce, "start");
 }
 /* }}} */
 
@@ -255,7 +288,7 @@ PHP_METHOD(Riak_Search_Input, getStartOffset)
 Set the sort string */
 PHP_METHOD(Riak_Search_Input, setSort)
 {
-    RIAK_SEARCH_INPUT_SETTER_STRING("sort");
+    RIAK_SETTER_STRING(riak_search_input_ce, "sort");
 }
 /* }}} */
 
@@ -263,7 +296,7 @@ PHP_METHOD(Riak_Search_Input, setSort)
 Get the sort string */
 PHP_METHOD(Riak_Search_Input, getSort)
 {
-    RIAK_SEARCH_INPUT_GETTER_STRING("sort");
+    RIAK_GETTER_STRING(riak_search_input_ce, "sort");
 }
 /* }}} */
 
@@ -271,7 +304,7 @@ PHP_METHOD(Riak_Search_Input, getSort)
 Set the filter string */
 PHP_METHOD(Riak_Search_Input, setFilter)
 {
-    RIAK_SEARCH_INPUT_SETTER_STRING("filter");
+    RIAK_SETTER_STRING(riak_search_input_ce, "filter");
 }
 /* }}} */
 
@@ -279,7 +312,7 @@ PHP_METHOD(Riak_Search_Input, setFilter)
 Get the filter string */
 PHP_METHOD(Riak_Search_Input, getFilter)
 {
-    RIAK_SEARCH_INPUT_GETTER_STRING("filter");
+    RIAK_GETTER_STRING(riak_search_input_ce, "filter");
 }
 /* }}} */
 
@@ -287,7 +320,7 @@ PHP_METHOD(Riak_Search_Input, getFilter)
 Set the default field name */
 PHP_METHOD(Riak_Search_Input, setDefaultField)
 {
-    RIAK_SEARCH_INPUT_SETTER_STRING("defaultField");
+    RIAK_SETTER_STRING(riak_search_input_ce, "defaultField");
 }
 /* }}} */
 
@@ -295,7 +328,7 @@ PHP_METHOD(Riak_Search_Input, setDefaultField)
 Get the default field name */
 PHP_METHOD(Riak_Search_Input, getDefaultField)
 {
-    RIAK_SEARCH_INPUT_GETTER_STRING("defaultField");
+    RIAK_GETTER_STRING(riak_search_input_ce, "defaultField");
 }
 /* }}} */
 
@@ -303,7 +336,7 @@ PHP_METHOD(Riak_Search_Input, getDefaultField)
 Set the default opereration */
 PHP_METHOD(Riak_Search_Input, setDefaultOperation)
 {
-    RIAK_SEARCH_INPUT_SETTER_STRING("defaultOperation");
+    RIAK_SETTER_STRING(riak_search_input_ce, "defaultOperation");
 }
 /* }}} */
 
@@ -311,7 +344,7 @@ PHP_METHOD(Riak_Search_Input, setDefaultOperation)
 Get the default operation */
 PHP_METHOD(Riak_Search_Input, getDefaultOperation)
 {
-    RIAK_SEARCH_INPUT_GETTER_STRING("defaultOperation");
+    RIAK_GETTER_STRING(riak_search_input_ce, "defaultOperation");
 }
 /* }}} */
 
@@ -319,7 +352,7 @@ PHP_METHOD(Riak_Search_Input, getDefaultOperation)
 Set the presort string */
 PHP_METHOD(Riak_Search_Input, setPresort)
 {
-    RIAK_SEARCH_INPUT_SETTER_STRING("presort");
+    RIAK_SETTER_STRING(riak_search_input_ce, "presort");
 }
 /* }}} */
 
@@ -327,7 +360,7 @@ PHP_METHOD(Riak_Search_Input, setPresort)
 Get the presort string */
 PHP_METHOD(Riak_Search_Input, getPresort)
 {
-    RIAK_SEARCH_INPUT_GETTER_STRING("presort");
+    RIAK_GETTER_STRING(riak_search_input_ce, "presort");
 }
 /* }}} */
 

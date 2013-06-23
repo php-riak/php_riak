@@ -33,9 +33,28 @@
 #define RIAK_POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
 #define RIAK_PUSH_EO_PARAM()
 #define RIAK_POP_EO_PARAM()
- 
-#define RIAK_CALL_METHOD_BASE(classname, name) zim_##classname##_##name
 
+#define RIAK_SETTER_LONG(CE, PROPERTY_NAME) \
+    long val; \
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &val) == FAILURE) { return; } \
+    zend_update_property_long(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val TSRMLS_CC);
+
+#define RIAK_GETTER_LONG(CE, PROPERTY_NAME) \
+    zval* ztmp = zend_read_property(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
+    if (Z_TYPE_P(ztmp) == IS_LONG) { RETURN_LONG(Z_LVAL_P(ztmp)); } \
+    RETURN_NULL();
+
+#define RIAK_SETTER_STRING(CE, PROPERTY_NAME) \
+    char* val; int val_len; \
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &val, &val_len) == FAILURE) { return; } \
+    zend_update_property_stringl(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val, val_len TSRMLS_CC);
+
+#define RIAK_GETTER_STRING(CE, PROPERTY_NAME) \
+    zval* ztmp = zend_read_property(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
+    if (Z_TYPE_P(ztmp) == IS_STRING) { RETURN_ZVAL(ztmp, 1, 0); } \
+    RETURN_NULL();
+
+#define RIAK_CALL_METHOD_BASE(classname, name) zim_##classname##_##name
 
 #define RIAK_CALL_METHOD_HELPER(classname, name, retval, thisptr, num, param) \
   RIAK_PUSH_PARAM(param); RIAK_PUSH_PARAM((void*)num);                            \

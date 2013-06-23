@@ -13,16 +13,28 @@ $json[] = '{"name": "apple","price": 2.50, "tags": ["fruit"]}';
 $json[] = '{"name": "potato","price": 1.50, "tags": ["veg", "something"]}';
 $json[] = '{"name": "pineapple","price": 15, "tags": ["fruit"]}';
 $json[] = '{"name": "cheese", "price": 45, "tags": ["cow", "dairy"]}';
+
+$i = 0;
 foreach ($json as $j) {
-    $obj = new RiakObject();
+    $i++;
+    $obj = new RiakObject("id$i");
     $obj->contentType = "application/json";
     $obj->data = $j;
     $bucket->put($obj);
 }
+
 $search = new Search($riak);
 $si = new Parameters();
 $si->setDefaultField('name');
-$search->search("testsearch", "apple");
+$res = $search->search("testsearch", "apple", $si);
+foreach ($res->documents as $doc) {
+    if ($doc->fields["name"] != "apple") {
+        var_dump($doc);
+    }
+}
+for ($i=0; $i<count($json); $i++) {
+    $bucket->delete("id$i");
+}
 echo "done!".PHP_EOL;
 ?>
 --EXPECT--
