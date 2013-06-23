@@ -22,7 +22,8 @@ extern zend_class_entry *riak_search_ce;
 /* helpers */
 
 void riak_search_init(TSRMLS_D);
-void riak_search_set_optional_params(zval* zparams, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC);
+void riak_search_set_optional_params(struct RIACK_CLIENT *client, zval* zparams, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC);
+void riak_search_free_optional_params(struct RIACK_CLIENT *client, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC);
 
 /* Search */
 
@@ -36,5 +37,15 @@ PHP_METHOD(Riak_Search_Input, setStartOffset);
 PHP_METHOD(Riak_Search_Input, getStartOffset);
 PHP_METHOD(Riak_Search_Input, setSort);
 PHP_METHOD(Riak_Search_Input, getSort);
+PHP_METHOD(Riak_Search_Input, setFilter);
+PHP_METHOD(Riak_Search_Input, getFilter);
+PHP_METHOD(Riak_Search_Input, setDefaultField);
+PHP_METHOD(Riak_Search_Input, getDefaultField);
+PHP_METHOD(Riak_Search_Input, setDefaultOperation);
+PHP_METHOD(Riak_Search_Input, getDefaultOperation);
+PHP_METHOD(Riak_Search_Input, setPresort);
+PHP_METHOD(Riak_Search_Input, getPresort);
+PHP_METHOD(Riak_Search_Input, setFieldLimits);
+PHP_METHOD(Riak_Search_Input, getFieldLimits);
 
 #endif
