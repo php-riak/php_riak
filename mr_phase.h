@@ -20,15 +20,14 @@
 
 #include <php.h>
 
-#define PHASE_TYPE_MAP    1
-#define PHASE_TYPE_REDUCE 2
-#define PHASE_TYPE_LINK   3
-
 extern zend_class_entry *riak_mrphase_ce;
 
 void riak_mrphase_init(TSRMLS_D);
 
-PHP_METHOD(RiakMrPhase, __construct);
-PHP_METHOD(RiakMrPhase, toArray);
+PHP_METHOD(Riak_MapReduce_Phase_MapPhase, __construct);
+PHP_METHOD(Riak_MapReduce_Phase_MapPhase, toArray);
+
+PHP_METHOD(Riak_MapReduce_Phase_ReducePhase, __construct);
+PHP_METHOD(Riak_MapReduce_Phase_ReducePhase, toArray);
 
 #endif

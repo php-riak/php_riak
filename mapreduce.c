@@ -55,8 +55,7 @@ static zend_function_entry riak_mrphase_methods[] = {
 void riak_mapreduce_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
-
-    INIT_CLASS_ENTRY(ce, "RiakMapreduce", riak_mrphase_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce", "MapReduce", riak_mrphase_methods);
     riak_mapreduce_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_property_null(riak_mapreduce_ce, "phases", sizeof("phases")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
@@ -65,8 +64,14 @@ void riak_mapreduce_init(TSRMLS_D)/* {{{ */
 }
 /* }}} */
 
-/* {{{ proto void RiakMapreduce->__construct(RiakClient $client)
-Create a new RiakMapreduce */
+
+/*************************************************************
+* Implementation: Riak\MapReduce\MapReduce
+*************************************************************/
+
+
+/* {{{ proto void Riak\MapReduce\MapReduce->__construct(RiakClient $client)
+Create a new MapReduce object */
 PHP_METHOD(RiakMapreduce, __construct)
 {
     zval *zclient, *zphases;
@@ -81,7 +86,7 @@ PHP_METHOD(RiakMapreduce, __construct)
 }
 /* }}} */
 
-/* {{{ proto RiakMapreduce RiakMapreduce->addPhase(RiakMrPhase $phase)
+/* {{{ proto Riak\MapReduce\MapReduce Riak\MapReduce\MapReduce->addPhase(Riak\MapReduce\Phase\Phase $phase)
 Add a new phase to this map reduce job, atleast one phase needs to be added before a mapreduce query can succeed */
 PHP_METHOD(RiakMapreduce, addPhase)
 {
@@ -96,7 +101,7 @@ PHP_METHOD(RiakMapreduce, addPhase)
 }
 /* }}} */
 
-/* {{{ proto RiakMapreduce RiakMapreduce->setInput(RiakMrInput $input)
+/* {{{ proto Riak\MapReduce\MapReduce Riak\MapReduce\MapReduce->setInput(Riak\MapReduce\Input\Input $input)
 Set mapreduce input, needs to be set for a mapreduce query to succeed */
 PHP_METHOD(RiakMapreduce, setInput)
 {
@@ -134,7 +139,7 @@ void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPR
 }
 /* }}} */
 
-/* {{{ proto array RiakMapreduce->run([RiakMrStreamer $streamer])
+/* {{{ proto array Riak\MapReduce\MapReduce->run([RiakMrStreamer $streamer])
 Runs the mapreduce query and returns the results as an array of RiakMrResult */
 PHP_METHOD(RiakMapreduce, run)
 {
@@ -192,17 +197,20 @@ PHP_METHOD(RiakMapreduce, run)
 
 void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
 {
-    zval *zarr, *ztargetarr;
+    zval *zarr, *ztargetarr, zfuncname;
     ztargetarr = (zval*)custom_ptr;
+
     MAKE_STD_ZVAL(zarr);
-    RIAK_CALL_METHOD(RiakMrPhase, toArray, zarr, *data);
+    ZVAL_STRING(&zfuncname, "toArray", 0);
+    call_user_function(NULL, data, &zfuncname, zarr, 0, NULL TSRMLS_CC);
+    //call_user_function(NULL, &zfunc, &zname, zfuncarray, 0, NULL TSRMLS_CC);
     if (zarr && Z_TYPE_P(zarr) == IS_ARRAY) {
         add_next_index_zval(ztargetarr, zarr);
     }
 }
 /* }}} */
 
-/* {{{ proto array RiakMapreduce->toArray()
+/* {{{ proto array Riak\MapReduce\MapReduce->toArray()
 Returns the current mapreduce query as an array, this is mostly usefull when debugging failing mr queries */
 PHP_METHOD(RiakMapreduce, toArray)
 {
@@ -235,7 +243,7 @@ PHP_METHOD(RiakMapreduce, toArray)
 }
 /* }}} */
 
-/* {{{ proto string RiakMapreduce->toJson()
+/* {{{ proto string Riak\MapReduce\MapReduce->toJson()
 Returns the current mapreduce query as an json string, this is mostly usefull when debugging failing mr queries */
 PHP_METHOD(RiakMapreduce, toJson)
 {

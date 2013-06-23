@@ -26,17 +26,17 @@ void riak_mrinputs_init(TSRMLS_D);
 
 PHP_METHOD(RiakMrInput, toArray);
 
-PHP_METHOD(RiakMrInputBucket, __construct);
-PHP_METHOD(RiakMrInputBucket, getValue);
-PHP_METHOD(RiakMrInputBucket, setIndexFilter);
+PHP_METHOD(Riak_MapReduce_Input_BucketInput, __construct);
+PHP_METHOD(Riak_MapReduce_Input_BucketInput, getValue);
+PHP_METHOD(Riak_MapReduce_Input_BucketInput, setIndexFilter);
 
-PHP_METHOD(RiakMrInputKeyList, __construct);
-PHP_METHOD(RiakMrInputKeyList, addArray);
-PHP_METHOD(RiakMrInputKeyList, addSingle);
-PHP_METHOD(RiakMrInputKeyList, getValue);
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, __construct);
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addArray);
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addSingle);
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, getValue);
 
-PHP_METHOD(RiakMrInputKeyDataList, __construct);
-PHP_METHOD(RiakMrInputKeyDataList, getValue);
-PHP_METHOD(RiakMrInputKeyDataList, add);
+PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, __construct);
+PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, getValue);
+PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, add);
 
 #endif

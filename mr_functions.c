@@ -63,15 +63,15 @@ void riak_mrfunctions_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce, jsce, erlce;
 
-    INIT_CLASS_ENTRY(ce, "RiakMrFunction", riak_mrfunction_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Functions", "Function", riak_mrfunction_methods);
     riak_mrfunction_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
-    INIT_CLASS_ENTRY(jsce, "RiakMrJavascriptFunction", riak_mrfunction_js_methods);
+    INIT_NS_CLASS_ENTRY(jsce, "Riak\\MapReduce\\Functions", "JavascriptFunction", riak_mrfunction_js_methods);
     riak_mrfunction_js_ce = zend_register_internal_class_ex(&jsce, riak_mrfunction_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrfunction_js_ce, "named", sizeof("named")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_mrfunction_js_ce, "source", sizeof("source")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 
-    INIT_CLASS_ENTRY(erlce, "RiakMrErlangFunction", riak_mrfunction_erl_methods);
+    INIT_NS_CLASS_ENTRY(erlce, "Riak\\MapReduce\\Functions", "ErlangFunction", riak_mrfunction_erl_methods);
     riak_mrfunction_erl_ce = zend_register_internal_class_ex(&erlce, riak_mrfunction_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrfunction_erl_ce, "module", sizeof("module")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_mrfunction_erl_ce, "function", sizeof("function")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
@@ -91,8 +91,12 @@ void create_named_mr_js_function(zend_class_entry *classentry, zval* result,
 }
 /* }}} */
 
-/* {{{ proto void RiakMrFunction->__construct(bool $named, string $source)
-Create a new RiakMrFunction */
+/*************************************************************
+* Implementation: Riak\MapReduce\Function\JavascriptFunction
+*************************************************************/
+
+/* {{{ proto void Riak\MapReduce\Function\JavascriptFunction->__construct(bool $named, string $source)
+Create a new JavascriptFunction */
 PHP_METHOD(RiakMrJavascriptFunction, __construct)
 {
     zend_bool named;
@@ -106,8 +110,8 @@ PHP_METHOD(RiakMrJavascriptFunction, __construct)
 }
 /* }}} */
 
-/* {{{ proto array RiakMrFunction->toArray()
-Returns this RiakMrFunction as an array */
+/* {{{ proto array Riak\MapReduce\Function\JavascriptFunction->toArray()
+Returns this Function as an array */
 PHP_METHOD(RiakMrJavascriptFunction, toArray)
 {
     zend_bool named;
@@ -132,8 +136,8 @@ PHP_METHOD(RiakMrJavascriptFunction, toArray)
 }
 /* }}} */
 
-/* {{{ proto RiakMrJavascriptFunction RiakMrJavascriptFunction::named(string $name)
-Creates a named RiakMrJavascriptFunction */
+/* {{{ proto Riak\MapReduce\Function\JavascriptFunction Riak\MapReduce\Function\JavascriptFunction::named(string $name)
+Creates a named JavascriptFunction */
 PHP_METHOD(RiakMrJavascriptFunction, named)
 {
     char* source; int sourcelen;
@@ -144,8 +148,8 @@ PHP_METHOD(RiakMrJavascriptFunction, named)
 }
 /* }}} */
 
-/* {{{ proto RiakMrJavascriptFunction RiakMrJavascriptFunction::anon(string $source)
-Creates an anonymous RiakMrJavascriptFunction */
+/* {{{ proto Riak\MapReduce\Function\JavascriptFunction Riak\MapReduce\Function\JavascriptFunction::anon(string $source)
+Creates an anonymous JavascriptFunction */
 PHP_METHOD(RiakMrJavascriptFunction, anon)
 {
     char* source; int sourcelen;
@@ -157,8 +161,12 @@ PHP_METHOD(RiakMrJavascriptFunction, anon)
 /* }}} */
 
 
-/* {{{ proto void RiakMrErlangFunction->__construct(string $module, string $function)
-Creates RiakMrErlangFunction */
+/*************************************************************
+* Implementation: Riak\MapReduce\Function\ErlangFunction
+*************************************************************/
+
+/* {{{ proto void Riak\MapReduce\Function\ErlangFunction->__construct(string $module, string $function)
+Creates a new ErlangFunction */
 PHP_METHOD(RiakMrErlangFunction, __construct)
 {
     char *module, *function;
@@ -172,8 +180,8 @@ PHP_METHOD(RiakMrErlangFunction, __construct)
 }
 /* }}} */
 
-/* {{{ proto array RiakMrErlangFunction->toArray()
-Returns this RiakMrFunction as an array */
+/* {{{ proto array Riak\MapReduce\Function\ErlangFunction->toArray()
+Returns this Funtion as an array */
 PHP_METHOD(RiakMrErlangFunction, toArray)
 {
     zval *zarray, *zmodule, *zfunc;

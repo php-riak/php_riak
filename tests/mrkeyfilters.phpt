@@ -2,6 +2,10 @@
 Test key filters
 --FILE--
 <?php
+use \Riak\MapReduce\MapReduce;
+use \Riak\MapReduce\Phase\MapPhase;
+use \Riak\MapReduce\Functions\ErlangFunction;
+use \Riak\MapReduce\Input\BucketInput;
 include_once "connect.inc";
 
 $client = new RiakClient($host, $port);
@@ -19,12 +23,12 @@ for ($i=0; $i<20; $i++) {
     $obj->data = "dummy";
     $bucket->put($obj);
 }
-$function1 = new RiakMrErlangFunction("riak_kv_mapreduce","map_object_value");
-$input = new RiakMrInputBucket("test_keyfilters");
+$function1 = new ErlangFunction("riak_kv_mapreduce","map_object_value");
+$input = new BucketInput("test_keyfilters");
 $input->keyFilters = array( array("tokenize", "_", 2), array("between", "05", "15") );
 
-$mr = new RiakMapreduce($client);
-$mr ->addPhase(new RiakMrPhase(RiakMrPhase::map, $function1))
+$mr = new MapReduce($client);
+$mr ->addPhase(new MapPhase($function1))
     ->setInput($input);
 $mrres = $mr->run();
 

@@ -2,9 +2,12 @@
 Test map reduce function objects
 --FILE--
 <?php
-$js1 = new RiakMrJavascriptFunction(true, "source_name");
-$jsanon = RiakMrJavascriptFunction::anon("anon_source");
-$jsnamed = RiakMrJavascriptFunction::named("named_source");
+use \Riak\MapReduce\Functions\JavascriptFunction;
+use \Riak\MapReduce\Functions\ErlangFunction;
+
+$js1 = new JavascriptFunction(true, "source_name");
+$jsanon = JavascriptFunction::anon("anon_source");
+$jsnamed = JavascriptFunction::named("named_source");
 
 $jsanonarr = $jsanon->toArray();
 if ($jsanonarr["language"] !== "javascript" || $jsanonarr["source"] !== "anon_source") {
@@ -15,7 +18,7 @@ if ($jsnamedarr["language"] !== "javascript" || $jsnamedarr["name"] !== "named_s
     var_dump($jsanonarr);
 }
 
-$erl1 = new RiakMrErlangFunction("module", "function");
+$erl1 = new ErlangFunction("module", "function");
 
 $erlnarr = $erl1->toArray();
 if ($erlnarr["module"] !== "module" || $erlnarr["function"] !== "function") {

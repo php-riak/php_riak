@@ -2,6 +2,11 @@
 Test mapreduce
 --FILE--
 <?php
+use \Riak\MapReduce\MapReduce;
+use \Riak\MapReduce\Input\KeyListInput;
+use \Riak\MapReduce\Phase\MapPhase;
+use \Riak\MapReduce\Phase\ReducePhase;
+use \Riak\MapReduce\Functions\JavascriptFunction;
 include_once "connect.inc";
 
 $alice1 = "Alice was beginning to get very tired of sitting by her sister on the ".
@@ -37,9 +42,9 @@ try {
     $obj3->data = $alice3;
     $alicebucket->put($obj3);
 
-    $mrinput = new RiakMrInputKeyList(array("test_alice" => array("alice1", $obj2, $obj3)));
+    $mrinput = new KeyListInput(array("test_alice" => array("alice1", $obj2, $obj3)));
 
-    $jsmapfunc = RiakMrJavascriptFunction::anon("function(v) {".
+    $jsmapfunc = JavascriptFunction::anon("function(v) {".
         "var m = v.values[0].data.toLowerCase().match(/\w*/g);".
         "var r = [];".
         "for(var i in m) {".
@@ -52,7 +57,7 @@ try {
         "return r;".
         "}");
 
-    $jsredfunc = RiakMrJavascriptFunction::anon("function(v) {".
+    $jsredfunc = JavascriptFunction::anon("function(v) {".
         "var r = {};".
         "for(var i in v) {".
         "   for(var w in v[i]) {".
@@ -63,9 +68,9 @@ try {
         "return [r];".
         "}");
 
-    $mr = new RiakMapreduce($client);
-    $mr ->addPhase(new RiakMrPhase(RiakMrPhase::map, $jsmapfunc))
-        ->addPhase(new RiakMrPhase(RiakMrPhase::reduce, $jsredfunc))
+    $mr = new MapReduce($client);
+    $mr ->addPhase(new MapPhase($jsmapfunc))
+        ->addPhase(new ReducePhase($jsredfunc))
         ->setInput($mrinput);
     $json = $mr->toJson();
     $result = $mr->run();

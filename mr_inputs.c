@@ -63,55 +63,59 @@ static zend_function_entry riak_mrinput_methods[] = {
 };
 
 static zend_function_entry riak_mrinputbucket_methods[] = {
-    PHP_ME(RiakMrInputBucket, __construct, arginfo_mrinput_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakMrInputBucket, setIndexFilter, arginfo_mrinputbucket_setindex, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakMrInputBucket, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_MapReduce_Input_BucketInput, __construct, arginfo_mrinput_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(Riak_MapReduce_Input_BucketInput, setIndexFilter, arginfo_mrinputbucket_setindex, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_MapReduce_Input_BucketInput, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
 static zend_function_entry riak_mrinputlist_methods[] = {
-    PHP_ME(RiakMrInputKeyList, __construct, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakMrInputKeyList, addArray, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakMrInputKeyList, addSingle, arginfo_mrinputkeylist_single, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakMrInputKeyList, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_MapReduce_Input_KeyListInput, __construct, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(Riak_MapReduce_Input_KeyListInput, addArray, arginfo_mrinputkeylist_ctor, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_MapReduce_Input_KeyListInput, addSingle, arginfo_mrinputkeylist_single, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_MapReduce_Input_KeyListInput, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
 static zend_function_entry riak_mrinputkeydatalist_methods[] = {
-    PHP_ME(RiakMrInputKeyDataList, __construct, arginfo_mrinput_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakMrInputKeyDataList, add, arginfo_mrinputkeydatalist_add, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakMrInputKeyDataList, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_MapReduce_Input_KeyDataListInput, __construct, arginfo_mrinput_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(Riak_MapReduce_Input_KeyDataListInput, add, arginfo_mrinputkeydatalist_add, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_MapReduce_Input_KeyDataListInput, getValue, arginfo_mrinput_toarr, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
 void riak_mrinputs_init(TSRMLS_D) /* {{{ */
 {
-    zend_class_entry ce, bucket_ce, list_ce, list_data_ce;
+    zend_class_entry ce;
 
-    INIT_CLASS_ENTRY(ce, "RiakMrInput", riak_mrinput_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Input", "Input", riak_mrinput_methods);
     riak_mrinput_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
-    INIT_CLASS_ENTRY(bucket_ce, "RiakMrInputBucket", riak_mrinputbucket_methods);
-    riak_mrinput_bucket_ce = zend_register_internal_class_ex(&bucket_ce, riak_mrinput_ce, NULL TSRMLS_CC);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Input", "BucketInput", riak_mrinputbucket_methods);
+    riak_mrinput_bucket_ce = zend_register_internal_class_ex(&ce, riak_mrinput_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "keyFilters", sizeof("keyFilters")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "idxname", sizeof("idxname")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "idxstart", sizeof("idxstart")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "idxend", sizeof("idxend")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 
-    INIT_CLASS_ENTRY(list_ce, "RiakMrInputKeyList", riak_mrinputlist_methods);
-    riak_mrinput_keylist_ce = zend_register_internal_class_ex(&list_ce, riak_mrinput_ce, NULL TSRMLS_CC);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Input", "KeyListInput", riak_mrinputlist_methods);
+    riak_mrinput_keylist_ce = zend_register_internal_class_ex(&ce, riak_mrinput_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_bucket_ce, "inputList", sizeof("inputList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 
-    INIT_CLASS_ENTRY(list_data_ce, "RiakMrInputKeyDataList", riak_mrinputkeydatalist_methods);
-    riak_mrinput_keydatalist_ce = zend_register_internal_class_ex(&list_data_ce, riak_mrinput_ce, NULL TSRMLS_CC);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Input", "KeyDataListInput", riak_mrinputkeydatalist_methods);
+    riak_mrinput_keydatalist_ce = zend_register_internal_class_ex(&ce, riak_mrinput_ce, NULL TSRMLS_CC);
     zend_declare_property_null(riak_mrinput_keydatalist_ce, "inputList", sizeof("inputList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 /* }}} */
 
-/* {{{ proto void RiakMrInputBucket->__construct(string $bucketName)
-Create a RiakMrInputBucket an RiakMrInput that uses a bucket as input */
-PHP_METHOD(RiakMrInputBucket, __construct)
+/*************************************************************
+* Implementation: Riak\MapReduce\Input\BucketInput
+*************************************************************/
+
+/* {{{ proto void Riak\MapReduce\Input\BucketInput->__construct(string $bucketName)
+Creates a new BucketInput */
+PHP_METHOD(Riak_MapReduce_Input_BucketInput, __construct)
 {
     char *name;
     int namelen;
@@ -122,9 +126,9 @@ PHP_METHOD(RiakMrInputBucket, __construct)
 }
 /* }}} */
 
-/* {{{ proto void RiakMrInputBucket->setIndexFilter($indexname, $start [, $end])
+/* {{{ proto void Riak\MapReduce\Input\BucketInput->setIndexFilter($indexname, $start [, $end])
 Add a index query filter */
-PHP_METHOD(RiakMrInputBucket, setIndexFilter)
+PHP_METHOD(Riak_MapReduce_Input_BucketInput, setIndexFilter)
 {
     char *index, *start, *end;
     int indexlen, startlen, endlen;
@@ -139,9 +143,9 @@ PHP_METHOD(RiakMrInputBucket, setIndexFilter)
     }
 }
 
-/* {{{ proto string|array RiakMrInputBucket->getValue()
+/* {{{ proto string|array Riak\MapReduce\Input\BucketInput->getValue()
 Returns value to use in Mapreduce */
-PHP_METHOD(RiakMrInputBucket, getValue)
+PHP_METHOD(Riak_MapReduce_Input_BucketInput, getValue)
 {
     zval* zname, *zfilters, *zresult, *zindex;
     zname = zend_read_property(riak_mrinput_bucket_ce, getThis(), "name", sizeof("name")-1, 1 TSRMLS_CC);
@@ -180,6 +184,10 @@ PHP_METHOD(RiakMrInputBucket, getValue)
     }
 }
 /* }}} */
+
+/*************************************************************
+* Implementation: Riak\MapReduce\Input\KeyListInput
+*************************************************************/
 
 
 zval *riak_create_kv_pair(char* bucket, int bucketlen, char* key, int keylen)/* {{{{ */
@@ -252,9 +260,9 @@ zval* riak_array_to_tupple_array(HashTable* from TSRMLS_DC)/* {{{{ */
 }
 /* }}} */
 
-/* {{{ proto void RiakMrInputKeyList->__construct(array $bucketKeys)
-Create a RiakMrInputBucket, input should be an array with ["bucket" => "key", "bucket2" => "key2"] or ["bucket" => ["key1", "key2"]] */
-PHP_METHOD(RiakMrInputKeyList, __construct)
+/* {{{ proto void Riak\MapReduce\Input\KeyListInput->__construct(array $bucketKeys)
+Create a KeyListInput, input should be an array with ["bucket" => "key", "bucket2" => "key2"] or ["bucket" => ["key1", "key2"]] */
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, __construct)
 {
     zval *zarr;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &zarr) == FAILURE) {
@@ -264,9 +272,9 @@ PHP_METHOD(RiakMrInputKeyList, __construct)
 }
 /* }}} */
 
-/* {{{ proto RiakMrInputKeyList RiakMrInputKeyList->addArray(array $bucketKeys)
+/* {{{ proto Riak\MapReduce\Input\KeyListInput Riak\MapReduce\Input\KeyListInput->addArray(array $bucketKeys)
 Add bucket/key inputs to the current list, $bucketKeys must be an array with ["bucket" => "key", "bucket2" => "key2"] or ["bucket" => ["key1", "key2"]] */
-PHP_METHOD(RiakMrInputKeyList, addArray)
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addArray)
 {
     zval *zarr[2], zfuncname, *zcombinedarr;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &zarr[1]) == FAILURE) {
@@ -286,9 +294,9 @@ PHP_METHOD(RiakMrInputKeyList, addArray)
 }
 /* }}} */
 
-/* {{{ proto RiakMrInputKeyList RiakMrInputKeyList->addSingle(string $bucket, string $key)
+/* {{{ proto Riak\MapReduce\Input\KeyListInput Riak\MapReduce\Input\KeyListInput->addSingle(string $bucket, string $key)
 Add a single bucket/key to the current list of inputs */
-PHP_METHOD(RiakMrInputKeyList, addSingle)
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addSingle)
 {
     zval *zbucket, *zobject, *zarray;
     char *bucket, *key;
@@ -314,7 +322,7 @@ PHP_METHOD(RiakMrInputKeyList, addSingle)
         MAKE_STD_ZVAL(zarray);
         array_init(zarray);
         add_assoc_stringl_ex(zarray, bucket, bucketlen, key, keylen, 1);
-        RIAK_CALL_METHOD1(RiakMrInputKeyList, addArray, return_value, getThis(), zarray);
+        RIAK_CALL_METHOD1(Riak_MapReduce_Input_KeyListInput, addArray, return_value, getThis(), zarray);
         zval_ptr_dtor(&zarray);
     } else {
         zend_throw_exception(riak_badarguments_exception_ce, "Key or bucketname missing", 5001 TSRMLS_CC);
@@ -322,9 +330,9 @@ PHP_METHOD(RiakMrInputKeyList, addSingle)
 }
 /* }}} */
 
-/* {{{ proto array RiakMrInputKeyList->getValue()
+/* {{{ proto array Riak\MapReduce\Input\KeyListInput->getValue()
 Returns value to use in Mapreduce */
-PHP_METHOD(RiakMrInputKeyList, getValue)
+PHP_METHOD(Riak_MapReduce_Input_KeyListInput, getValue)
 {
     zval* zresult;
     zval* zinputlist = zend_read_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
@@ -333,9 +341,13 @@ PHP_METHOD(RiakMrInputKeyList, getValue)
 }
 /* }}} */
 
-/* {{{ proto void RiakMrInputKeyDataList->__construct()
-Create a RiakMrInputKeyDataList */
-PHP_METHOD(RiakMrInputKeyDataList, __construct)
+/*************************************************************
+* Implementation: Riak\MapReduce\Input\KeyDataListInput
+*************************************************************/
+
+/* {{{ proto void Riak\MapReduce\Input\KeyDataListInput->__construct()
+Create a KeyDataListInput */
+PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, __construct)
 {
     zval *list;
     MAKE_STD_ZVAL(list);
@@ -345,9 +357,9 @@ PHP_METHOD(RiakMrInputKeyDataList, __construct)
 }
 /* }}} */
 
-/* {{{ proto void RiakMrInputKeyDataList->add(string|RiakBucket $bucket, string|RiakObject $object, $data)
+/* {{{ proto void Riak\MapReduce\Input\KeyDataListInput->add(string|RiakBucket $bucket, string|RiakObject $object, $data)
 Add a bucket/key/data set to input */
-PHP_METHOD(RiakMrInputKeyDataList, add)
+PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, add)
 {
     zval *zbucket, *zkey, *zdata, *zarr, *zlist;
     char *bucket, *key;
@@ -386,9 +398,9 @@ PHP_METHOD(RiakMrInputKeyDataList, add)
 /* }}} */
 
 
-/* {{{ proto array RiakMrInputKeyDataList->getValue()
+/* {{{ proto array Riak\MapReduce\Input\KeyDataListInput->getValue()
 Returns value to use in Mapreduce */
-PHP_METHOD(RiakMrInputKeyDataList, getValue)
+PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, getValue)
 {
     zval* zinputlist = zend_read_property(riak_mrinput_keydatalist_ce, getThis(), "inputList", sizeof("inputList")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zinputlist) == IS_ARRAY) {
