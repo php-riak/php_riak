@@ -32,8 +32,8 @@ static zend_function_entry riak_keystreamer_methods[] = {
     {NULL, NULL, NULL}
 };
 
-static zend_function_entry riak_mrstreamer_methods[] = {
-    ZEND_ABSTRACT_ME(RiakMrStreamer, receive, arginfo_mrstreamer_rec)
+static zend_function_entry riak_mapreduce_out_stream_methods[] = {
+    ZEND_ABSTRACT_ME(Riak_MapReduce_Output_StreamOutput, receive, arginfo_mrstreamer_rec)
     {NULL, NULL, NULL}
 };
 
@@ -43,7 +43,7 @@ void riak_streaming_init(TSRMLS_D)/* {{{ */
     INIT_CLASS_ENTRY(ce, "RiakKeyStreamer", riak_keystreamer_methods);
     riak_key_streamer_ce = zend_register_internal_interface(&ce TSRMLS_CC);
 
-    INIT_CLASS_ENTRY(ce, "RiakMrStreamer", riak_mrstreamer_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Output","StreamOutput", riak_mapreduce_out_stream_methods);
     riak_mr_streamer_ce = zend_register_internal_interface(&ce TSRMLS_CC);
 }
 /* }}} */

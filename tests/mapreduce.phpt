@@ -81,7 +81,7 @@ try {
     global $streamedsomething;
     $streamedsomething = false;
     // Now do the same but stream it
-    class MrStream implements RiakMrStreamer {
+    class MrStream implements \Riak\MapReduce\Output\StreamOutput {
         public function receive($response) {
             global $streamedsomething;
             $streamedsomething = true;

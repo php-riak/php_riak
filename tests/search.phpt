@@ -27,8 +27,9 @@ $search = new Search($riak);
 $si = new Parameters();
 $si->setDefaultField('name');
 $res = $search->search("testsearch", "apple", $si);
-foreach ($res->documents as $doc) {
-    if ($doc->fields["name"] != "apple") {
+foreach ($res->getDocuments() as $doc) {
+    $fields = $doc->getFields();
+    if ($fields["name"] != "apple") {
         var_dump($doc);
     }
 }

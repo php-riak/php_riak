@@ -44,6 +44,16 @@
     if (Z_TYPE_P(ztmp) == IS_LONG) { RETURN_LONG(Z_LVAL_P(ztmp)); } \
     RETURN_NULL();
 
+#define RIAK_GETTER_ARRAY(CE, PROPERTY_NAME) \
+    zval* ztmp = zend_read_property(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
+    if (Z_TYPE_P(ztmp) == IS_ARRAY) { RETURN_ZVAL(ztmp, 1, 0); } \
+    RETURN_NULL();
+
+#define RIAK_GETTER_DOUBLE(CE, PROPERTY_NAME) \
+    zval* ztmp = zend_read_property(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
+    if (Z_TYPE_P(ztmp) == IS_DOUBLE) { RETURN_DOUBLE(Z_DVAL_P(ztmp)); } \
+    RETURN_NULL();
+
 #define RIAK_SETTER_STRING(CE, PROPERTY_NAME) \
     char* val; int val_len; \
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &val, &val_len) == FAILURE) { return; } \

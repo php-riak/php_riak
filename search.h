@@ -33,6 +33,16 @@ zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* doc
 PHP_METHOD(Riak_Search, __construct);
 PHP_METHOD(Riak_Search, search);
 
+/* Riak\Search\Output\Output */
+PHP_METHOD(Riak_Search_Output_Output, hasMaxScore);
+PHP_METHOD(Riak_Search_Output_Output, getMaxScore);
+PHP_METHOD(Riak_Search_Output_Output, hasNumFound);
+PHP_METHOD(Riak_Search_Output_Output, getNumFound);
+PHP_METHOD(Riak_Search_Output_Output, getDocuments);
+
+/* Riak\Search\Output\DocumentOutput */
+PHP_METHOD(Riak_Search_Output_DocumentOutput, getFields);
+
 /* Search\Input */
 PHP_METHOD(Riak_Search_Input, setRowLimit);
 PHP_METHOD(Riak_Search_Input, getRowLimit);

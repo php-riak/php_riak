@@ -79,6 +79,11 @@ static zend_function_entry riak_search_methods[] = {
 
 
 static zend_function_entry riak_search_output_methods[] = {
+    PHP_ME(Riak_Search_Output_Output, hasMaxScore, arginfo_search_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Search_Output_Output, getMaxScore, arginfo_search_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Search_Output_Output, hasNumFound, arginfo_search_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Search_Output_Output, getNumFound, arginfo_search_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Search_Output_Output, getDocuments, arginfo_search_noargs, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -104,6 +109,7 @@ static zend_function_entry riak_search_input_methods[] = {
 };
 
 static zend_function_entry riak_search_doc_methods[] = {
+    PHP_ME(Riak_Search_Output_DocumentOutput, getFields, arginfo_search_noargs, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -128,13 +134,13 @@ void riak_search_init(TSRMLS_D) /* {{{ */
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Output", "Output", riak_search_output_methods);
     riak_search_output_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(riak_search_output_ce, "maxScore", sizeof("maxScore")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_search_output_ce, "numFound", sizeof("numFound")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_search_output_ce, "documents", sizeof("documents")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_search_output_ce, "maxScore", sizeof("maxScore")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_search_output_ce, "numFound", sizeof("numFound")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_search_output_ce, "documents", sizeof("documents")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Output", "Document", riak_search_doc_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Output", "DocumentOutput", riak_search_doc_methods);
     riak_search_doc_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(riak_search_doc_ce, "fields", sizeof("fields")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_search_doc_ce, "fields", sizeof("fields")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 }
 /* }}} */
 
@@ -220,8 +226,41 @@ zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *se
     return zresult;
 }
 
+PHP_METHOD(Riak_Search_Output_Output, hasMaxScore)
+{
+    zval *zprop = zend_read_property(riak_search_output_ce, getThis(), "maxScore", sizeof("maxScore"), 1 TSRMLS_CC);
+    if (!zprop || Z_TYPE_P(zprop) == IS_NULL) {
+        RETURN_BOOL(0);
+    }
+    RETURN_BOOL(1);
+}
+
+PHP_METHOD(Riak_Search_Output_Output, getMaxScore)
+{
+    RIAK_GETTER_DOUBLE(riak_search_output_ce, "maxScore");
+}
+
+PHP_METHOD(Riak_Search_Output_Output, hasNumFound)
+{
+    zval *zprop = zend_read_property(riak_search_output_ce, getThis(), "numFound", sizeof("numFound"), 1 TSRMLS_CC);
+    if (zprop == NULL || Z_TYPE_P(zprop) == IS_NULL) {
+        RETURN_BOOL(0);
+    }
+    RETURN_BOOL(1);
+}
+
+PHP_METHOD(Riak_Search_Output_Output, getNumFound)
+{
+    RIAK_GETTER_LONG(riak_search_output_ce, "numFound");
+}
+
+PHP_METHOD(Riak_Search_Output_Output, getDocuments)
+{
+    RIAK_GETTER_ARRAY(riak_search_output_ce, "documents");
+}
+
 /*************************************************************
-* Implementation: Riak\Search\Output\Document
+* Implementation: Riak\Search\Output\DocumentOutput
 *************************************************************/
 zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* document TSRMLS_DC)
 {
@@ -246,6 +285,11 @@ zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* doc
     zend_update_property(riak_search_doc_ce, zresult, "fields", sizeof("fields")-1, zarr TSRMLS_CC);
     zval_ptr_dtor(&zarr);
     return zresult;
+}
+
+PHP_METHOD(Riak_Search_Output_DocumentOutput, getFields)
+{
+    RIAK_GETTER_ARRAY(riak_search_doc_ce, "fields");
 }
 
 /*************************************************************
