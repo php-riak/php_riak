@@ -121,7 +121,7 @@ void riak_search_init(TSRMLS_D) /* {{{ */
     zend_declare_property_null(riak_search_ce, "client", sizeof("client")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 
 
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Input", "Parameters", riak_search_input_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Input", "ParameterBag", riak_search_input_methods);
     riak_search_input_ce = zend_register_internal_class(&ce TSRMLS_CC);
     zend_declare_property_null(riak_search_input_ce, "rowLimit", sizeof("rowLimit")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_search_input_ce, "start", sizeof("start")-1, ZEND_ACC_PROTECTED TSRMLS_CC);

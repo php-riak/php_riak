@@ -3,7 +3,7 @@ Riak search test
 --FILE--
 <?php
 use \Riak\Search\Search;
-use \Riak\Search\Input\Parameters;
+use \Riak\Search\Input\ParameterBag;
 include_once "connect.inc";
 
 $riak = new RiakClient($host, $port);
@@ -24,7 +24,7 @@ foreach ($json as $j) {
 }
 
 $search = new Search($riak);
-$si = new Parameters();
+$si = new ParameterBag();
 $si->setDefaultField('name');
 $res = $search->search("testsearch", "apple", $si);
 foreach ($res->getDocuments() as $doc) {

@@ -2,9 +2,9 @@
 Riak Search Input test
 --FILE--
 <?php
-use \Riak\Search\Input\Parameters;
+use \Riak\Search\Input\ParameterBag;
 include_once "connect.inc";
-$inp = new Parameters();
+$inp = new ParameterBag();
 
 $inp->setRowLimit(10);
 if ($inp->getRowLimit() != 10) {
