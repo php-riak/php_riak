@@ -63,7 +63,7 @@ void riak_mrfunctions_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce, jsce, erlce;
 
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Functions", "Function", riak_mrfunction_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Functions", "BaseFunction", riak_mrfunction_methods);
     riak_mrfunction_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(jsce, "Riak\\MapReduce\\Functions", "JavascriptFunction", riak_mrfunction_js_methods);
