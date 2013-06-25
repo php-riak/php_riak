@@ -6,11 +6,12 @@ use \Riak\MapReduce\MapReduce;
 use \Riak\MapReduce\Phase\MapPhase;
 use \Riak\MapReduce\Functions\ErlangFunction;
 use \Riak\MapReduce\Input\BucketInput;
+use \Riak\BucketPropertyList;
 include_once "connect.inc";
 
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_keyfilters");
-$newProps = new RiakBucketProperties(3, false);
+$newProps = new BucketPropertyList(3, false);
 $bucket->applyProperties($newProps);
 
 // Make 20 keys for testing

@@ -286,35 +286,19 @@ PHP_METHOD(RiakBucket, applyProperties)
 	riak_connection *connection;
 
 	RIACK_STRING bucketName;
-	zval* zBucketPropsObj, **zTmp;
-	HashTable *htBucketPropsProps;
+    zval* zpropsObj, znval, zallowmult;
 	int riackResult;
-	uint32_t nVal;
-	uint8_t allowMult;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zBucketPropsObj) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zpropsObj) == FAILURE) {
 		return;
 	}
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
-    htBucketPropsProps = zend_std_get_properties(zBucketPropsObj TSRMLS_CC);
 
+    RIAK_CALL_METHOD(RiakBucketProperties, getNValue, &znval, zpropsObj);
+    RIAK_CALL_METHOD(RiakBucketProperties, getAllowMult, &zallowmult, zpropsObj);
 
-	if ((zend_hash_find(htBucketPropsProps, "nVal", sizeof("nVal"), (void**)&zTmp) == SUCCESS)
-     	&& (Z_TYPE_P(*zTmp) == IS_LONG)) {
-		nVal = (uint32_t)Z_LVAL_PP(zTmp);
- 	} else {
- 		zend_throw_exception(riak_badarguments_exception_ce, "nVal must be integer", 5000 TSRMLS_CC);
- 		return;
- 	}
- 	if ((zend_hash_find(htBucketPropsProps, "allowMult", sizeof("allowMult"), (void**)&zTmp) == SUCCESS)
-     	&& (Z_TYPE_P(*zTmp) == IS_BOOL)) {
-		allowMult = Z_BVAL_PP(zTmp);
- 	} else {
- 		zend_throw_exception(riak_badarguments_exception_ce, "allowMult must be boolean", 5001 TSRMLS_CC);
- 		return;
- 	}
- 	riackResult = riack_set_bucket_props(connection->client, bucketName, nVal, allowMult);
+    riackResult = riack_set_bucket_props(connection->client, bucketName, Z_LVAL(znval), Z_BVAL(zallowmult));
  	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
 /* }}} */

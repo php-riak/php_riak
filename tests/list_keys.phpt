@@ -2,10 +2,11 @@
 Test bucket list keys
 --FILE--
 <?php
+use \Riak\BucketPropertyList;
 include_once "connect.inc";
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_list_keys");
-$props = new RiakBucketProperties(3, false);
+$props = new BucketPropertyList(3, false);
 $bucket->applyProperties($props);
 try {
     // Make some objects we can list afterwards
