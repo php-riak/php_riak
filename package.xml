@@ -73,8 +73,8 @@
             <file role="src" name="stats.h"/>
             <file role="src" name="streaming.c"/>
             <file role="src" name="streaming.h"/>
-            <file role="src" name="req_configs.c"/>
-            <file role="src" name="req_configs.h"/>
+            <file role="src" name="req_inputs.c"/>
+            <file role="src" name="req_inputs.h"/>
             
             <dir name="riack">
                 <dir name="src">

@@ -23,7 +23,7 @@
 #include "client.h"
 #include "object.h"
 #include "exceptions.h"
-#include "req_configs.h"
+#include "req_inputs.h"
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 
@@ -401,9 +401,13 @@ PHP_METHOD(RiakBucket, put)
 	memset(&returnedObj, 0, sizeof(returnedObj));
 	memset(&riackContent, 0, sizeof(riackContent));
     memset(&props, 0, sizeof(props));
-    if (zconfig != NULL && get_return_head(zconfig TSRMLS_CC)) {
-        props.return_head_use = props.return_head = 1;
-    }
+/*    if (zconfig != NULL) {
+        zval return_head;
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getReturnHead, &return_head, zconfig);
+        if (Z_BVAL(return_head)) {
+            props.return_head_use = props.return_head = 1;
+        }
+    }*/
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("dw", props.dw_use, props.dw, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("pw", props.pw_use, props.pw, zTmp)
@@ -474,13 +478,42 @@ PHP_METHOD(RiakBucket, get)
 	memset(&props, 0, sizeof(props));
 	memset(&getResult, 0, sizeof(getResult));
 
-    if (zconfig != NULL && get_return_head(zconfig TSRMLS_CC)) {
-        props.head_use = 1;
-        props.head = 1;
+    if (zconfig != NULL && Z_TYPE_P(zconfig) == IS_OBJECT) {
+        zval ztmp;
+        // Return head
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getReturnHead, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
+            props.head_use = props.head = 1;
+        }
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getR, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_LONG) {
+            props.r_use = 1;
+            props.r = Z_LVAL(ztmp);
+        }
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getPR, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_LONG) {
+            props.pr_use = 1;
+            props.pr = Z_LVAL(ztmp);
+        }
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getBasicQuorum, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
+            props.basic_quorum_present = props.basic_quorum = 1;
+        }
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getNotFoundOk, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
+            props.notfound_ok_present = props.notfound_ok = 1;
+        }
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getReturnDeletedVClock, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
+            props.deletedvclock_present = props.deletedvclock = 1;
+        }
+        RIAK_CALL_METHOD(Riak_Input_GetInput, getIfModifiedVClock, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_STRING) {
+            props.if_modified_use = 1;
+            props.if_modified.len = Z_STRLEN(ztmp);
+            props.if_modified.clock = (uint8_t*)estrndup(Z_STRVAL(ztmp), Z_STRLEN(ztmp));
+        }
     }
-
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("pr", props.pr_use, props.pr, zObj)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("r", props.r_use, props.r, zObj)
 
     rsBucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 	rsKey.len = keyLen;
@@ -525,6 +558,9 @@ PHP_METHOD(RiakBucket, get)
 		CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 	}
 	zval_ptr_dtor(&zKey);
+    if (props.if_modified.clock) {
+        efree(props.if_modified.clock);
+    }
 }
 /* }}} */
 

@@ -3,6 +3,7 @@ Simple get test
 --FILE--
 <?php
 use \Riak\BucketPropertyList;
+use \Riak\Input\GetInput;
 include_once "connect.inc";
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_bucket");
@@ -13,7 +14,7 @@ try {
         $obj = new RiakObject("get_head");
         $obj->data = "test-get plap";
         $bucket->put($obj);
-        $cfg = new RiakGetRequestConfiguration();
+        $cfg = new GetInput();
         $cfg->setReturnHead(true);
         $readdenObj = $bucket->get("get_head", $cfg);
         if (!is_null($readdenObj->data)) {
