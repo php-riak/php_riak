@@ -24,4 +24,9 @@ void riak_bucket_props_init(TSRMLS_D);
 
 PHP_METHOD(RiakBucketProperties, __construct);
 
+PHP_METHOD(RiakBucketProperties, getNValue);
+PHP_METHOD(RiakBucketProperties, setNValue);
+PHP_METHOD(RiakBucketProperties, getAllowMult);
+PHP_METHOD(RiakBucketProperties, setAllowMult);
+
 #endif

@@ -28,4 +28,8 @@ void riak_link_init(TSRMLS_D);
 
 PHP_METHOD(RiakLink, __construct);
 
+PHP_METHOD(RiakLink, getTag);
+PHP_METHOD(RiakLink, getBucketName);
+PHP_METHOD(RiakLink, getKey);
+
 #endif

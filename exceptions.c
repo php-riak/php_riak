@@ -36,31 +36,31 @@ void riak_exceptions_init(TSRMLS_D)
 {
 	zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc, ceConflict, ceNotFound;
 
-	INIT_CLASS_ENTRY(ceRiak, "RiakException", NULL);
+    INIT_NS_CLASS_ENTRY(ceRiak, "Riak\\Exception", "RiakException", NULL);
 	riak_exception_ce = zend_register_internal_class_ex(&ceRiak, 
 		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
 
-	INIT_CLASS_ENTRY(ceBadArgs, "RiakBadArgumentsException", NULL);
+    INIT_NS_CLASS_ENTRY(ceBadArgs, "Riak\\Exception", "BadArgumentsException", NULL);
 	riak_badarguments_exception_ce = zend_register_internal_class_ex(&ceBadArgs, 
 		riak_exception_ce, NULL TSRMLS_CC);
 
-	INIT_CLASS_ENTRY(ceConnExc, "RiakConnectionException", NULL);
+    INIT_NS_CLASS_ENTRY(ceConnExc, "Riak\\Exception", "ConnectionException", NULL);
 	riak_connection_exception_ce = zend_register_internal_class_ex(&ceConnExc, 
 		riak_exception_ce, NULL TSRMLS_CC);
 
-	INIT_CLASS_ENTRY(ceCommExc, "RiakCommunicationException", NULL);
+    INIT_NS_CLASS_ENTRY(ceCommExc, "Riak\\Exception","CommunicationException", NULL);
 	riak_communication_exception_ce = zend_register_internal_class_ex(&ceCommExc, 
 		riak_exception_ce, NULL TSRMLS_CC);
 
-	INIT_CLASS_ENTRY(ceRespExc, "RiakResponseException", NULL);
+    INIT_NS_CLASS_ENTRY(ceRespExc, "Riak\\Exception", "UnexpectedResponseException", NULL);
 	riak_response_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
 		riak_exception_ce, NULL TSRMLS_CC);
 
-	INIT_CLASS_ENTRY(ceNotFound, "RiakNotFoundException", NULL);
+    INIT_NS_CLASS_ENTRY(ceNotFound, "Riak\\Exception","NotFoundException", NULL);
 	riak_not_found_exception_ce = zend_register_internal_class_ex(&ceNotFound, 
 		riak_exception_ce, NULL TSRMLS_CC);
 
-	INIT_CLASS_ENTRY(ceConflict, "RiakConflictedObjectException", riak_conflicted_exception_methods);
+    INIT_NS_CLASS_ENTRY(ceConflict, "Riak\\Exception", "ConflictedObjectException", riak_conflicted_exception_methods);
 	riak_conflicted_object_exception_ce = zend_register_internal_class_ex(&ceConflict, 
 		riak_exception_ce, NULL TSRMLS_CC);
 

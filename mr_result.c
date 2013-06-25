@@ -24,8 +24,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_result_toarr, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
-static zend_function_entry riak_mrresult_methods[] = {
-    PHP_ME(RiakMrResult, __construct, arginfo_result_toarr, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+static zend_function_entry riak_mroutput_methods[] = {
+    PHP_ME(Riak_MapReduce_Output_Output, __construct, arginfo_result_toarr, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     {NULL, NULL, NULL}
 };
 
@@ -33,7 +33,7 @@ void riak_mrresult_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
-    INIT_CLASS_ENTRY(ce, "RiakMrResult", riak_mrresult_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Output", "Output", riak_mroutput_methods);
     riak_mrresult_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_property_null(riak_mrresult_ce, "value", sizeof("value")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
@@ -53,19 +53,19 @@ zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TS
     if (mapresult->phase_present) {
         MAKE_STD_ZVAL(zphase);
         ZVAL_LONG(zphase, mapresult->phase);
-        RIAK_CALL_METHOD2(RiakMrResult, __construct, zresult, zresult, zvalue, zphase);
+        RIAK_CALL_METHOD2(Riak_MapReduce_Output_Output, __construct, zresult, zresult, zvalue, zphase);
         zval_ptr_dtor(&zphase);
     } else {
-        RIAK_CALL_METHOD1(RiakMrResult, __construct, zresult, zresult, zvalue);
+        RIAK_CALL_METHOD1(Riak_MapReduce_Output_Output, __construct, zresult, zresult, zvalue);
     }
     zval_ptr_dtor(&zvalue);
     return zresult;
 }
 /* }}} */
 
-/* {{{ proto void RiakMrResult->__construct($value, [, int $phase])
-Create a RiakMrResult */
-PHP_METHOD(RiakMrResult, __construct)
+/* {{{ proto void Riak\MapReduce\Output\Output->__construct($value, [, int $phase])
+Create a Riak_MapReduce_Output_Output */
+PHP_METHOD(Riak_MapReduce_Output_Output, __construct)
 {
     zval* zvalue;
     long phase = 0;

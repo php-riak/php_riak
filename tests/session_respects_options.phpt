@@ -8,6 +8,7 @@ session.serialize_handler=php
 session.save_handler=riak
 --FILE--
 <?php
+use \Riak\Exception\UnexpectedResponseException;
 include_once "connect.inc";
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "sessions_violation");
@@ -21,7 +22,7 @@ try {
     session_start();
     $_SESSION['favcolor'] = 'green';
     session_commit();
-} catch (RiakResponseException $exc) {
+} catch (UnexpectedResponseException $exc) {
     echo "done!";
 }
 ?>

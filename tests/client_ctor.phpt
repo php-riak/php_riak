@@ -2,6 +2,7 @@
 Basic riak connection
 --FILE--
 <?php
+use \Riak\Exception\ConnectionException;
 include_once "connect.inc";
 try {
 	$riak = new RiakClient($host, $port);
@@ -9,7 +10,7 @@ try {
 		echo "done!".PHP_EOL;
 	}
 	$riak = new RiakClient("255.255.255.255");
-} catch (RiakConnectionException $e) {
+} catch (ConnectionException $e) {
 	echo "Connection error!".PHP_EOL;
 }
 ?>

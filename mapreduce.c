@@ -140,7 +140,7 @@ void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPR
 /* }}} */
 
 /* {{{ proto array Riak\MapReduce\MapReduce->run([RiakMrStreamer $streamer])
-Runs the mapreduce query and returns the results as an array of RiakMrResult */
+Runs the mapreduce query and returns the results as an array of Riak_MapReduce_Output_Output */
 PHP_METHOD(RiakMapreduce, run)
 {
     zval* zjson, *zclient, *zresult, *zstreamer;

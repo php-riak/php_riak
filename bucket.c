@@ -297,7 +297,8 @@ PHP_METHOD(RiakBucket, applyProperties)
 	}
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
-	htBucketPropsProps = zend_std_get_properties(zBucketPropsObj TSRMLS_CC);
+    htBucketPropsProps = zend_std_get_properties(zBucketPropsObj TSRMLS_CC);
+
 
 	if ((zend_hash_find(htBucketPropsProps, "nVal", sizeof("nVal"), (void**)&zTmp) == SUCCESS)
      	&& (Z_TYPE_P(*zTmp) == IS_LONG)) {

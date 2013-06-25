@@ -27,9 +27,14 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_link_ctor, 0, ZEND_RETURN_VALUE, 3)
     ZEND_ARG_INFO(0, key)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_link_noargs, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_link_methods[] = {
     PHP_ME(RiakLink, __construct, arginfo_link_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakLink, getTag, arginfo_link_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakLink, getBucketName, arginfo_link_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakLink, getKey, arginfo_link_noargs, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -37,12 +42,12 @@ void riak_link_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
-    INIT_CLASS_ENTRY(ce, "RiakLink", riak_link_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak", "Link", riak_link_methods);
     riak_link_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
-    zend_declare_property_null(riak_link_ce, "tag", sizeof("tag")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_link_ce, "bucket", sizeof("bucket")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_link_ce, "key", sizeof("key")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_link_ce, "tag", sizeof("tag")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_link_ce, "bucket", sizeof("bucket")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_link_ce, "key", sizeof("key")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 }
 /* }}} */
 
@@ -68,8 +73,8 @@ zval* create_link_object(const char* tag, const char *bucket, const char* key TS
 }
 /* }}} */
 
-/* {{{ proto void RiakClient->__construct(string $tag, string $bucket, string $key)
-Create a new RiakLink */
+/* {{{ proto void Riak\Link->__construct(string $tag, string $bucket, string $key)
+Create a new link */
 PHP_METHOD(RiakLink, __construct)
 {
     char *key, *bucket, *tag;
@@ -81,5 +86,26 @@ PHP_METHOD(RiakLink, __construct)
     zend_update_property_stringl(riak_link_ce, getThis(), "tag", sizeof("tag")-1, tag, taglen TSRMLS_CC);
     zend_update_property_stringl(riak_link_ce, getThis(), "bucket", sizeof("bucket")-1, bucket, bucketlen TSRMLS_CC);
     zend_update_property_stringl(riak_link_ce, getThis(), "key", sizeof("key")-1, key, keylen TSRMLS_CC);
+}
+/* }}} */
+
+/* {{{ proto string Riak\Link->getTag() */
+PHP_METHOD(RiakLink, getTag)
+{
+    RIAK_GETTER_STRING(riak_link_ce, "tag");
+}
+/* }}} */
+
+/* {{{ proto string Riak\Link->getBucketName() */
+PHP_METHOD(RiakLink, getBucketName)
+{
+    RIAK_GETTER_STRING(riak_link_ce, "bucket");
+}
+/* }}} */
+
+/* {{{ proto string Riak\Link->getKey() */
+PHP_METHOD(RiakLink, getKey)
+{
+    RIAK_GETTER_STRING(riak_link_ce, "key");
 }
 /* }}} */

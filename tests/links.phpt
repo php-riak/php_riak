@@ -2,10 +2,13 @@
 Test links gets written and read correctly
 --FILE--
 <?php
+use \Riak\Link;
+use \Riak\BucketPropertyList;
+
 include_once "connect.inc";
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_bucket");
-$props = new RiakBucketProperties(3, false);
+$props = new BucketPropertyList(3, false);
 $bucket->applyProperties($props);
 
 $obj = new RiakObject("key1");
@@ -20,7 +23,7 @@ try {
         $bucket->put($obj2);
 
         // add links to obj
-        $obj->links[] = new RiakLink("link$i", "test_bucket", $obj2->key);
+        $obj->links[] = new Link("link$i", "test_bucket", $obj2->key);
     }
     $bucket->put($obj);
 
@@ -29,15 +32,15 @@ try {
     if (count($readdenObj->links) == 10) {
         $i = 0;
         foreach ($readdenObj->links as $link) {
-            if (strcmp($link->tag, "link$i") !== 0) {
+            if (strcmp($link->getTag(), "link$i") !== 0) {
                 $success = false;
                 echo "expected tag name to be 'link$i' but was '".$link->tag."'".PHP_EOL;
             }
-            if (strcmp($link->bucket, 'test_bucket') !== 0) {
+            if (strcmp($link->getBucketName(), 'test_bucket') !== 0) {
                 $success = false;
                 echo "expected bucket name to be 'test_bucket' but was '".$link->bucket."'".PHP_EOL;
             }
-            if (strcmp($link->key, "key_with_link_$i") !== 0) {
+            if (strcmp($link->getKey(), "key_with_link_$i") !== 0) {
                 $success = false;
                 echo "expected key name to be 'key_with_link_$i' but was '".$link->key."'".PHP_EOL;
             }

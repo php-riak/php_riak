@@ -27,6 +27,6 @@ zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TS
 
 void riak_mrresult_init(TSRMLS_D);
 
-PHP_METHOD(RiakMrResult, __construct);
+PHP_METHOD(Riak_MapReduce_Output_Output, __construct);
 
 #endif
