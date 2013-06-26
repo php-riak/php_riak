@@ -29,24 +29,19 @@ riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 
 zend_class_entry *riak_bucket_ce;
 
+#define RIAK_REQ_PROP_SET_LONG(CLASS_ALIAS, GETTER, TARGET) \
+    RIAK_CALL_METHOD(CLASS_ALIAS, GETTER, &ztmp, zconfig); \
+    if (Z_TYPE(ztmp) == IS_LONG) { TARGET##_use = 1; TARGET = Z_LVAL(ztmp); }
+
+#define RIAK_REQ_PROP_SET_BOOL(CLASS_ALIAS, GETTER, TARGET) \
+    RIAK_CALL_METHOD(CLASS_ALIAS, GETTER, &ztmp, zconfig); \
+    if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) { TARGET##_use = TARGET = 1; }
+
 #define GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR( VAR ) VAR = get_riak_connection(getThis() TSRMLS_CC); \
   if (!VAR) { \
       zend_throw_exception(riak_badarguments_exception_ce, "No client", 500 TSRMLS_CC); \
       return; \
   } 
-
-#define COPY_CLIENT_LONG_PROPERTY_IF_SET( CLIENT, NAME, ZP ) \
-    ZP = zend_read_property(riak_client_ce, CLIENT, NAME, sizeof(NAME)-1, 1 TSRMLS_CC); \
-    if (ZP && Z_TYPE_P(ZP) == IS_LONG) { \
-        zend_update_property_long(riak_bucket_ce, getThis(), NAME, sizeof(NAME)-1, Z_LVAL_P(ZP) TSRMLS_CC); \
-    }
-
-#define SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT(NAME, MUSE, MVAL, ZP) \
-    ZP = zend_read_property(riak_bucket_ce, getThis(), NAME, sizeof(NAME)-1, 1 TSRMLS_CC); \
-    if (Z_TYPE_P(ZP) == IS_LONG) { \
-        MUSE = 1; \
-        MVAL = Z_LVAL_P(ZP); \
-    }
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_ctor, 0, ZEND_RETURN_VALUE, 2)
     ZEND_ARG_INFO(0, client)
@@ -109,17 +104,6 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
 
     zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_bucket_ce, "client", sizeof("client")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
-
-	zend_declare_property_null(riak_bucket_ce, "nVal", sizeof("nVal")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_bucket_ce, "allowMult", sizeof("allowMult")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-
-    zend_declare_property_null(riak_bucket_ce, "w", sizeof("w")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_ce, "dw", sizeof("dw")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_ce, "pw", sizeof("pw")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_ce, "r", sizeof("r")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_ce, "rw", sizeof("rw")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_ce, "pr", sizeof("pr")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-
 }
 /* }}} */
 
@@ -151,14 +135,6 @@ PHP_METHOD(RiakBucket, __construct)
 	}
 	zend_update_property_stringl(riak_bucket_ce, getThis(), "name", sizeof("name")-1, name, nameLen TSRMLS_CC);
 	zend_update_property(riak_bucket_ce, getThis(), "client", sizeof("client")-1, client TSRMLS_CC);
-
-    /* Get default w, dw, pw, r, rw and pr from client */
-    COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "w", zprop)
-    COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "dw", zprop)
-    COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "pw", zprop)
-    COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "r", zprop)
-    COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "rw", zprop)
-    COPY_CLIENT_LONG_PROPERTY_IF_SET( client, "w", zprop)
 }
 /* }}} */
 
@@ -343,18 +319,17 @@ PHP_METHOD(RiakBucket, delete)
 {
 	struct RIACK_DEL_PROPERTIES props;
 	riak_connection *connection;
-    zval *zparam, *zTmp;
+    zval *zparam, *zTmp, *zconfig;
 	RIACK_STRING bucketName, key;
 	int riackResult;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zparam) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|o", &zparam, &zconfig) == FAILURE) {
 		return;
 	}
-
+    memset(&props, 0, sizeof(props));
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
     /* Set bucket name */
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
-
     if (Z_TYPE_P(zparam) == IS_STRING) {
         key.len = Z_STRLEN_P(zparam);
         key.value = Z_STRVAL_P(zparam);
@@ -365,13 +340,22 @@ PHP_METHOD(RiakBucket, delete)
             return;
         }
     }
-    memset(&props, 0, sizeof(props));
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("dw", props.dw_use, props.dw, zTmp)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("pw", props.pw_use, props.pw, zTmp)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("r", props.r_use, props.r, zTmp)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("pr", props.pr_use, props.pr, zTmp)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("rw", props.rw_use, props.rw, zTmp)
+
+    if (zconfig != NULL && Z_TYPE_P(zconfig) == IS_OBJECT) {
+        zval ztmp;
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getR, props.r);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getPR, props.pr);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getRW, props.rw);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getW, props.w);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getDW, props.dw);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getPW, props.pw);
+        RIAK_CALL_METHOD(Riak_Input_DeleteInput, getVClock, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_STRING) {
+            props.vclock.len = Z_STRLEN(ztmp);
+            props.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
+        }
+    }
+
     /* vclock ? */
 	riackResult = riack_delete(connection->client, bucketName, key, &props);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
@@ -401,16 +385,21 @@ PHP_METHOD(RiakBucket, put)
 	memset(&returnedObj, 0, sizeof(returnedObj));
 	memset(&riackContent, 0, sizeof(riackContent));
     memset(&props, 0, sizeof(props));
-/*    if (zconfig != NULL) {
-        zval return_head;
-        RIAK_CALL_METHOD(Riak_Input_GetInput, getReturnHead, &return_head, zconfig);
-        if (Z_BVAL(return_head)) {
-            props.return_head_use = props.return_head = 1;
+    if (zconfig != NULL && Z_TYPE_P(zconfig) == IS_OBJECT) {
+        zval ztmp;
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_PutInput, getReturnHead, props.return_head);
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_PutInput, getReturnBody, props.return_body);
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_PutInput, getIfNotModified, props.if_not_modified);
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_PutInput, getIfNoneMatch, props.if_none_match);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getW, props.w);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getDW, props.dw);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getPW, props.pw);
+        RIAK_CALL_METHOD(Riak_Input_PutInput, getVClock, &ztmp, zconfig);
+        if (Z_TYPE(ztmp) == IS_STRING) {
+            props.vclock.len = Z_STRLEN(ztmp);
+            props.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
         }
-    }*/
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("dw", props.dw_use, props.dw, zTmp)
-    SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("pw", props.pw_use, props.pw, zTmp)
+    }
 
     /* fill content */
 	set_riak_content_from_object(&riackContent, zObject, connection->client TSRMLS_CC);
@@ -511,7 +500,7 @@ PHP_METHOD(RiakBucket, get)
         if (Z_TYPE(ztmp) == IS_STRING) {
             props.if_modified_use = 1;
             props.if_modified.len = Z_STRLEN(ztmp);
-            props.if_modified.clock = (uint8_t*)estrndup(Z_STRVAL(ztmp), Z_STRLEN(ztmp));
+            props.if_modified.clock = (uint8_t*)Z_STRVAL(ztmp);
         }
     }
 
@@ -557,10 +546,7 @@ PHP_METHOD(RiakBucket, get)
 		zval_ptr_dtor(&zKey);
 		CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 	}
-	zval_ptr_dtor(&zKey);
-    if (props.if_modified.clock) {
-        efree(props.if_modified.clock);
-    }
+    zval_ptr_dtor(&zKey);
 }
 /* }}} */
 

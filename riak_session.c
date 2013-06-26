@@ -19,20 +19,33 @@
 #include <riack.h>
 #include "riak_session.h"
 
-#ifdef PHP_SESSION
+// #ifdef PHP_SESSION
 #include <zend_exceptions.h>
 #include "client.h"
 #include "bucket.h"
 #include "object.h"
+#include "req_inputs.h"
 #include "SAPI.h"
 #include <ext/standard/php_string.h>
 #include <ext/standard/url.h>
 #include <main/php_variables.h>
 
-#define SET_CLIENT_OPTION_IF_PRESENT(NAME, CLIENT, ZARR, ZPP) \
+#define SET_GET_OPTION_IF_PRESENT(NAME, CLIENT, ZARR, ZPP) \
     if (zend_hash_find(Z_ARRVAL_P(ZARR), NAME, sizeof(NAME), (void**)&ZPP) == SUCCESS) { \
         convert_to_long(*ZPP); \
-        zend_update_property(riak_client_ce, CLIENT, NAME, sizeof(NAME)-1, *ZPP TSRMLS_CC); \
+        zend_update_property(riak_get_input_ce, CLIENT, NAME, sizeof(NAME)-1, *ZPP TSRMLS_CC); \
+    }
+
+#define SET_PUT_OPTION_IF_PRESENT(NAME, CLIENT, ZARR, ZPP) \
+    if (zend_hash_find(Z_ARRVAL_P(ZARR), NAME, sizeof(NAME), (void**)&ZPP) == SUCCESS) { \
+        convert_to_long(*ZPP); \
+        zend_update_property(riak_put_input_ce, CLIENT, NAME, sizeof(NAME)-1, *ZPP TSRMLS_CC); \
+    }
+
+#define SET_DELETE_OPTION_IF_PRESENT(NAME, CLIENT, ZARR, ZPP) \
+    if (zend_hash_find(Z_ARRVAL_P(ZARR), NAME, sizeof(NAME), (void**)&ZPP) == SUCCESS) { \
+        convert_to_long(*ZPP); \
+        zend_update_property(riak_delete_input_ce, CLIENT, NAME, sizeof(NAME)-1, *ZPP TSRMLS_CC); \
     }
 
 ps_module ps_mod_riak = {
@@ -43,6 +56,9 @@ typedef struct _riak_session_data {
    char* session_name;
    zval *zbucket;
    zval *zclient;
+   zval *zgetprops;
+   zval *zputprops;
+   zval *zdelprops;
 } riak_session_data;
 
 #define PS_RIAK_DATA riak_session_data *data = PS_GET_MOD_DATA()
@@ -50,7 +66,7 @@ typedef struct _riak_session_data {
 PS_OPEN_FUNC(riak) /* {{{ */
 {
     riak_session_data* session_data;
-    zval *zclient, *zbucket, *zoptionsarray, **zoption;
+    zval *zclient, *zbucket, *zgetprops, *zdelprops, *zputprops, *zoptionsarray, **zoption;
     php_url *purl;
     char* stripped_path;
 
@@ -66,17 +82,37 @@ PS_OPEN_FUNC(riak) /* {{{ */
         PS_SET_MOD_DATA(NULL);
         return FAILURE;
     }
+
+    // Input options for get operations
+    MAKE_STD_ZVAL(zgetprops);
+    object_init_ex(zgetprops, riak_get_input_ce);
+
+    MAKE_STD_ZVAL(zputprops);
+    object_init_ex(zputprops, riak_put_input_ce);
+
+    MAKE_STD_ZVAL(zdelprops);
+    object_init_ex(zdelprops, riak_delete_input_ce);
+
     /* Set w,dw,pw,r,rw,pw if set */
     MAKE_STD_ZVAL(zoptionsarray);
     array_init(zoptionsarray);
     if (purl->query) {
         sapi_module.treat_data(PARSE_STRING, estrdup(purl->query), zoptionsarray TSRMLS_CC);
-        SET_CLIENT_OPTION_IF_PRESENT("w", zclient, zoptionsarray, zoption)
-        SET_CLIENT_OPTION_IF_PRESENT("dw", zclient, zoptionsarray, zoption)
-        SET_CLIENT_OPTION_IF_PRESENT("pw", zclient, zoptionsarray, zoption)
-        SET_CLIENT_OPTION_IF_PRESENT("r", zclient, zoptionsarray, zoption)
-        SET_CLIENT_OPTION_IF_PRESENT("rw", zclient, zoptionsarray, zoption)
-        SET_CLIENT_OPTION_IF_PRESENT("pr", zclient, zoptionsarray, zoption)
+
+        SET_GET_OPTION_IF_PRESENT("r", zgetprops, zoptionsarray, zoption)
+        SET_GET_OPTION_IF_PRESENT("rw", zgetprops, zoptionsarray, zoption)
+        SET_GET_OPTION_IF_PRESENT("pr", zgetprops, zoptionsarray, zoption)
+
+        SET_PUT_OPTION_IF_PRESENT("w", zputprops, zoptionsarray, zoption)
+        SET_PUT_OPTION_IF_PRESENT("dw", zputprops, zoptionsarray, zoption)
+        SET_PUT_OPTION_IF_PRESENT("pw", zputprops, zoptionsarray, zoption)
+
+        SET_DELETE_OPTION_IF_PRESENT("r", zdelprops, zoptionsarray, zoption)
+        SET_DELETE_OPTION_IF_PRESENT("pr", zdelprops, zoptionsarray, zoption)
+        SET_DELETE_OPTION_IF_PRESENT("rw", zdelprops, zoptionsarray, zoption)
+        SET_DELETE_OPTION_IF_PRESENT("w", zdelprops, zoptionsarray, zoption)
+        SET_DELETE_OPTION_IF_PRESENT("dw", zdelprops, zoptionsarray, zoption)
+        SET_DELETE_OPTION_IF_PRESENT("pw", zdelprops, zoptionsarray, zoption)
     }
     zval_ptr_dtor(&zoptionsarray);
 
@@ -87,12 +123,18 @@ PS_OPEN_FUNC(riak) /* {{{ */
     if (EG(exception)) {
         zval_ptr_dtor(&zbucket);
         zval_ptr_dtor(&zclient);
+        zval_ptr_dtor(&zgetprops);
+        zval_ptr_dtor(&zputprops);
+        zval_ptr_dtor(&zdelprops);
         PS_SET_MOD_DATA(NULL);
         return FAILURE;
     } else {
         session_data = ecalloc(1, sizeof(riak_session_data));
         session_data->zbucket = zbucket;
         session_data->zclient = zclient;
+        session_data->zgetprops = zgetprops;
+        session_data->zputprops = zputprops;
+        session_data->zdelprops = zdelprops;
         session_data->session_name = estrdup(session_name);
         PS_SET_MOD_DATA(session_data);
         return SUCCESS;
@@ -107,6 +149,9 @@ PS_CLOSE_FUNC(riak) /* {{{ */
         efree(data->session_name);
         zval_ptr_dtor(&data->zbucket);
         zval_ptr_dtor(&data->zclient);
+        zval_ptr_dtor(&data->zgetprops);
+        zval_ptr_dtor(&data->zputprops);
+        zval_ptr_dtor(&data->zdelprops);
         efree(data);
 
         PS_SET_MOD_DATA(NULL);
@@ -126,7 +171,7 @@ PS_READ_FUNC(riak) /* {{{ */
 
     MAKE_STD_ZVAL(zobject);
     object_init_ex(zobject, riak_object_ce);
-    RIAK_CALL_METHOD1(RiakBucket, get, zobject, data->zbucket, zkey);
+    RIAK_CALL_METHOD2(RiakBucket, get, zobject, data->zbucket, zkey, data->zgetprops);
 
     if (!EG(exception)) {
         zdata = zend_read_property(riak_object_ce, zobject, "data", sizeof("data")-1, 1 TSRMLS_CC);
@@ -158,7 +203,7 @@ PS_WRITE_FUNC(riak) /* {{{ */
         return FAILURE;
     }
     zend_update_property_stringl(riak_object_ce, zobject, "data", sizeof("data")-1, val, vallen TSRMLS_CC);
-    RIAK_CALL_METHOD1(RiakBucket, put, zobject, data->zbucket, zobject);
+    RIAK_CALL_METHOD2(RiakBucket, put, zobject, data->zbucket, zobject, data->zputprops);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {
         return FAILURE;
@@ -173,7 +218,7 @@ PS_DESTROY_FUNC(riak) /* {{{ */
     PS_RIAK_DATA;
     zval *zobject;
     zobject = create_object_object(key TSRMLS_CC);
-    RIAK_CALL_METHOD1(RiakBucket, delete, zobject, data->zbucket, zobject);
+    RIAK_CALL_METHOD2(RiakBucket, delete, zobject, data->zbucket, zobject, data->zdelprops);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {
         return FAILURE;
@@ -188,5 +233,5 @@ PS_GC_FUNC(riak) /* {{{ */
 }
 /* }}} */
 
-#endif
+//#endif
 

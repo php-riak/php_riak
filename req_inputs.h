@@ -21,6 +21,8 @@
 #include <riack.h>
 
 extern zend_class_entry *riak_get_input_ce;
+extern zend_class_entry *riak_put_input_ce;
+extern zend_class_entry *riak_delete_input_ce;
 
 void riak_req_inputs_init(TSRMLS_D);
 
