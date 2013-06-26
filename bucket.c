@@ -365,7 +365,7 @@ PHP_METHOD(RiakBucket, delete)
             return;
         }
     }
-	memset(&props, 0, sizeof(props));
+    memset(&props, 0, sizeof(props));
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("w", props.w_use, props.w, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("dw", props.dw_use, props.dw, zTmp)
     SET_LONG_PROPERTY_AS_RIACK_MEMBER_IF_PRESENT("pw", props.pw_use, props.pw, zTmp)
