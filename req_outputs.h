@@ -22,5 +22,6 @@
 
 void riak_req_outputs_init(TSRMLS_D);
 
+zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj TSRMLS_DC);
 
 #endif

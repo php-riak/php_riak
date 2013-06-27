@@ -36,3 +36,26 @@ void riak_req_outputs_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_get_output_ce, "unchanged", sizeof("unchanged")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 /* }}} */
+
+
+zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj TSRMLS_DC)
+{
+    zval *zoutput, *zobjectlist;
+    size_t content_cnt;
+    MAKE_STD_ZVAL(zoutput);
+    object_init_ex(zoutput, riak_get_output_ce);
+    if (getobj->unchanged_present) {
+        zend_update_property_bool(riak_get_output_ce, zoutput, "unchanged", sizeof("unchanged")-1, getobj->unchanged TSRMLS_CC);
+    }
+    if (getobj->object.vclock.len > 0) {
+        zend_update_property_stringl(riak_get_output_ce, zoutput, "vClock", sizeof("vClock")-1, getobj->object.vclock.clock, getobj->object.vclock.len TSRMLS_CC);
+    }
+
+    MAKE_STD_ZVAL(zobjectlist);
+    array_init(zobjectlist);
+    content_cnt = getobj->object.content_count;
+    // TODO
+    zend_update_property(riak_get_output_ce, zoutput, "objectList", sizeof("objectList"), zobjectlist TSRMLS_CC);
+    zval_ptr_dtor(&zobjectlist);
+    return zoutput;
+}
