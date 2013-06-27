@@ -22,6 +22,11 @@
 
 void riak_req_outputs_init(TSRMLS_D);
 
-zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj TSRMLS_DC);
+zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC);
+
+PHP_METHOD(Riak_Output_GetOutput, getObjectList);
+PHP_METHOD(Riak_Output_GetOutput, getVClock);
+PHP_METHOD(Riak_Output_GetOutput, isUnchanged);
+PHP_METHOD(Riak_Output_GetOutput, hasSiblings);
 
 #endif

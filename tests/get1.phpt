@@ -16,18 +16,24 @@ try {
         $bucket->put($obj);
         $cfg = new GetInput();
         $cfg->setReturnHead(true);
-        $readdenObj = $bucket->get("get_head", $cfg);
-        if (!is_null($readdenObj->data)) {
-            var_dump($readdenObj);
+        $output = $bucket->get("get_head", $cfg);
+        $objs = $output->getObjectList();
+        if (isset($objs[0]->data) && strlen($objs[0]->data > 0)) {
+            echo "Did not expect returned object to have data, when return_head is set".PHP_EOL;
+            var_dump($objs);
         }
-
         $obj = new RiakObject("get_test");
 	$obj->contentType = "text/plain";
 	$obj->data = "test-get plap";
         $obj->metadata["test"] = "test";
         $bucket->put($obj);
-        $readdenObj = $bucket->get("get_test");
-        if (strcmp($readdenObj->data, $obj->data) == 0 || strcmp($readdenObj->metadata["test"], "test") !== 0 ) {
+        $output = $bucket->get("get_test");
+        if ($output->hasSiblings()) {
+            echo "Did not expect siblings".PHP_EOL;
+            var_dump($output);
+        }
+        $objs = $output->getObjectList();
+        if (strcmp($objs[0]->data, $obj->data) == 0 || strcmp($objs[0]->metadata["test"], "test") !== 0 ) {
 		echo "success!";
 	}
 } catch (Exception $e) {

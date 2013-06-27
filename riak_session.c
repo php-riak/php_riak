@@ -25,6 +25,7 @@
 #include "bucket.h"
 #include "object.h"
 #include "req_inputs.h"
+#include "req_outputs.h"
 #include "SAPI.h"
 #include <ext/standard/php_string.h>
 #include <ext/standard/url.h>
@@ -162,31 +163,38 @@ PS_CLOSE_FUNC(riak) /* {{{ */
 
 PS_READ_FUNC(riak) /* {{{ */
 {
-    zval *zobject, *zkey, *zdata, *zex;
+    zval *zoutput, *zkey, *zdata, *zex;
     PS_RIAK_DATA;
     *vallen = 0;
 
     MAKE_STD_ZVAL(zkey);
     ZVAL_STRING(zkey, key, 1);
 
-    MAKE_STD_ZVAL(zobject);
-    object_init_ex(zobject, riak_object_ce);
-    RIAK_CALL_METHOD2(RiakBucket, get, zobject, data->zbucket, zkey, data->zgetprops);
+    MAKE_STD_ZVAL(zoutput);
+    RIAK_CALL_METHOD2(RiakBucket, get, zoutput, data->zbucket, zkey, data->zgetprops);
 
     if (!EG(exception)) {
-        zdata = zend_read_property(riak_object_ce, zobject, "data", sizeof("data")-1, 1 TSRMLS_CC);
-        if (zdata->type == IS_STRING && Z_STRLEN_P(zdata) > 0) {
-            *vallen = Z_STRLEN_P(zdata);
-            *val = emalloc(Z_STRLEN_P(zdata));
-            memcpy(*val, Z_STRVAL_P(zdata), Z_STRLEN_P(zdata));
+        zval *zobjarr;
+        MAKE_STD_ZVAL(zobjarr);
+        RIAK_CALL_METHOD(Riak_Output_GetOutput, getObjectList, zobjarr, zoutput);
+        if (Z_TYPE_P(zobjarr) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(zobjarr)) > 0) {
+            zval **found = NULL;
+            zend_hash_index_find(Z_ARRVAL_P(zobjarr), 0, (void**)&found);
+            zdata = zend_read_property(riak_object_ce, *found, "data", sizeof("data")-1, 1 TSRMLS_CC);
+            if (zdata->type == IS_STRING && Z_STRLEN_P(zdata) > 0) {
+                *vallen = Z_STRLEN_P(zdata);
+                *val = emalloc(Z_STRLEN_P(zdata));
+                memcpy(*val, Z_STRVAL_P(zdata), Z_STRLEN_P(zdata));
+            }
         }
+        zval_ptr_dtor(&zobjarr);
     } else {
         zend_clear_exception(TSRMLS_C);
     }
     if (*vallen == 0) {
         *val = STR_EMPTY_ALLOC();
     }
-    zval_ptr_dtor(&zobject);
+    zval_ptr_dtor(&zoutput);
     zval_ptr_dtor(&zkey);
     return SUCCESS;
 }
