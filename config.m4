@@ -26,6 +26,7 @@ if test "$PHP_RIAK" != "no"; then
     search.c \
     streaming.c \
     req_inputs.c \
+    req_outputs.c \
     riack/src/riack_sock.c \
     riack/src/riack.c \
     riack/src/riack_kv.c \

@@ -3,15 +3,16 @@ Test bucket stream keys
 --FILE--
 <?php
 use \Riak\BucketPropertyList;
+use \Riak\Output\KeyStreamOutput;
 include_once "connect.inc";
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_stream_keys");
 $props = new BucketPropertyList(3, false);
 $bucket->applyProperties($props);
 
-class KeyStreamer implements RiakKeyStreamer {
+class KeyStreamer implements KeyStreamOutput {
     public $cnt = 0;
-    public function key($key) {
+    public function process($key) {
         if (strcmp(substr($key, 0, 6), "stream") == 0) {
             $this->cnt++;
         }

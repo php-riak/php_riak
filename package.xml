@@ -75,6 +75,8 @@
             <file role="src" name="streaming.h"/>
             <file role="src" name="req_inputs.c"/>
             <file role="src" name="req_inputs.h"/>
+            <file role="src" name="req_outputs.c"/>
+            <file role="src" name="req_outputs.h"/>
             
             <dir name="riack">
                 <dir name="src">

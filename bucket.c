@@ -152,7 +152,7 @@ void riak_stream_key_cb(struct RIACK_CLIENT* c, void* p, RIACK_STRING key) {/* {
     struct riak_stream_key_cb_param *param = (struct riak_stream_key_cb_param*)p;
     MAKE_STD_ZVAL(zkey);
     ZVAL_STRINGL(zkey, key.value, key.len, 1);
-    ZVAL_STRING(&zfuncname, "key", 0);
+    ZVAL_STRING(&zfuncname, "process", 0);
 #ifdef ZTS
     call_user_function(NULL, &param->zstreamer, &zfuncname, &zret, 1, &zkey, param->tsrm_ls);
 #else
