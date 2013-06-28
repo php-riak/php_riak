@@ -28,7 +28,8 @@ try {
     $bucket->put($obj);
 
     $output = $bucket->get("key1");
-    $readdenObj = $output->getObjectList()[0];
+    $objs = $output->getObjectList();
+    $readdenObj = $objs[0];
     $success = true;
     if (count($readdenObj->links) == 10) {
         $i = 0;

@@ -17,7 +17,8 @@ try {
         $bucket->put($obj);
 
         $output = $bucket->get("get_test");
-        $readdenObj = $output->getObjectList()[0];
+        $objs = $output->getObjectList();
+        $readdenObj = $objs[0];
 	if (isset($readdenObj->metadata["ost"]) && $readdenObj->metadata["ost"] == 7) {
 		echo "success!";
 	} else {
