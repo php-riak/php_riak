@@ -32,5 +32,12 @@ void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, s
 void riak_key_from_object(zval *zobject, char** key, int* keylen  TSRMLS_DC);
 
 PHP_METHOD(RiakObject, __construct);
+PHP_METHOD(RiakObject, getKey);
+PHP_METHOD(RiakObject, setKey);
+PHP_METHOD(RiakObject, getValue);
+PHP_METHOD(RiakObject, setValue);
+PHP_METHOD(RiakObject, addIndex);
+PHP_METHOD(RiakObject, addLink);
+PHP_METHOD(RiakObject, addMetadata);
 
 #endif

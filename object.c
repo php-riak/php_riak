@@ -22,36 +22,65 @@
 
 zend_class_entry *riak_object_ce;
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_object_ctor, 0, ZEND_RETURN_VALUE, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_ctor, 0, ZEND_RETURN_VALUE, 0)
     ZEND_ARG_INFO(0, key)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_noargs, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_set_key, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_set_value, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_add_index, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, index_name)
+    ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_add_link, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, link)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_add_meta, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, metadata_name)
+    ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_object_methods[] = {
-	PHP_ME(RiakObject, __construct, arginfo_object_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakObject, __construct, arginfo_riak_object_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(RiakObject, getKey, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, setKey, arginfo_riak_object_set_key, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, getValue, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, setValue, arginfo_riak_object_set_value, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, addIndex, arginfo_riak_object_add_index, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, addLink, arginfo_riak_object_add_link, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, addMetadata, arginfo_riak_object_add_meta, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
 void riak_object_init(TSRMLS_D)/* {{{ */
 {
-	zend_class_entry ce;
-	
-
-	INIT_CLASS_ENTRY(ce, "RiakObject", riak_object_methods);
+    zend_class_entry ce;
+    INIT_NS_CLASS_ENTRY(ce, "Riak", "Object", riak_object_methods);
 	riak_object_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "key", sizeof("key")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "vclock", sizeof("vclock")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "contentEncoding", sizeof("contentEncoding")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "charset", sizeof("charset")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_string(riak_object_ce, "contentType", sizeof("contentType")-1, "text/plain", ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "value", sizeof("value")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "isDeleted", sizeof("isDeleted")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "lastModified", sizeof("lastModified")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
-	zend_declare_property_null(riak_object_ce, "key", sizeof("key")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_object_ce, "vclock", sizeof("vclock")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_object_ce, "contentEncoding", sizeof("contentEncoding")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_object_ce, "charset", sizeof("charset")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_string(riak_object_ce, "contentType", sizeof("contentType")-1, "text/plain", ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_object_ce, "data", sizeof("data")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_object_ce, "isDeleted", sizeof("isDeleted")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_object_ce, "lastModified", sizeof("lastModified")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_object_ce, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-
-	zend_declare_property_null(riak_object_ce, "metadata", sizeof("metadata")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_object_ce, "indexes", sizeof("indexes")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(riak_object_ce, "links", sizeof("links")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "metadata", sizeof("metadata")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "indexes", sizeof("indexes")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "links", sizeof("links")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 }
 /* }}} */
 
@@ -115,6 +144,94 @@ PHP_METHOD(RiakObject, __construct)
 }
 /* }}} */
 
+/* {{{ proto string Riak\Object->getKey()
+ */
+PHP_METHOD(RiakObject, getKey)
+{
+    RIAK_GETTER_STRING(riak_object_ce, "key")
+}
+/* }}} */
+
+/* {{{ proto Riak\Object Riak\Object->setKey(string $key)
+ */
+PHP_METHOD(RiakObject, setKey)
+{
+    RIAK_SETTER_STRING(riak_object_ce, "key");
+    RIAK_RETURN_THIS
+}
+/* }}} */
+
+/* {{{ proto string Riak\Object->getValue()
+ */
+PHP_METHOD(RiakObject, getValue)
+{
+    RIAK_GETTER_STRING(riak_object_ce, "value")
+}
+/* }}} */
+
+/* {{{ proto Riak\Object Riak\Object->setValue(string $value)
+ */
+PHP_METHOD(RiakObject, setValue)
+{
+    RIAK_SETTER_STRING(riak_object_ce, "value");
+    RIAK_RETURN_THIS
+}
+/* }}} */
+
+/* {{{ proto Riak\Object Riak\Object->addIndex(string $indexName [, string $value])
+ */
+PHP_METHOD(RiakObject, addIndex)
+{
+    zval* zindexarr;
+    char* idxname, *idxvalue;
+    int idxname_len, idxvalue_len;
+    idxvalue = NULL;
+    idxvalue_len = 0;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &idxname, &idxname_len, &idxvalue, &idxvalue_len) == FAILURE) {
+        return;
+    }
+    zindexarr = zend_read_property(riak_object_ce, getThis(), "indexes", sizeof("indexes")-1, 1 TSRMLS_CC);
+    if (idxvalue != NULL && idxvalue_len > 0) {
+        add_assoc_stringl_ex(zindexarr, idxname, idxname_len-1, idxvalue, idxname_len, 1);
+    } else {
+        add_assoc_null_ex(zindexarr, idxname, idxname_len-1);
+    }
+    RIAK_RETURN_THIS
+}
+/* }}} */
+
+/* {{{ proto Riak\Object Riak\Object->addLink(Riak\Link $link)
+ */
+PHP_METHOD(RiakObject, addLink)
+{
+    zval *zlink, *zlinksarr;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zlink) == FAILURE) {
+        return;
+    }
+    zlinksarr = zend_read_property(riak_object_ce, getThis(), "links", sizeof("links")-1, 1 TSRMLS_CC);
+    add_next_index_zval(zlinksarr, zlink);
+    RIAK_RETURN_THIS
+}
+/* }}} */
+
+/* {{{ proto Riak\Object Riak\Object->addMetadata(string $name [, string $value])
+ */
+PHP_METHOD(RiakObject, addMetadata)
+{
+    char* metaname, *metavalue;
+    int metaname_len, metavalue_len;
+    metavalue = NULL;
+    metavalue_len = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &metaname, &metaname_len, &metavalue, &metavalue_len) == FAILURE) {
+        return;
+    }
+    if (metavalue != NULL && metavalue_len > 0) {
+        //
+    }
+    RIAK_RETURN_THIS
+}
+/* }}} */
+
 zval *links_from_content(struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
 {
     struct RIACK_LINK *curr_link;
@@ -170,7 +287,7 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
 {
     zval* zmetadata, *zlinks, *zindexes;
 
-	zend_update_property_stringl(riak_object_ce, object, "data", sizeof("data")-1, 
+    zend_update_property_stringl(riak_object_ce, object, "value", sizeof("value")-1,
 		(const char*)content->data, content->data_len TSRMLS_CC);
 	zend_update_property_stringl(riak_object_ce, object, "contentEncoding", sizeof("contentEncoding")-1, 
 		(const char*)content->content_encoding.value, content->content_encoding.len TSRMLS_CC);
@@ -198,7 +315,7 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
     zend_update_property(riak_object_ce, object, "metadata", sizeof("metadata")-1, zmetadata TSRMLS_CC);
     zval_ptr_dtor(&zmetadata);
 
-    zindexes = assoc_array_from_riack_pairs(content->usermetas, content->usermeta_count TSRMLS_CC);
+    zindexes = assoc_array_from_riack_pairs(content->indexes, content->index_count TSRMLS_CC);
     zend_update_property(riak_object_ce, object, "indexes", sizeof("indexes")-1, zindexes TSRMLS_CC);
     zval_ptr_dtor(&zindexes);
 
@@ -312,7 +429,7 @@ void set_indexes_from_object(struct RIACK_CONTENT* content, zval* zindexsarray, 
 void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC)/* {{{ */
 {
 	zval* zTmp;
-	zTmp = zend_read_property(riak_object_ce, object, "data", sizeof("data")-1, 1 TSRMLS_CC);
+    zTmp = zend_read_property(riak_object_ce, object, "value", sizeof("value")-1, 1 TSRMLS_CC);
 	if (Z_TYPE_P(zTmp) == IS_STRING) {
 		content->data_len = Z_STRLEN_P(zTmp);
 		content->data = (uint8_t*)Z_STRVAL_P(zTmp);
