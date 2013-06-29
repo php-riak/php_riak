@@ -10,7 +10,7 @@ include_once "connect.inc";
 echo RiakStats::activeConnections().PHP_EOL;
 $clients = array();
 for ($i=0; $i<25; ++$i) {
-	$clients[] = new RiakClient($host, $port);
+	$clients[] = new \Riak\Connection($host, $port);
 }
 echo RiakStats::activeConnections().PHP_EOL;
 echo RiakStats::activePersistentConnections().PHP_EOL;

@@ -12,7 +12,7 @@ use \Riak\BucketPropertyList;
 use \Riak\Exception\UnexpectedResponseException;
 
 include_once "connect.inc";
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($client, "sessions_violation");
 
 // Set properties so we are sure writing a session later will fail because w > n

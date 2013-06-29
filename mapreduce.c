@@ -15,7 +15,7 @@
    limitations under the License.
 */
 #include "mapreduce.h"
-#include "client.h"
+#include "connection.h"
 #include "exceptions.h"
 #include "mr_result.h"
 #include "mr_inputs.h"
@@ -70,7 +70,7 @@ void riak_mapreduce_init(TSRMLS_D)/* {{{ */
 *************************************************************/
 
 
-/* {{{ proto void Riak\MapReduce\MapReduce->__construct(RiakClient $client)
+/* {{{ proto void Riak\MapReduce\MapReduce->__construct(RiakConnection $client)
 Create a new MapReduce object */
 PHP_METHOD(RiakMapreduce, __construct)
 {

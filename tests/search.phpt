@@ -7,7 +7,7 @@ use \Riak\Search\Search;
 use \Riak\Search\Input\ParameterBag;
 include_once "connect.inc";
 
-$riak = new RiakClient($host, $port);
+$riak = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($riak, 'testsearch');
 
 $json[] = '{"name": "apple","price": 2.50, "tags": ["fruit"]}';

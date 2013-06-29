@@ -7,7 +7,7 @@ use \Riak\Object;
 use \Riak\BucketPropertyList;
 
 include_once "connect.inc";
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($client, "test_bucket");
 $props = new BucketPropertyList(3, false);
 $bucket->applyProperties($props);

@@ -5,7 +5,7 @@ riak.persistent.timeout=1
 --FILE--
 <?php
 include_once "connect.inc";
-$c = new RiakClient($host, $port);
+$c = new \Riak\Connection($host, $port);
 $c->ping();
 sleep(3);
 $c->ping();

@@ -5,7 +5,7 @@ Test bucket list keys
 use \Riak\BucketPropertyList;
 use \Riak\Object;
 include_once "connect.inc";
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($client, "test_list_keys");
 $props = new BucketPropertyList(3, false);
 $bucket->applyProperties($props);

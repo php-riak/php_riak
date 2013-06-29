@@ -28,7 +28,7 @@ $alice3 = "The rabbit-hole went straight on like a tunnel for some way, and then
     "well.";
 
 try {
-    $client = new RiakClient($host, $port);
+    $client = new \Riak\Connection($host, $port);
     $alicebucket = new RiakBucket($client, "test_alice");
 
     $obj1 = new Object("alice1");

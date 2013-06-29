@@ -5,7 +5,7 @@ Simple store test with no read back
 use \Riak\Object;
 include_once "connect.inc";
 try {
-  $client = new RiakClient($host, $port);
+  $client = new \Riak\Connection($host, $port);
   $bucket = new RiakBucket($client, "test_bucket");
 
   // No key provieded

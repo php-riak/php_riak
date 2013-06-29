@@ -20,7 +20,7 @@
 #include "php_riak.h"
 #include "bucket.h"
 #include "bucket_properties.h"
-#include "client.h"
+#include "connection.h"
 #include "object.h"
 #include "exceptions.h"
 #include "req_inputs.h"
@@ -100,7 +100,7 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;
 
-	INIT_CLASS_ENTRY(ce, "RiakBucket", riak_bucket_methods);
+    INIT_CLASS_ENTRY(ce, "RiakBucket", riak_bucket_methods);
 	riak_bucket_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
@@ -108,13 +108,13 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
 }
 /* }}} */
 
-zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC) /* {{{ */
+zval* create_bucket_object(zval* zclient, char* name, int name_len TSRMLS_DC) /* {{{ */
 {
 	zval *zbucket, *zname;
 	MAKE_STD_ZVAL(zbucket);
 	MAKE_STD_ZVAL(zname);
 
-	ZVAL_STRING(zname, name, 1);
+    ZVAL_STRINGL(zname, name, name_len, 1);
 
 	object_init_ex(zbucket, riak_bucket_ce);
 	RIAK_CALL_METHOD2(RiakBucket, __construct, zbucket, zbucket, zclient, zname);
@@ -124,7 +124,7 @@ zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC) /* {{{ */
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->__construct(RiakClient $client, string $name)
+/* {{{ proto void RiakBucket->__construct(RiakConnection $client, string $name)
 Create a new RiakBucket */
 PHP_METHOD(RiakBucket, __construct)
 {

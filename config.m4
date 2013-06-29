@@ -8,7 +8,7 @@ if test "$PHP_RIAK" != "no"; then
 
   dnl this defines the extension
   PHP_NEW_EXTENSION(riak, php_riak.c \
-    client.c \
+    connection.c \
     bucket.c \
     object.c \
     exceptions.c \

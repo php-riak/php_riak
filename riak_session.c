@@ -21,7 +21,7 @@
 
 // #ifdef PHP_SESSION
 #include <zend_exceptions.h>
-#include "client.h"
+#include "connection.h"
 #include "bucket.h"
 #include "object.h"
 #include "req_inputs.h"
@@ -118,7 +118,7 @@ PS_OPEN_FUNC(riak) /* {{{ */
     zval_ptr_dtor(&zoptionsarray);
 
     stripped_path = php_trim(purl->path, strlen(purl->path), "/", 1, NULL, 3 TSRMLS_CC);
-    zbucket = create_bucket_object(zclient, stripped_path TSRMLS_CC);
+    zbucket = create_bucket_object(zclient, stripped_path, strlen(stripped_path) TSRMLS_CC);
     php_url_free(purl);
     efree(stripped_path);
     if (EG(exception)) {

@@ -7,7 +7,7 @@ use \Riak\MapReduce\Input\BucketInput;
 use \Riak\MapReduce\Input\KeyDataListInput;
 use \Riak\MapReduce\Input\KeyListInput;
 include_once "connect.inc";
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($client, "test_bucket");
 
 $buckeetInput1 = new BucketInput("bucket_name");

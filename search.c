@@ -16,7 +16,7 @@
 #include <php.h>
 #include <riack.h>
 #include "php_riak.h"
-#include "client.h"
+#include "connection.h"
 #include "search.h"
 
 zend_class_entry *riak_search_ce;
@@ -150,7 +150,7 @@ void riak_search_init(TSRMLS_D) /* {{{ */
 *************************************************************/
 
 
-/* {{{ proto void Riak\Search->__construct(RiakClient $client)
+/* {{{ proto void Riak\Search->__construct(RiakConnection $client)
 Create a new Search object */
 PHP_METHOD(Riak_Search, __construct)
 {
