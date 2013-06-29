@@ -7,6 +7,7 @@ use \Riak\MapReduce\Input\KeyListInput;
 use \Riak\MapReduce\Phase\MapPhase;
 use \Riak\MapReduce\Phase\ReducePhase;
 use \Riak\MapReduce\Functions\JavascriptFunction;
+use \Riak\Object;
 include_once "connect.inc";
 
 $alice1 = "Alice was beginning to get very tired of sitting by her sister on the ".
@@ -30,16 +31,16 @@ try {
     $client = new RiakClient($host, $port);
     $alicebucket = new RiakBucket($client, "test_alice");
 
-    $obj1 = new RiakObject("alice1");
-    $obj1->data = $alice1;
+    $obj1 = new Object("alice1");
+    $obj1->setContent($alice1);
     $alicebucket->put($obj1);
 
-    $obj2 = new RiakObject("alice2");
-    $obj2->data = $alice2;
+    $obj2 = new Object("alice2");
+    $obj2->setContent($alice2);
     $alicebucket->put($obj2);
 
-    $obj3 = new RiakObject("alice3");
-    $obj3->data = $alice3;
+    $obj3 = new Object("alice3");
+    $obj3->setContent($alice3);
     $alicebucket->put($obj3);
 
     $mrinput = new KeyListInput(array("test_alice" => array("alice1", $obj2, $obj3)));

@@ -11,9 +11,9 @@ $bucket->applyProperties($props);
 
 try {
     for ($i=0; $i<10; $i++) {
-        $obj = new RiakObject("obj$i");
-        $obj->data = "test-idx";
-        $obj->indexes = array("tal_int" => $i, "tekst_bin" => "text$i");
+        $obj = new \Riak\Object("obj$i");
+        $obj->setContent("test-idx");
+        $obj->addIndex("tal_int", $i)->addIndex("tekst_bin", "text$i");
         $bucket->put($obj);
     }
     $result = $bucket->indexQuery("tal_int", 1);
@@ -27,6 +27,9 @@ try {
         !in_array("obj6", $result)) {
         var_dump($result);
     }
+    $props = NULL;
+    $bucket = NULL;
+    $result = NULL;
     echo "done!";
 } catch (Exception $e) {
     var_dump($e);

@@ -2,6 +2,7 @@
 Test key filters
 --FILE--
 <?php
+use \Riak\Object;
 use \Riak\MapReduce\MapReduce;
 use \Riak\MapReduce\Phase\MapPhase;
 use \Riak\MapReduce\Functions\ErlangFunction;
@@ -17,11 +18,11 @@ $bucket->applyProperties($newProps);
 // Make 20 keys for testing
 for ($i=0; $i<20; $i++) {
     if ($i<10) {
-        $obj = new RiakObject("key_0$i");
+        $obj = new Object("key_0$i");
     } else {
-        $obj = new RiakObject("key_$i");
+        $obj = new Object("key_$i");
     }
-    $obj->data = "dummy";
+    $obj->setContent("dummy");
     $bucket->put($obj);
 }
 $function1 = new ErlangFunction("riak_kv_mapreduce","map_object_value");

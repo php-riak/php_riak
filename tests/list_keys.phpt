@@ -3,6 +3,7 @@ Test bucket list keys
 --FILE--
 <?php
 use \Riak\BucketPropertyList;
+use \Riak\Object;
 include_once "connect.inc";
 $client = new RiakClient($host, $port);
 $bucket = new RiakBucket($client, "test_list_keys");
@@ -11,8 +12,8 @@ $bucket->applyProperties($props);
 try {
     // Make some objects we can list afterwards
     for ($i=0; $i<20; $i++) {
-        $obj = new RiakObject("list$i");
-        $obj->data = "test-get plap";
+        $obj = new Object("list$i");
+        $obj->setContent("test-get plap");
         $bucket->put($obj);
     }
     $keys = $bucket->listKeys();
