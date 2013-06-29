@@ -2,22 +2,23 @@
 Simple store test with no read back
 --FILE--
 <?php
+use \Riak\Object;
 include_once "connect.inc";
 try {
-  $client = new RiakClient($host, $port);
+  $client = new \Riak\Connection($host, $port);
   $bucket = new RiakBucket($client, "test_bucket");
 
   // No key provieded
-  $obj = new RiakObject();
-  $obj->data = "dummy";
+  $obj = new Object();
+  $obj->setContent("dummy");
   $obj = $bucket->put($obj);
-  if (is_null($obj->key) || strlen($obj->key) == 0) {
+  if (is_null($obj->getKey()) || strlen($obj->getKey()) == 0) {
     var_dump($obj);
   }
 
-  $obj = new RiakObject("dummy");
-  $obj->contentType = "text/plain";
-  $obj->data = "test value that should get written";
+  $obj = new Object("dummy");
+  $obj->setContentType("text/plain");
+  $obj->setContent("test value that should get written");
   $bucket->put($obj);
   echo "done!";
 } catch (Exception $e) {

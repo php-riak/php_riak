@@ -4,7 +4,7 @@ Test bucket properties
 <?php
 use \Riak\BucketPropertyList;
 include_once "connect.inc";
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($client, "test_bucket_props");
 $oldProps = $bucket->fetchProperties();
 $newProps = new BucketPropertyList(1, false);

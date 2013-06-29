@@ -7,10 +7,10 @@ riak.persistent.connections=20
 <?php
 include_once "connect.inc";
 echo RiakStats::activeConnections().PHP_EOL;
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 echo RiakStats::activeConnections().PHP_EOL;
 echo RiakStats::activePersistentConnections().PHP_EOL;
-$client2 = new RiakClient($host, $port);
+$client2 = new \Riak\Connection($host, $port);
 echo RiakStats::activeConnections().PHP_EOL;
 echo RiakStats::activePersistentConnections().PHP_EOL;
 $client = NULL;

@@ -2,10 +2,11 @@
 Test bucket stream keys
 --FILE--
 <?php
+use \Riak\Object;
 use \Riak\BucketPropertyList;
 use \Riak\Output\KeyStreamOutput;
 include_once "connect.inc";
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($client, "test_stream_keys");
 $props = new BucketPropertyList(3, false);
 $bucket->applyProperties($props);
@@ -22,8 +23,8 @@ class KeyStreamer implements KeyStreamOutput {
 try {
     // Make some objects we can list afterwards
     for ($i=0; $i<20; $i++) {
-        $obj = new RiakObject("stream$i");
-        $obj->data = "test-get plap";
+        $obj = new Object("stream$i");
+        $obj->setContent("test-get plap");
         $bucket->put($obj);
     }
     $streamer = new KeyStreamer();

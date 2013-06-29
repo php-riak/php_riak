@@ -21,7 +21,7 @@
 
 // #ifdef PHP_SESSION
 #include <zend_exceptions.h>
-#include "client.h"
+#include "connection.h"
 #include "bucket.h"
 #include "object.h"
 #include "req_inputs.h"
@@ -118,7 +118,7 @@ PS_OPEN_FUNC(riak) /* {{{ */
     zval_ptr_dtor(&zoptionsarray);
 
     stripped_path = php_trim(purl->path, strlen(purl->path), "/", 1, NULL, 3 TSRMLS_CC);
-    zbucket = create_bucket_object(zclient, stripped_path TSRMLS_CC);
+    zbucket = create_bucket_object(zclient, stripped_path, strlen(stripped_path) TSRMLS_CC);
     php_url_free(purl);
     efree(stripped_path);
     if (EG(exception)) {
@@ -180,7 +180,7 @@ PS_READ_FUNC(riak) /* {{{ */
         if (Z_TYPE_P(zobjarr) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(zobjarr)) > 0) {
             zval **found = NULL;
             zend_hash_index_find(Z_ARRVAL_P(zobjarr), 0, (void**)&found);
-            zdata = zend_read_property(riak_object_ce, *found, "data", sizeof("data")-1, 1 TSRMLS_CC);
+            zdata = zend_read_property(riak_object_ce, *found, "content", sizeof("content")-1, 1 TSRMLS_CC);
             if (zdata->type == IS_STRING && Z_STRLEN_P(zdata) > 0) {
                 *vallen = Z_STRLEN_P(zdata);
                 *val = emalloc(Z_STRLEN_P(zdata));
@@ -210,7 +210,7 @@ PS_WRITE_FUNC(riak) /* {{{ */
         zval_ptr_dtor(&zobject);
         return FAILURE;
     }
-    zend_update_property_stringl(riak_object_ce, zobject, "data", sizeof("data")-1, val, vallen TSRMLS_CC);
+    zend_update_property_stringl(riak_object_ce, zobject, "content", sizeof("content")-1, val, vallen TSRMLS_CC);
     RIAK_CALL_METHOD2(RiakBucket, put, zobject, data->zbucket, zobject, data->zputprops);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {

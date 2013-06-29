@@ -21,7 +21,7 @@
 #include "php_riak.h"
 
 #include "pool.h"
-#include "client.h"
+#include "connection.h"
 #include "object.h"
 #include "bucket.h"
 #include "bucket_properties.h"
@@ -92,7 +92,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     REGISTER_INI_ENTRIES();
     riack_init();
     le_riak_connection_list = zend_register_list_destructors_ex(NULL, le_riak_connections_pefree, "Persistent clients", module_number);
-    riak_client_init(TSRMLS_C);
+    riak_connection_init(TSRMLS_C);
     riak_object_init(TSRMLS_C);
     riak_link_init(TSRMLS_C);
     riak_bucket_init(TSRMLS_C);

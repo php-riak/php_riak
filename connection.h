@@ -15,13 +15,13 @@
    limitations under the License.
 */
 
-#ifndef RIAK_CLIENT__H__
-#define RIAK_CLIENT__H__
+#ifndef RIAK_CONNECTION__H__
+#define RIAK_CONNECTION__H__
 
 #include <riack.h>
 #include "pool.h"
 
-extern zend_class_entry *riak_client_ce;
+extern zend_class_entry *riak_connection_ce;
 
 typedef struct _client_data {
   /* required */
@@ -44,11 +44,14 @@ typedef struct _client_data {
 
 zval* create_client_object(char* host, long port TSRMLS_DC);
 
-void riak_client_init(TSRMLS_D);
+void riak_connection_init(TSRMLS_D);
 zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC);
 void free_client_data(void *object TSRMLS_DC);
 
-PHP_METHOD(RiakClient, __construct);
-PHP_METHOD(RiakClient, ping);
+PHP_METHOD(RiakConnection, __construct);
+PHP_METHOD(RiakConnection, ping);
+PHP_METHOD(RiakConnection, getHost);
+PHP_METHOD(RiakConnection, getPort);
+PHP_METHOD(RiakConnection, getBucket);
 
 #endif

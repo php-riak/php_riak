@@ -3,27 +3,22 @@ Test links gets written and read correctly
 --FILE--
 <?php
 use \Riak\Link;
+use \Riak\Object;
 use \Riak\BucketPropertyList;
 
 include_once "connect.inc";
-$client = new RiakClient($host, $port);
+$client = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($client, "test_bucket");
 $props = new BucketPropertyList(3, false);
 $bucket->applyProperties($props);
 
-$obj = new RiakObject("key1");
+$obj = new Object("key1");
 try {
-    $obj->contentType = "text/plain";
-    $obj->data = "test-get plap";
-
     for ($i=0; $i<10; $i++) {
-        $obj2 = new RiakObject("key_with_link_$i");
-        $obj2->contentType = "text/plain";
-        $obj2->data = "dummy";
+        $obj2 = new Object("key_with_link_$i");
         $bucket->put($obj2);
-
-        // add links to obj
-        $obj->links[] = new Link("link$i", "test_bucket", $obj2->key);
+        // add link to obj
+        $obj->addLink(new Link("link$i", "test_bucket", $obj2->getKey()));
     }
     $bucket->put($obj);
 
@@ -31,9 +26,10 @@ try {
     $objs = $output->getObjectList();
     $readdenObj = $objs[0];
     $success = true;
-    if (count($readdenObj->links) == 10) {
+    $readdenLinks = $readdenObj->getLinkList();
+    if (count($readdenLinks) == 10) {
         $i = 0;
-        foreach ($readdenObj->links as $link) {
+        foreach ($readdenLinks as $link) {
             if (strcmp($link->getTag(), "link$i") !== 0) {
                 $success = false;
                 echo "expected tag name to be 'link$i' but was '".$link->tag."'".PHP_EOL;
@@ -50,7 +46,7 @@ try {
         }
     } else {
         $success = false;
-        var_dump($readdenObj->links);
+        var_dump($readdenLinks);
     }
     if ($success) {
         echo "success!";

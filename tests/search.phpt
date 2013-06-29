@@ -2,11 +2,12 @@
 Riak search test
 --FILE--
 <?php
+use \Riak\Object;
 use \Riak\Search\Search;
 use \Riak\Search\Input\ParameterBag;
 include_once "connect.inc";
 
-$riak = new RiakClient($host, $port);
+$riak = new \Riak\Connection($host, $port);
 $bucket = new RiakBucket($riak, 'testsearch');
 
 $json[] = '{"name": "apple","price": 2.50, "tags": ["fruit"]}';
@@ -17,9 +18,9 @@ $json[] = '{"name": "cheese", "price": 45, "tags": ["cow", "dairy"]}';
 $i = 0;
 foreach ($json as $j) {
     $i++;
-    $obj = new RiakObject("id$i");
-    $obj->contentType = "application/json";
-    $obj->data = $j;
+    $obj = new Object("id$i");
+    $obj->setContentType("application/json");
+    $obj->setContent($j);
     $bucket->put($obj);
 }
 

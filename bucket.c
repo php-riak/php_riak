@@ -20,7 +20,7 @@
 #include "php_riak.h"
 #include "bucket.h"
 #include "bucket_properties.h"
-#include "client.h"
+#include "connection.h"
 #include "object.h"
 #include "exceptions.h"
 #include "req_inputs.h"
@@ -100,7 +100,7 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;
 
-	INIT_CLASS_ENTRY(ce, "RiakBucket", riak_bucket_methods);
+    INIT_CLASS_ENTRY(ce, "RiakBucket", riak_bucket_methods);
 	riak_bucket_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
@@ -108,13 +108,13 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
 }
 /* }}} */
 
-zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC) /* {{{ */
+zval* create_bucket_object(zval* zclient, char* name, int name_len TSRMLS_DC) /* {{{ */
 {
 	zval *zbucket, *zname;
 	MAKE_STD_ZVAL(zbucket);
 	MAKE_STD_ZVAL(zname);
 
-	ZVAL_STRING(zname, name, 1);
+    ZVAL_STRINGL(zname, name, name_len, 1);
 
 	object_init_ex(zbucket, riak_bucket_ce);
 	RIAK_CALL_METHOD2(RiakBucket, __construct, zbucket, zbucket, zclient, zname);
@@ -124,7 +124,7 @@ zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC) /* {{{ */
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->__construct(RiakClient $client, string $name)
+/* {{{ proto void RiakBucket->__construct(RiakConnection $client, string $name)
 Create a new RiakBucket */
 PHP_METHOD(RiakBucket, __construct)
 {
@@ -363,7 +363,7 @@ PHP_METHOD(RiakBucket, delete)
 }
 /* }}} */
 
-/* {{{ proto RiakObject RiakBucket->put(RiakObject $object [, RiakPutRequestConfiguration $configuration])
+/* {{{ proto Riak\Object RiakBucket->put(Riak\Object $object [, RiakPutRequestConfiguration $configuration])
 Store a RiakObject in riak, if something goes wrong an RiakException is thrown */
 PHP_METHOD(RiakBucket, put)
 {
@@ -386,6 +386,9 @@ PHP_METHOD(RiakBucket, put)
 	memset(&returnedObj, 0, sizeof(returnedObj));
 	memset(&riackContent, 0, sizeof(riackContent));
     memset(&props, 0, sizeof(props));
+    /* fill content */
+    set_riak_content_from_object(&riackContent, zObject, connection->client TSRMLS_CC);
+
     if (zconfig != NULL && Z_TYPE_P(zconfig) == IS_OBJECT) {
         zval ztmp;
         RIAK_REQ_PROP_SET_BOOL(Riak_Input_PutInput, getReturnHead, props.return_head);
@@ -397,20 +400,10 @@ PHP_METHOD(RiakBucket, put)
         RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getPW, props.pw);
         RIAK_CALL_METHOD(Riak_Input_PutInput, getVClock, &ztmp, zconfig);
         if (Z_TYPE(ztmp) == IS_STRING) {
-            props.vclock.len = Z_STRLEN(ztmp);
-            props.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
+            obj.vclock.len = Z_STRLEN(ztmp);
+            obj.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
         }
     }
-
-    /* fill content */
-	set_riak_content_from_object(&riackContent, zObject, connection->client TSRMLS_CC);
-    /* fill obj */
-    /* Set vclock */
-	zTmp = zend_read_property(riak_object_ce, zObject, "vclock", sizeof("vclock")-1, 1 TSRMLS_CC);
-	if (Z_TYPE_P(zTmp) == IS_STRING) {
-		obj.vclock.len = Z_STRLEN_P(zTmp);
-		obj.vclock.clock = (uint8_t*)Z_STRVAL_P(zTmp);
-	}
     /* Set bucket name */
     obj.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 	obj.content_count = 1;

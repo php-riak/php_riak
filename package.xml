@@ -37,8 +37,8 @@
             <file role="src" name="bucket_properties.h"/>
             <file role="src" name="bucket.c"/>
             <file role="src" name="bucket.h"/>
-            <file role="src" name="client.c"/>
-            <file role="src" name="client.h"/>
+            <file role="src" name="connection.c"/>
+            <file role="src" name="connection.h"/>
             <file role="src" name="config.m4"/>
             <file role="src" name="config.w32"/>
             <file role="src" name="exceptions.c"/>
