@@ -11,9 +11,9 @@ use \Riak\BucketPropertyList;
 include_once "connect.inc";
 
 $client = new \Riak\Connection($host, $port);
-$bucket = new RiakBucket($client, "test_keyfilters");
+$bucket = new \Riak\Bucket($client, "test_keyfilters");
 $newProps = new BucketPropertyList(3, false);
-$bucket->applyProperties($newProps);
+$bucket->setPropertyList($newProps);
 
 // Make 20 keys for testing
 for ($i=0; $i<20; $i++) {

@@ -5,17 +5,17 @@ Test bucket properties
 use \Riak\BucketPropertyList;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new RiakBucket($client, "test_bucket_props");
-$oldProps = $bucket->fetchProperties();
+$bucket = new \Riak\Bucket($client, "test_bucket_props");
+$oldProps = $bucket->getPropertyList();
 $newProps = new BucketPropertyList(1, false);
-$bucket->applyProperties($newProps);
-$currentProps = $bucket->fetchProperties();
+$bucket->setPropertyList($newProps);
+$currentProps = $bucket->getPropertyList();
 if ($currentProps->getNValue() === 1 && $currentProps->getAllowMult() === false) {
 	echo "success!";
 } else {
 	var_dump($currentProps);
 }
-$bucket->applyProperties($oldProps);
+$bucket->setPropertyList($oldProps);
 ?>
 --EXPECT--
 success!

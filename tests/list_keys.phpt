@@ -6,9 +6,9 @@ use \Riak\BucketPropertyList;
 use \Riak\Object;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new RiakBucket($client, "test_list_keys");
+$bucket = new \Riak\Bucket($client, "test_list_keys");
 $props = new BucketPropertyList(3, false);
-$bucket->applyProperties($props);
+$bucket->setPropertyList($props);
 try {
     // Make some objects we can list afterwards
     for ($i=0; $i<20; $i++) {
@@ -16,7 +16,7 @@ try {
         $obj->setContent("test-get plap");
         $bucket->put($obj);
     }
-    $keys = $bucket->listKeys();
+    $keys = $bucket->getKeyList();
     $foundcnt = 0;
     foreach ($keys as $key) {
         $keystart = substr($key, 0, 4);

@@ -51,6 +51,11 @@
     if (Z_TYPE_P(ztmp) == IS_ARRAY) { RETURN_ZVAL(ztmp, 1, 0); } \
     RETURN_NULL();
 
+#define RIAK_GETTER_OBJECT(CE, PROPERTY_NAME) \
+    zval* ztmp = zend_read_property(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
+    if (Z_TYPE_P(ztmp) == IS_OBJECT) { RETURN_ZVAL(ztmp, 1, 0); } \
+    RETURN_NULL();
+
 #define RIAK_GETTER_DOUBLE(CE, PROPERTY_NAME) \
     zval* ztmp = zend_read_property(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
     if (Z_TYPE_P(ztmp) == IS_DOUBLE) { RETURN_DOUBLE(Z_DVAL_P(ztmp)); } \

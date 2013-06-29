@@ -6,9 +6,9 @@ use \Riak\BucketPropertyList;
 use \Riak\Input\GetInput;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new RiakBucket($client, "test_bucket");
+$bucket = new \Riak\Bucket($client, "test_bucket");
 $props = new BucketPropertyList(3, false);
-$bucket->applyProperties($props);
+$bucket->setPropertyList($props);
 
 try {
         $obj = new \Riak\Object("get_head");

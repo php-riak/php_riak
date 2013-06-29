@@ -79,7 +79,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_streamkeys, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, keystreamer)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_listkeys, 0, ZEND_RETURN_VALUE, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_bucket_noargs, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_bucket_methods[] = {
@@ -87,12 +87,14 @@ static zend_function_entry riak_bucket_methods[] = {
     PHP_ME(RiakBucket, put, arginfo_bucket_put, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, get, arginfo_bucket_get, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, delete, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakBucket, indexQuery, arginfo_bucket_indexq, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, index, arginfo_bucket_indexq, ZEND_ACC_PUBLIC)
 
-	PHP_ME(RiakBucket, fetchProperties, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
-	PHP_ME(RiakBucket, applyProperties, arginfo_bucket_applyprops, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakBucket, streamKeys, arginfo_bucket_streamkeys, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakBucket, listKeys, arginfo_bucket_listkeys, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, getPropertyList, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, setPropertyList, arginfo_bucket_applyprops, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, getKeyStream, arginfo_bucket_streamkeys, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, getKeyList, arginfo_riak_bucket_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, getName, arginfo_riak_bucket_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, getConnection, arginfo_riak_bucket_noargs, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
@@ -100,11 +102,11 @@ void riak_bucket_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;
 
-    INIT_CLASS_ENTRY(ce, "RiakBucket", riak_bucket_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Riak", "Bucket", riak_bucket_methods);
 	riak_bucket_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_property_null(riak_bucket_ce, "name", sizeof("name")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_ce, "client", sizeof("client")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_ce, "connection", sizeof("connection")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 /* }}} */
 
@@ -124,18 +126,18 @@ zval* create_bucket_object(zval* zclient, char* name, int name_len TSRMLS_DC) /*
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->__construct(RiakConnection $client, string $name)
-Create a new RiakBucket */
+/* {{{ proto void Riak\Bucket->__construct(Riak\Connection $connection, string $name)
+Create a new Riak\Bucket */
 PHP_METHOD(RiakBucket, __construct)
 {
 	char *name;
 	int nameLen;
-    zval* client, *zprop;
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "os", &client, &name, &nameLen) == FAILURE) {
+    zval* zconnection;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "os", &zconnection, &name, &nameLen) == FAILURE) {
 		return;
 	}
 	zend_update_property_stringl(riak_bucket_ce, getThis(), "name", sizeof("name")-1, name, nameLen TSRMLS_CC);
-	zend_update_property(riak_bucket_ce, getThis(), "client", sizeof("client")-1, client TSRMLS_CC);
+    zend_update_property(riak_bucket_ce, getThis(), "connection", sizeof("connection")-1, zconnection TSRMLS_CC);
 }
 /* }}} */
 
@@ -164,9 +166,9 @@ void riak_stream_key_cb(struct RIACK_CLIENT* c, void* p, RIACK_STRING key) {/* {
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->streamKeys(RiakKeyStreamer streamer)
+/* {{{ proto void Riak\Bucket->getKeyStream(Riak\Output\KeyStreamOutput streamer)
 Streams all keys in the bucket */
-PHP_METHOD(RiakBucket, streamKeys)
+PHP_METHOD(RiakBucket, getKeyStream)
 {
     struct riak_stream_key_cb_param cb_params;
     RIACK_STRING rsbucket;
@@ -188,9 +190,9 @@ PHP_METHOD(RiakBucket, streamKeys)
 /* }}} */
 
 
-/* {{{ proto string[] RiakBucket->listKeys()
+/* {{{ proto string[] Riak\Bucket->getKeyList()
 List all keys in the bucket */
-PHP_METHOD(RiakBucket, listKeys)
+PHP_METHOD(RiakBucket, getKeyList)
 {
     struct RIACK_STRING_LINKED_LIST* resultlist, *curr;
     RIACK_STRING rsbucket;
@@ -216,9 +218,9 @@ PHP_METHOD(RiakBucket, listKeys)
 /* }}} */
 
 
-/* {{{ proto array RiakBucket->indexQuery(string $index, string $from [, string $to])
+/* {{{ proto array Riak\Bucket->index(string $index, string $from [, string $to])
 Apply given properties to this bucket */
-PHP_METHOD(RiakBucket, indexQuery)
+PHP_METHOD(RiakBucket, index)
 {
     RIACK_STRING rsbucket, rsindex, rsfrom, rsto;
     RIACK_STRING_LIST resultlist;
@@ -256,9 +258,9 @@ PHP_METHOD(RiakBucket, indexQuery)
 }
 /* }}} */
 
-/* {{{ proto void RiakBucket->applyProperties(RiakBucketProperties $properties)
+/* {{{ proto Riak\Bucket Riak\Bucket->setPropertyList(Riak\BucketProperties $properties)
 Apply given properties to this bucket */
-PHP_METHOD(RiakBucket, applyProperties)
+PHP_METHOD(RiakBucket, setPropertyList)
 {
 	riak_connection *connection;
 
@@ -277,12 +279,14 @@ PHP_METHOD(RiakBucket, applyProperties)
 
     riackResult = riack_set_bucket_props(connection->client, bucketName, Z_LVAL(znval), Z_BVAL(zallowmult));
  	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
+
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto RiakBucketProperties RiakBucket->fetchProperties()
+/* {{{ proto Riak\BucketPropertyList Riak\Bucket->getPropertyList()
 Fetch and return a RiakBucketProperties object with properties for this bucket */
-PHP_METHOD(RiakBucket, fetchProperties)
+PHP_METHOD(RiakBucket, getPropertyList)
 {
 	riak_connection *connection;
 	RIACK_STRING bucketName;
@@ -363,7 +367,7 @@ PHP_METHOD(RiakBucket, delete)
 }
 /* }}} */
 
-/* {{{ proto Riak\Object RiakBucket->put(Riak\Object $object [, RiakPutRequestConfiguration $configuration])
+/* {{{ proto Riak\Object Riak\Bucket->put(Riak\Object $object [, RiakPutRequestConfiguration $configuration])
 Store a RiakObject in riak, if something goes wrong an RiakException is thrown */
 PHP_METHOD(RiakBucket, put)
 {
@@ -435,7 +439,7 @@ PHP_METHOD(RiakBucket, put)
 }
 /* }}} */
 
-/* {{{ proto Output\GetOutput RiakBucket->get(string $key [, Riak\Input\GetInput $input])
+/* {{{ proto Output\GetOutput Riak\Bucket->get(string $key [, Riak\Input\GetInput $input])
 Get value from riak */
 PHP_METHOD(RiakBucket, get)
 {
@@ -520,6 +524,21 @@ PHP_METHOD(RiakBucket, get)
 }
 /* }}} */
 
+/* {{{ proto string Riak\Bucket->getName()
+Get bucket name */
+PHP_METHOD(RiakBucket, getName)
+{
+    RIAK_GETTER_STRING(riak_object_ce, "name");
+}
+/* }}} */
+
+/* {{{ proto string Riak\Bucket->getConnection() */
+PHP_METHOD(RiakBucket, getConnection)
+{
+    RIAK_GETTER_OBJECT(riak_object_ce, "connection");
+}
+/* }}} */
+
 zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
 {
 	zval *object;
@@ -560,7 +579,7 @@ riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)/* {{{ */
 {
     zval *zclient;
     riak_connection *connection = NULL;
-    zclient = zend_read_property(riak_bucket_ce, zbucket, "client", sizeof("client")-1, 1 TSRMLS_CC);
+    zclient = zend_read_property(riak_bucket_ce, zbucket, "connection", sizeof("connection")-1, 1 TSRMLS_CC);
     if (zclient) {
         GET_RIAK_CONNECTION(zclient, connection);
 		ensure_connected(connection TSRMLS_CC);

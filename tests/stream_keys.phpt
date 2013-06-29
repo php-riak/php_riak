@@ -7,9 +7,9 @@ use \Riak\BucketPropertyList;
 use \Riak\Output\KeyStreamOutput;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new RiakBucket($client, "test_stream_keys");
+$bucket = new \Riak\Bucket($client, "test_stream_keys");
 $props = new BucketPropertyList(3, false);
-$bucket->applyProperties($props);
+$bucket->setPropertyList($props);
 
 class KeyStreamer implements KeyStreamOutput {
     public $cnt = 0;
@@ -28,7 +28,7 @@ try {
         $bucket->put($obj);
     }
     $streamer = new KeyStreamer();
-    $bucket->streamKeys($streamer);
+    $bucket->getKeyStream($streamer);
     if ($streamer->cnt == 20) {
         echo "success!".PHP_EOL;
     } else {

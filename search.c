@@ -118,7 +118,7 @@ void riak_search_init(TSRMLS_D) /* {{{ */
     zend_class_entry ce;
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Search", "Search", riak_search_methods);
     riak_search_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(riak_search_ce, "client", sizeof("client")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_search_ce, "connection", sizeof("connection")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Search\\Input", "ParameterBag", riak_search_input_methods);
@@ -150,7 +150,7 @@ void riak_search_init(TSRMLS_D) /* {{{ */
 *************************************************************/
 
 
-/* {{{ proto void Riak\Search->__construct(RiakConnection $client)
+/* {{{ proto void Riak\Search->__construct(Riak\Connection $client)
 Create a new Search object */
 PHP_METHOD(Riak_Search, __construct)
 {
@@ -158,7 +158,7 @@ PHP_METHOD(Riak_Search, __construct)
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zclient) == FAILURE) {
         return;
     }
-    zend_update_property(riak_search_ce, getThis(), "client", sizeof("client")-1, zclient TSRMLS_CC);
+    zend_update_property(riak_search_ce, getThis(), "connection", sizeof("connection")-1, zclient TSRMLS_CC);
 }
 /* }}} */
 
@@ -177,7 +177,7 @@ PHP_METHOD(Riak_Search, search)
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss|o", &index, &index_len, &query, &query_len, &zparams) == FAILURE) {
         return;
     }
-    zclient = zend_read_property(riak_search_ce, getThis(), "client", sizeof("client")-1, 1 TSRMLS_CC);
+    zclient = zend_read_property(riak_search_ce, getThis(), "connection", sizeof("connection")-1, 1 TSRMLS_CC);
     GET_RIAK_CONNECTION(zclient, connection);
     memset(&search_params, 0, sizeof(struct RIACK_SEARCH_OPTIONAL_PARAMETERS));
     rsquery.value = query;

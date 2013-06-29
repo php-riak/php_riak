@@ -28,15 +28,17 @@ zval* create_bucket_object(zval* zclient, char* name, int name_len TSRMLS_DC);
 void riak_bucket_init(TSRMLS_D);
 
 PHP_METHOD(RiakBucket, __construct);
-PHP_METHOD(RiakBucket, applyProperties);
-PHP_METHOD(RiakBucket, fetchProperties);
+PHP_METHOD(RiakBucket, setPropertyList);
+PHP_METHOD(RiakBucket, getPropertyList);
 PHP_METHOD(RiakBucket, put);
 PHP_METHOD(RiakBucket, get);
 PHP_METHOD(RiakBucket, delete);
-PHP_METHOD(RiakBucket, indexQuery);
+PHP_METHOD(RiakBucket, index);
 
-PHP_METHOD(RiakBucket, streamKeys);
-PHP_METHOD(RiakBucket, listKeys);
+PHP_METHOD(RiakBucket, getKeyStream);
+PHP_METHOD(RiakBucket, getKeyList);
+PHP_METHOD(RiakBucket, getName);
+PHP_METHOD(RiakBucket, getConnection);
 
 zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC);
 RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC);

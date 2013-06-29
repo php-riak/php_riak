@@ -27,7 +27,7 @@
 zend_class_entry *riak_mapreduce_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mapred_ctor, 0, ZEND_RETURN_VALUE, 1)
-    ZEND_ARG_INFO(0, client)
+    ZEND_ARG_INFO(0, connection)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_addphase, 0, ZEND_RETURN_VALUE, 1)
@@ -59,7 +59,7 @@ void riak_mapreduce_init(TSRMLS_D)/* {{{ */
     riak_mapreduce_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
     zend_declare_property_null(riak_mapreduce_ce, "phases", sizeof("phases")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_null(riak_mapreduce_ce, "client", sizeof("client")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_mapreduce_ce, "connection", sizeof("connection")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_mapreduce_ce, "input", sizeof("input")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 }
 /* }}} */
@@ -70,7 +70,7 @@ void riak_mapreduce_init(TSRMLS_D)/* {{{ */
 *************************************************************/
 
 
-/* {{{ proto void Riak\MapReduce\MapReduce->__construct(RiakConnection $client)
+/* {{{ proto void Riak\MapReduce\MapReduce->__construct(Riak\Connection $client)
 Create a new MapReduce object */
 PHP_METHOD(RiakMapreduce, __construct)
 {
@@ -78,7 +78,7 @@ PHP_METHOD(RiakMapreduce, __construct)
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zclient) == FAILURE) {
         return;
     }
-    zend_update_property(riak_mapreduce_ce, getThis(), "client", sizeof("client")-1, zclient TSRMLS_CC);
+    zend_update_property(riak_mapreduce_ce, getThis(), "connection", sizeof("connection")-1, zclient TSRMLS_CC);
     MAKE_STD_ZVAL(zphases);
     array_init(zphases);
     zend_update_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, zphases TSRMLS_CC);
@@ -159,7 +159,7 @@ PHP_METHOD(RiakMapreduce, run)
     RIAK_CALL_METHOD(RiakMapreduce, toJson, zjson, getThis());
 
 
-    zclient = zend_read_property(riak_mapreduce_ce, getThis(), "client", sizeof("client")-1, 1 TSRMLS_CC);
+    zclient = zend_read_property(riak_mapreduce_ce, getThis(), "connection", sizeof("connection")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zclient) == IS_OBJECT) {
         GET_RIAK_CONNECTION(zclient, connection);
         ensure_connected(connection TSRMLS_CC);

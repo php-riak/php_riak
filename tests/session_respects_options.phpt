@@ -13,11 +13,11 @@ use \Riak\Exception\UnexpectedResponseException;
 
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new RiakBucket($client, "sessions_violation");
+$bucket = new \Riak\Bucket($client, "sessions_violation");
 
 // Set properties so we are sure writing a session later will fail because w > n
 $props = new BucketPropertyList(2, false);
-$bucket->applyProperties($props);
+$bucket->setPropertyList($props);
 
 ini_set('session.save_path',"proto://$host:$port/sessions_violation?w=4&dw=4&pw=4&r=4&rw=4&pr=4");
 try {

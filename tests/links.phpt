@@ -8,9 +8,9 @@ use \Riak\BucketPropertyList;
 
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new RiakBucket($client, "test_bucket");
+$bucket = new \Riak\Bucket($client, "test_bucket");
 $props = new BucketPropertyList(3, false);
-$bucket->applyProperties($props);
+$bucket->setPropertyList($props);
 
 $obj = new Object("key1");
 try {
