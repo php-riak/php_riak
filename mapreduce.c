@@ -15,7 +15,7 @@
    limitations under the License.
 */
 #include "mapreduce.h"
-#include "client.h"
+#include "connection.h"
 #include "exceptions.h"
 #include "mr_result.h"
 #include "mr_inputs.h"
@@ -70,7 +70,7 @@ void riak_mapreduce_init(TSRMLS_D)/* {{{ */
 *************************************************************/
 
 
-/* {{{ proto void Riak\MapReduce\MapReduce->__construct(RiakClient $client)
+/* {{{ proto void Riak\MapReduce\MapReduce->__construct(RiakConnection $client)
 Create a new MapReduce object */
 PHP_METHOD(RiakMapreduce, __construct)
 {
@@ -97,7 +97,7 @@ PHP_METHOD(RiakMapreduce, addPhase)
     zphasearr = zend_read_property(riak_mapreduce_ce, getThis(), "phases", sizeof("phases")-1, 1 TSRMLS_CC);
     zval_add_ref(&zphase);
     add_next_index_zval(zphasearr, zphase);
-    RETURN_ZVAL(getThis(), 1, 0);
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -110,7 +110,7 @@ PHP_METHOD(RiakMapreduce, setInput)
         return;
     }
     zend_update_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, zinput TSRMLS_CC);
-    RETURN_ZVAL(getThis(), 1, 0);
+    RIAK_RETURN_THIS
 }
 /* }}} */
 

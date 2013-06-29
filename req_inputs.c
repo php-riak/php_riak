@@ -190,11 +190,12 @@ void riak_req_inputs_init(TSRMLS_D) /* {{{ */
 * Implementation: Riak\Input\DeleteInput
 *************************************************************/
 
-/* {{{ proto void Riak\Input\DeleteInput->setR(int $r)
+/* {{{ proto Riak\Input\DeleteInput Riak\Input\DeleteInput->setR(int $r)
 Set R value */
 PHP_METHOD(Riak_Input_DeleteInput, setR)
 {
-    RIAK_SETTER_LONG(riak_delete_input_ce, "r")
+    RIAK_SETTER_LONG(riak_delete_input_ce, "r");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -206,11 +207,12 @@ PHP_METHOD(Riak_Input_DeleteInput, getR)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\DeleteInput->setPR(int $pr)
+/* {{{ proto Riak\Input\DeleteInput Riak\Input\DeleteInput->setPR(int $pr)
 Set PR value */
 PHP_METHOD(Riak_Input_DeleteInput, setPR)
 {
-    RIAK_SETTER_LONG(riak_delete_input_ce, "pr")
+    RIAK_SETTER_LONG(riak_delete_input_ce, "pr");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -222,11 +224,12 @@ PHP_METHOD(Riak_Input_DeleteInput, getPR)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\DeleteInput->setRW(int $rw)
+/* {{{ proto Riak\Input\DeleteInput Riak\Input\DeleteInput->setRW(int $rw)
 Set RW value */
 PHP_METHOD(Riak_Input_DeleteInput, setRW)
 {
-    RIAK_SETTER_LONG(riak_delete_input_ce, "rw")
+    RIAK_SETTER_LONG(riak_delete_input_ce, "rw");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -238,11 +241,12 @@ PHP_METHOD(Riak_Input_DeleteInput, getRW)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\DeleteInput->setW(int $w)
+/* {{{ proto Riak\Input\DeleteInput Riak\Input\DeleteInput->setW(int $w)
 Set W value */
 PHP_METHOD(Riak_Input_DeleteInput, setW)
 {
-    RIAK_SETTER_LONG(riak_delete_input_ce, "w")
+    RIAK_SETTER_LONG(riak_delete_input_ce, "w");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -254,11 +258,12 @@ PHP_METHOD(Riak_Input_DeleteInput, getW)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\DeleteInput->setDW(int $dw)
+/* {{{ proto Riak\Input\DeleteInput Riak\Input\DeleteInput->setDW(int $dw)
 Set DW value */
 PHP_METHOD(Riak_Input_DeleteInput, setDW)
 {
-    RIAK_SETTER_LONG(riak_delete_input_ce, "dw")
+    RIAK_SETTER_LONG(riak_delete_input_ce, "dw");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -270,11 +275,12 @@ PHP_METHOD(Riak_Input_DeleteInput, getDW)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\DeleteInput->setPW(int $pw)
+/* {{{ proto Riak\Input\DeleteInput Riak\Input\DeleteInput->setPW(int $pw)
 Set PW value */
 PHP_METHOD(Riak_Input_DeleteInput, setPW)
 {
-    RIAK_SETTER_LONG(riak_delete_input_ce, "pw")
+    RIAK_SETTER_LONG(riak_delete_input_ce, "pw");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -286,11 +292,12 @@ PHP_METHOD(Riak_Input_DeleteInput, getPW)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\DeleteInput->setVClock(string $rw)
+/* {{{ proto Riak\Input\DeleteInput Riak\Input\DeleteInput->setVClock(string $rw)
 Set set vector clock */
 PHP_METHOD(Riak_Input_DeleteInput, setVClock)
 {
-    RIAK_SETTER_STRING(riak_delete_input_ce, "vClock")
+    RIAK_SETTER_STRING(riak_delete_input_ce, "vClock");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -306,11 +313,12 @@ PHP_METHOD(Riak_Input_DeleteInput, getVClock)
 * Implementation: Riak\Input\PutInput
 *************************************************************/
 
-/* {{{ proto void Riak\Input\PutInput->setReturnHead(bool $returnHead)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setReturnHead(bool $returnHead)
 Sets return head option */
 PHP_METHOD(Riak_Input_PutInput, setReturnHead)
 {
     RIAK_SETTER_BOOL(riak_put_input_ce, "returnHead");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -330,11 +338,12 @@ PHP_METHOD(Riak_Input_PutInput, getW)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\PutInput->setW(int $w)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setW(int $w)
 Set W value */
 PHP_METHOD(Riak_Input_PutInput, setW)
 {
     RIAK_SETTER_LONG(riak_put_input_ce, "w");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -346,11 +355,12 @@ PHP_METHOD(Riak_Input_PutInput, getDW)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\PutInput->setDW(int $dw)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setDW(int $dw)
 Set DW value */
 PHP_METHOD(Riak_Input_PutInput, setDW)
 {
     RIAK_SETTER_LONG(riak_put_input_ce, "dw");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -362,11 +372,12 @@ PHP_METHOD(Riak_Input_PutInput, getPW)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\PutInput->setPW(int $pw)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setPW(int $pw)
 Set PW value */
 PHP_METHOD(Riak_Input_PutInput, setPW)
 {
     RIAK_SETTER_LONG(riak_put_input_ce, "pw");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -378,11 +389,12 @@ PHP_METHOD(Riak_Input_PutInput, getVClock)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\PutInput->setVClock(string $vClock)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setVClock(string $vClock)
 Set the vector clock value */
 PHP_METHOD(Riak_Input_PutInput, setVClock)
 {
     RIAK_SETTER_STRING(riak_put_input_ce, "vClock");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -394,11 +406,12 @@ PHP_METHOD(Riak_Input_PutInput, getReturnBody)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\PutInput->setReturnBody(bool $returnBody)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setReturnBody(bool $returnBody)
 Set return body value */
 PHP_METHOD(Riak_Input_PutInput, setReturnBody)
 {
     RIAK_SETTER_STRING(riak_put_input_ce, "returnBody");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -411,11 +424,12 @@ PHP_METHOD(Riak_Input_PutInput, getIfNoneMatch)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\PutInput->setIfNoneMatch(bool $ifNoneMatch)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setIfNoneMatch(bool $ifNoneMatch)
 Set if none match value */
 PHP_METHOD(Riak_Input_PutInput, setIfNoneMatch)
 {
     RIAK_SETTER_BOOL(riak_put_input_ce, "ifNoneMatch");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -427,11 +441,12 @@ PHP_METHOD(Riak_Input_PutInput, getIfNotModified)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\PutInput->setIfNotModified(bool $ifNotModified)
+/* {{{ proto Riak\Input\PutInput Riak\Input\PutInput->setIfNotModified(bool $ifNotModified)
 Set if not modified */
 PHP_METHOD(Riak_Input_PutInput, setIfNotModified)
 {
     RIAK_SETTER_BOOL(riak_put_input_ce, "ifNotModified");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -439,11 +454,12 @@ PHP_METHOD(Riak_Input_PutInput, setIfNotModified)
 * Implementation: Riak\Input\GetInput
 *************************************************************/
 
-/* {{{ proto void Riak\Input\GetInput->setReturnHead(bool $returnHead)
+/* {{{ proto Riak\Input\GetInput Riak\Input\GetInput->setReturnHead(bool $returnHead)
 Sets return head option */
 PHP_METHOD(Riak_Input_GetInput, setReturnHead)
 {
     RIAK_SETTER_BOOL(riak_get_input_ce, "returnHead");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -455,11 +471,12 @@ PHP_METHOD(Riak_Input_GetInput, getReturnHead)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\GetInput->setR(int $r)
+/* {{{ proto Riak\Input\GetInput Riak\Input\GetInput->setR(int $r)
 Set R value */
 PHP_METHOD(Riak_Input_GetInput, setR)
 {
     RIAK_SETTER_BOOL(riak_get_input_ce, "r");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -471,11 +488,12 @@ PHP_METHOD(Riak_Input_GetInput, getR)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\GetInput->setPR(int $r)
+/* {{{ proto Riak\Input\GetInput Riak\Input\GetInput->setPR(int $r)
 Set PR value */
 PHP_METHOD(Riak_Input_GetInput, setPR)
 {
     RIAK_SETTER_BOOL(riak_get_input_ce, "pr");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -495,11 +513,12 @@ PHP_METHOD(Riak_Input_GetInput, getBasicQuorum)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\GetInput->setBasicQuorum(bool $basicQuorum)
+/* {{{ proto Riak\Input\GetInput Riak\Input\GetInput->setBasicQuorum(bool $basicQuorum)
 Set basicQuerum value */
 PHP_METHOD(Riak_Input_GetInput, setBasicQuorum)
 {
     RIAK_SETTER_BOOL(riak_get_input_ce, "basicQuorum");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -511,11 +530,12 @@ PHP_METHOD(Riak_Input_GetInput, getNotFoundOk)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\GetInput->setNotFoundOk(bool $notFoundOk)
+/* {{{ proto Riak\Input\GetInput Riak\Input\GetInput->setNotFoundOk(bool $notFoundOk)
 Set not found ok */
 PHP_METHOD(Riak_Input_GetInput, setNotFoundOk)
 {
     RIAK_SETTER_BOOL(riak_get_input_ce, "notFoundOk");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -527,11 +547,12 @@ PHP_METHOD(Riak_Input_GetInput, getIfModifiedVClock)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\GetInput->setIfModifiedVClock(string $ifModifiedVClock)
+/* {{{ proto Riak\Input\GetInput Riak\Input\GetInput->setIfModifiedVClock(string $ifModifiedVClock)
 Set IfModifiedVClock */
 PHP_METHOD(Riak_Input_GetInput, setIfModifiedVClock)
 {
     RIAK_SETTER_STRING(riak_get_input_ce, "ifModifiedVClock");
+    RIAK_RETURN_THIS
 }
 
 /* {{{ proto bool Riak\Input\GetInput->getReturnDeletedVClock()
@@ -542,9 +563,10 @@ PHP_METHOD(Riak_Input_GetInput, getReturnDeletedVClock)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Input\GetInput->setReturnDeletedVClock(bool $returnDeletedVClock)
+/* {{{ proto Riak\Input\GetInput Riak\Input\GetInput->setReturnDeletedVClock(bool $returnDeletedVClock)
 Set returnDeletedVClock */
 PHP_METHOD(Riak_Input_GetInput, setReturnDeletedVClock)
 {
     RIAK_SETTER_BOOL(riak_get_input_ce, "deletedVClock");
+    RIAK_RETURN_THIS
 }

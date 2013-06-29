@@ -23,7 +23,7 @@
 
 extern zend_class_entry *riak_bucket_ce;
 
-zval* create_bucket_object(zval* zclient, char* name TSRMLS_DC);
+zval* create_bucket_object(zval* zclient, char* name, int name_len TSRMLS_DC);
 
 void riak_bucket_init(TSRMLS_D);
 

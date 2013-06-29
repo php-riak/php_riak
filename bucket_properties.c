@@ -17,7 +17,7 @@
 #include <php.h>
 #include "bucket_properties.h"
 #include "bucket.h"
-#include "client.h"
+#include "connection.h"
 #include "object.h"
 #include "exceptions.h"
 #include "php_riak.h"

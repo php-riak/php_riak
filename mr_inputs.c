@@ -290,7 +290,7 @@ PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addArray)
     zval_ptr_dtor(&zarr[0]);
     zval_ptr_dtor(&zcombinedarr);
 
-    RETURN_ZVAL(getThis(), 1, 0);
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
@@ -393,7 +393,7 @@ PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, add)
     } else {
         zend_throw_exception(riak_badarguments_exception_ce, "Key or bucketname missing", 5001 TSRMLS_CC);
     }
-    RETURN_ZVAL(getThis(), 1, 0);
+    RIAK_RETURN_THIS
 }
 /* }}} */
 

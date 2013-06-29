@@ -34,6 +34,8 @@
 #define RIAK_PUSH_EO_PARAM()
 #define RIAK_POP_EO_PARAM()
 
+#define RIAK_RETURN_THIS RETURN_ZVAL(getThis(), 1, 0);
+
 #define RIAK_GETTER_LONG(CE, PROPERTY_NAME) \
     zval* ztmp = zend_read_property(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, 1 TSRMLS_CC); \
     if (Z_TYPE_P(ztmp) == IS_LONG) { RETURN_LONG(Z_LVAL_P(ztmp)); } \
