@@ -31,11 +31,11 @@ riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 zend_class_entry *riak_bucket_ce;
 
 #define RIAK_REQ_PROP_SET_LONG(CLASS_ALIAS, GETTER, TARGET) \
-    RIAK_CALL_METHOD(CLASS_ALIAS, GETTER, &ztmp, zconfig); \
+    RIAK_CALL_METHOD(CLASS_ALIAS, GETTER, &ztmp, zinput); \
     if (Z_TYPE(ztmp) == IS_LONG) { TARGET##_use = 1; TARGET = Z_LVAL(ztmp); }
 
 #define RIAK_REQ_PROP_SET_BOOL(CLASS_ALIAS, GETTER, TARGET) \
-    RIAK_CALL_METHOD(CLASS_ALIAS, GETTER, &ztmp, zconfig); \
+    RIAK_CALL_METHOD(CLASS_ALIAS, GETTER, &ztmp, zinput); \
     if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) { TARGET##_use = TARGET = 1; }
 
 #define GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR( VAR ) VAR = get_riak_connection(getThis() TSRMLS_CC); \
@@ -324,10 +324,11 @@ PHP_METHOD(RiakBucket, delete)
 {
 	struct RIACK_DEL_PROPERTIES props;
 	riak_connection *connection;
-    zval *zparam, *zTmp, *zconfig;
+    zval *zparam, *zTmp, *zinput;
 	RIACK_STRING bucketName, key;
 	int riackResult;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|o", &zparam, &zconfig) == FAILURE) {
+    zinput = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|o", &zparam, &zinput) == FAILURE) {
 		return;
 	}
     memset(&props, 0, sizeof(props));
@@ -346,7 +347,7 @@ PHP_METHOD(RiakBucket, delete)
         }
     }
 
-    if (zconfig != NULL && Z_TYPE_P(zconfig) == IS_OBJECT) {
+    if (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT) {
         zval ztmp;
         RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getR, props.r);
         RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getPR, props.pr);
@@ -354,25 +355,23 @@ PHP_METHOD(RiakBucket, delete)
         RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getW, props.w);
         RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getDW, props.dw);
         RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getPW, props.pw);
-        RIAK_CALL_METHOD(Riak_Input_DeleteInput, getVClock, &ztmp, zconfig);
+        RIAK_CALL_METHOD(Riak_Input_DeleteInput, getVClock, &ztmp, zinput);
         if (Z_TYPE(ztmp) == IS_STRING) {
             props.vclock.len = Z_STRLEN(ztmp);
             props.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
         }
     }
-
-    /* vclock ? */
 	riackResult = riack_delete(connection->client, bucketName, key, &props);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
 /* }}} */
 
-/* {{{ proto Riak\Object Riak\Bucket->put(Riak\Object $object [, RiakPutRequestConfiguration $configuration])
+/* {{{ proto Riak\Output\PutOutput Riak\Bucket->put(Riak\Object $object [, RiakPutRequestConfiguration $configuration])
 Store a RiakObject in riak, if something goes wrong an RiakException is thrown */
 PHP_METHOD(RiakBucket, put)
 {
     int riackResult;
-    zval *zObject, *zTmp, *zconfig;
+    zval *zObject, *zTmp, *zinput, *zout;
 	struct RIACK_OBJECT obj, returnedObj;
 	struct RIACK_CONTENT riackContent;
 	struct RIACK_PUT_PROPERTIES props;
@@ -380,8 +379,8 @@ PHP_METHOD(RiakBucket, put)
     long options;
 
     options = 0;
-    zconfig = NULL;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o|o", &zObject, &zconfig) == FAILURE) {
+    zinput = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o|o", &zObject, &zinput) == FAILURE) {
 		return;
 	}
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
@@ -393,7 +392,7 @@ PHP_METHOD(RiakBucket, put)
     /* fill content */
     set_riak_content_from_object(&riackContent, zObject, connection->client TSRMLS_CC);
 
-    if (zconfig != NULL && Z_TYPE_P(zconfig) == IS_OBJECT) {
+    if (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT) {
         zval ztmp;
         RIAK_REQ_PROP_SET_BOOL(Riak_Input_PutInput, getReturnHead, props.return_head);
         RIAK_REQ_PROP_SET_BOOL(Riak_Input_PutInput, getReturnBody, props.return_body);
@@ -402,7 +401,7 @@ PHP_METHOD(RiakBucket, put)
         RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getW, props.w);
         RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getDW, props.dw);
         RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getPW, props.pw);
-        RIAK_CALL_METHOD(Riak_Input_PutInput, getVClock, &ztmp, zconfig);
+        RIAK_CALL_METHOD(Riak_Input_PutInput, getVClock, &ztmp, zinput);
         if (Z_TYPE(ztmp) == IS_STRING) {
             obj.vclock.len = Z_STRLEN(ztmp);
             obj.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
@@ -412,7 +411,6 @@ PHP_METHOD(RiakBucket, put)
     obj.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 	obj.content_count = 1;
 	obj.content = &riackContent;
-
     /* No ket provided on function call, get it from RiakObject */
     GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zObject, "key", zTmp, obj.key) {
         // Key is null this is ok
@@ -422,20 +420,18 @@ PHP_METHOD(RiakBucket, put)
 	riackResult = riack_put(connection->client, obj, &returnedObj, &props);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
-    if (returnedObj.vclock.len > 0) {
-        MAKE_STD_ZVAL(zTmp);
-        ZVAL_STRINGL(zTmp, (char*)returnedObj.vclock.clock, returnedObj.vclock.len, 1);
-        zend_update_property(riak_object_ce, zObject, "vclock", sizeof("vclock")-1, zTmp TSRMLS_CC);
-        zval_ptr_dtor(&zTmp);
-    }
+    // Now make put output from the response
+    MAKE_STD_ZVAL(zTmp);
     if (returnedObj.key.len > 0) {
-        MAKE_STD_ZVAL(zTmp);
         ZVAL_STRINGL(zTmp, (char*)returnedObj.key.value, returnedObj.key.len, 1);
-        zend_update_property(riak_object_ce, zObject, "key", sizeof("key")-1, zTmp TSRMLS_CC);
-        zval_ptr_dtor(&zTmp);
+    } else {
+        ZVAL_NULL(zTmp);
     }
+    zout = put_output_from_riack_object(&returnedObj, zTmp TSRMLS_CC);
+    RETVAL_ZVAL(zout, 0, 1);
+
+    zval_ptr_dtor(&zTmp);
     riack_free_object(connection->client, &returnedObj);
-    RETURN_ZVAL(zObject, 1, 0);
 }
 /* }}} */
 
@@ -455,45 +451,21 @@ PHP_METHOD(RiakBucket, get)
     zinput = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|o", &key, &keyLen, &zinput) == FAILURE) {
 		return;
-	}
-	
+    }
 	GET_RIAK_CONNECTION_RETURN_EXC_ON_ERROR(connection)
 
 	MAKE_STD_ZVAL(zKey);
 	ZVAL_STRINGL(zKey, key, keyLen, 1);
-
 	memset(&props, 0, sizeof(props));
-	memset(&getResult, 0, sizeof(getResult));
-
-    /* TODO Move this to its own function */
+    memset(&getResult, 0, sizeof(getResult));
     if (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT) {
         zval ztmp;
-        RIAK_CALL_METHOD(Riak_Input_GetInput, getReturnHead, &ztmp, zinput);
-        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
-            props.head_use = props.head = 1;
-        }
-        RIAK_CALL_METHOD(Riak_Input_GetInput, getR, &ztmp, zinput);
-        if (Z_TYPE(ztmp) == IS_LONG) {
-            props.r_use = 1;
-            props.r = Z_LVAL(ztmp);
-        }
-        RIAK_CALL_METHOD(Riak_Input_GetInput, getPR, &ztmp, zinput);
-        if (Z_TYPE(ztmp) == IS_LONG) {
-            props.pr_use = 1;
-            props.pr = Z_LVAL(ztmp);
-        }
-        RIAK_CALL_METHOD(Riak_Input_GetInput, getBasicQuorum, &ztmp, zinput);
-        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
-            props.basic_quorum_present = props.basic_quorum = 1;
-        }
-        RIAK_CALL_METHOD(Riak_Input_GetInput, getNotFoundOk, &ztmp, zinput);
-        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
-            props.notfound_ok_present = props.notfound_ok = 1;
-        }
-        RIAK_CALL_METHOD(Riak_Input_GetInput, getReturnDeletedVClock, &ztmp, zinput);
-        if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) {
-            props.deletedvclock_present = props.deletedvclock = 1;
-        }
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_GetInput, getReturnHead, props.head);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_GetInput, getR, props.r);
+        RIAK_REQ_PROP_SET_LONG(Riak_Input_GetInput, getPR, props.pr);
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_GetInput, getBasicQuorum, props.basic_quorum);
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_GetInput, getNotFoundOk, props.notfound_ok);
+        RIAK_REQ_PROP_SET_BOOL(Riak_Input_GetInput, getReturnDeletedVClock, props.deletedvclock);
         RIAK_CALL_METHOD(Riak_Input_GetInput, getIfModifiedVClock, &ztmp, zinput);
         if (Z_TYPE(ztmp) == IS_STRING) {
             props.if_modified_use = 1;

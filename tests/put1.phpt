@@ -11,15 +11,17 @@ try {
   // No key provieded
   $obj = new Object();
   $obj->setContent("dummy");
-  $obj = $bucket->put($obj);
-  if (is_null($obj->getKey()) || strlen($obj->getKey()) == 0) {
-    var_dump($obj);
+  $output = $bucket->put($obj);
+  if (is_null($output->getKey()) || strlen($output->getKey()) == 0) {
+    var_dump($output);
   }
+  $bucket->delete($output->getKey());
 
   $obj = new Object("dummy");
   $obj->setContentType("text/plain");
   $obj->setContent("test value that should get written");
   $bucket->put($obj);
+  $bucket->delete($obj);
   echo "done!";
 } catch (Exception $e) {
   echo $e->getMessage();

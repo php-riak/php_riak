@@ -176,7 +176,7 @@ PS_READ_FUNC(riak) /* {{{ */
     if (!EG(exception)) {
         zval *zobjarr;
         MAKE_STD_ZVAL(zobjarr);
-        RIAK_CALL_METHOD(Riak_Output_GetOutput, getObjectList, zobjarr, zoutput);
+        RIAK_CALL_METHOD(Riak_Output_Output, getObjectList, zobjarr, zoutput);
         if (Z_TYPE_P(zobjarr) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(zobjarr)) > 0) {
             zval **found = NULL;
             zend_hash_index_find(Z_ARRVAL_P(zobjarr), 0, (void**)&found);
