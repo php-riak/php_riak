@@ -293,18 +293,19 @@ PHP_METHOD(Riak_Search_Output_DocumentOutput, getFields)
 }
 
 /*************************************************************
-* Implementation: Riak\Search\Input\Parameters
+* Implementation: Riak\Search\Input\ParameterBag
 *************************************************************/
 
-/* {{{ proto void Riak\Search\Input\Parameters->setRowLimit(int $rowLimit)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setRowLimit(int $rowLimit)
 Set row limit for search */
 PHP_METHOD(Riak_Search_Input, setRowLimit)
 {
-    RIAK_SETTER_LONG(riak_search_input_ce, "rowLimit")
+    RIAK_SETTER_LONG(riak_search_input_ce, "rowLimit");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto int|null Riak\Search\Input\Parameters->getRowLimit()
+/* {{{ proto int|null Riak\Search\Input\ParameterBag->getRowLimit()
 Set row limit for search */
 PHP_METHOD(Riak_Search_Input, getRowLimit)
 {
@@ -312,15 +313,16 @@ PHP_METHOD(Riak_Search_Input, getRowLimit)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Search\Input\Parameters->setStartOffset(int $startOffset)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setStartOffset(int $startOffset)
 Set start offset for this search */
 PHP_METHOD(Riak_Search_Input, setStartOffset)
 {
-    RIAK_SETTER_LONG(riak_search_input_ce, "start")
+    RIAK_SETTER_LONG(riak_search_input_ce, "start");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto int|null Riak\Search\Input\Parameters->getStartOffset()
+/* {{{ proto int|null Riak\Search\Input\ParameterBag->getStartOffset()
 Get start offset */
 PHP_METHOD(Riak_Search_Input, getStartOffset)
 {
@@ -328,15 +330,16 @@ PHP_METHOD(Riak_Search_Input, getStartOffset)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Search\Input\Parameters->setSort(string $sort)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setSort(string $sort)
 Set the sort string */
 PHP_METHOD(Riak_Search_Input, setSort)
 {
     RIAK_SETTER_STRING(riak_search_input_ce, "sort");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto string|null Riak\Search\Input\Parameters->getSort()
+/* {{{ proto string|null Riak\Search\Input\ParameterBag->getSort()
 Get the sort string */
 PHP_METHOD(Riak_Search_Input, getSort)
 {
@@ -344,15 +347,16 @@ PHP_METHOD(Riak_Search_Input, getSort)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Search\Input\Parameters->setFilter(string $filter)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setFilter(string $filter)
 Set the filter string */
 PHP_METHOD(Riak_Search_Input, setFilter)
 {
     RIAK_SETTER_STRING(riak_search_input_ce, "filter");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto string|null Riak\Search\Input\Parameters->getFilter()
+/* {{{ proto string|null Riak\Search\Input\ParameterBag->getFilter()
 Get the filter string */
 PHP_METHOD(Riak_Search_Input, getFilter)
 {
@@ -360,15 +364,16 @@ PHP_METHOD(Riak_Search_Input, getFilter)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Search\Input\Parameters->setDefaultField(string $defaultField)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setDefaultField(string $defaultField)
 Set the default field name */
 PHP_METHOD(Riak_Search_Input, setDefaultField)
 {
     RIAK_SETTER_STRING(riak_search_input_ce, "defaultField");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto string|null Riak\Search\Input\Parameters->getDefaultField()
+/* {{{ proto string|null Riak\Search\Input\ParameterBag->getDefaultField()
 Get the default field name */
 PHP_METHOD(Riak_Search_Input, getDefaultField)
 {
@@ -376,15 +381,16 @@ PHP_METHOD(Riak_Search_Input, getDefaultField)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Search\Input\Parameters->setDefaultOperation(string $defaultOperation)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setDefaultOperation(string $defaultOperation)
 Set the default opereration */
 PHP_METHOD(Riak_Search_Input, setDefaultOperation)
 {
     RIAK_SETTER_STRING(riak_search_input_ce, "defaultOperation");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto string|null Riak\Search\Input\Parameters->getDefaultOperation()
+/* {{{ proto string|null Riak\Search\Input\ParameterBag->getDefaultOperation()
 Get the default operation */
 PHP_METHOD(Riak_Search_Input, getDefaultOperation)
 {
@@ -392,15 +398,16 @@ PHP_METHOD(Riak_Search_Input, getDefaultOperation)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Search\Input\Parameters->setPresort(string $presort)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setPresort(string $presort)
 Set the presort string */
 PHP_METHOD(Riak_Search_Input, setPresort)
 {
     RIAK_SETTER_STRING(riak_search_input_ce, "presort");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto string|null Riak\Search\Input\Parameters->getPresort()
+/* {{{ proto string|null Riak\Search\Input\ParameterBag->getPresort()
 Get the presort string */
 PHP_METHOD(Riak_Search_Input, getPresort)
 {
@@ -408,7 +415,7 @@ PHP_METHOD(Riak_Search_Input, getPresort)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Search\Input\Parameters->setFieldLimits(array $fieldLimits)
+/* {{{ proto Riak\Search\Input\ParameterBag Riak\Search\Input\ParameterBag->setFieldLimits(array $fieldLimits)
 Set field limits */
 PHP_METHOD(Riak_Search_Input, setFieldLimits)
 {
@@ -417,10 +424,11 @@ PHP_METHOD(Riak_Search_Input, setFieldLimits)
         return;
     }
     zend_update_property(riak_search_input_ce, getThis(), "fieldLimits", sizeof("fieldLimits")-1, zlimits TSRMLS_CC);
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
-/* {{{ proto array|null Riak\Search\Input\Parameters->getFieldLimits()
+/* {{{ proto array|null Riak\Search\Input\ParameterBag->getFieldLimits()
 Get the field limits array */
 PHP_METHOD(Riak_Search_Input, getFieldLimits)
 {

@@ -141,6 +141,7 @@ PHP_METHOD(Riak_MapReduce_Input_BucketInput, setIndexFilter)
     if (end != NULL && endlen > 0) {
         zend_update_property_stringl(riak_mrinput_bucket_ce, getThis(), "idxend", sizeof("idxend")-1, end, endlen TSRMLS_CC);
     }
+    RIAK_RETURN_THIS
 }
 
 /* {{{ proto string|array Riak\MapReduce\Input\BucketInput->getValue()
@@ -327,6 +328,7 @@ PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addSingle)
     } else {
         zend_throw_exception(riak_badarguments_exception_ce, "Key or bucketname missing", 5001 TSRMLS_CC);
     }
+    RIAK_RETURN_THIS
 }
 /* }}} */
 

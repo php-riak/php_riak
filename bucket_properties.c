@@ -83,6 +83,7 @@ PHP_METHOD(RiakBucketProperties, getNValue)
 PHP_METHOD(RiakBucketProperties, setNValue)
 {
     RIAK_SETTER_LONG(riak_bucket_properties_ce, "nVal")
+    RIAK_RETURN_THIS
 }
 
 PHP_METHOD(RiakBucketProperties, getAllowMult)
@@ -93,4 +94,5 @@ PHP_METHOD(RiakBucketProperties, getAllowMult)
 PHP_METHOD(RiakBucketProperties, setAllowMult)
 {
     RIAK_SETTER_BOOL(riak_bucket_properties_ce, "allowMult")
+    RIAK_RETURN_THIS
 }
