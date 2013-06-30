@@ -21,7 +21,7 @@ if test "$PHP_RIAK" != "no"; then
     mr_phase.c \
     mr_functions.c \
     mr_inputs.c \
-    mr_result.c \
+    mr_output.c \
     ht_utils.c \
     search.c \
     streaming.c \

@@ -33,7 +33,7 @@
 #include "mr_phase.h"
 #include "mr_functions.h"
 #include "mr_inputs.h"
-#include "mr_result.h"
+#include "mr_output.h"
 #include "streaming.h"
 #include "req_inputs.h"
 #include "req_outputs.h"
@@ -102,7 +102,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_mrphase_init(TSRMLS_C);
     riak_mrfunctions_init(TSRMLS_C);
     riak_mrinputs_init(TSRMLS_C);
-    riak_mrresult_init(TSRMLS_C);
+    riak_mroutput_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
     riak_stats_init(TSRMLS_C);

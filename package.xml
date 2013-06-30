@@ -56,8 +56,8 @@
             <file role="src" name="mr_inputs.h"/>
             <file role="src" name="mr_phase.c"/>
             <file role="src" name="mr_phase.h"/>
-            <file role="src" name="mr_result.c"/>
-            <file role="src" name="mr_result.h"/>
+            <file role="src" name="mr_output.c"/>
+            <file role="src" name="mr_output.h"/>
             <file role="src" name="object.c"/>
             <file role="src" name="object.h"/>
             <file role="src" name="php_riak.c"/>

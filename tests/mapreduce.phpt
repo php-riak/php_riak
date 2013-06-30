@@ -75,7 +75,8 @@ try {
         ->setInput($mrinput);
     $json = $mr->toJson();
     $result = $mr->run();
-    if ($result[0]->value[0]["the"] !== 8) {
+    $res0val = $result[0]->getValue();
+    if ($res0val[0]["the"] !== 8) {
         var_dump($result);
     }
 

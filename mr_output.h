@@ -15,18 +15,20 @@
    limitations under the License.
 */
 
-#ifndef RIAK_MR_RESULT__H__
-#define RIAK_MR_RESULT__H__
+#ifndef RIAK_MR_OUTPUT__H__
+#define RIAK_MR_OUTPUT__H__
 
 #include <php.h>
 #include <riack.h>
 
-extern zend_class_entry *riak_mrresult_ce;
+extern zend_class_entry *riak_mroutput_ce;
 
-zval *riak_mrresult_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC);
+zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC);
 
-void riak_mrresult_init(TSRMLS_D);
+void riak_mroutput_init(TSRMLS_D);
 
 PHP_METHOD(Riak_MapReduce_Output_Output, __construct);
+PHP_METHOD(Riak_MapReduce_Output_Output, getValue);
+PHP_METHOD(Riak_MapReduce_Output_Output, getPhaseNumber);
 
 #endif

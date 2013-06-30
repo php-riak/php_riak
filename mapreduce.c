@@ -17,7 +17,7 @@
 #include "mapreduce.h"
 #include "connection.h"
 #include "exceptions.h"
-#include "mr_result.h"
+#include "mr_output.h"
 #include "mr_inputs.h"
 #include "mr_phase.h"
 #include "ht_utils.h"
@@ -129,10 +129,10 @@ void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPR
     struct riak_mr_stream_params *params = (struct riak_mr_stream_params*)arg;
     ZVAL_STRING(&zfuncname, "receive", 0);
 #ifdef ZTS
-    zresponse = riak_mrresult_from_riack_mapred(response, params->tsrm_ls);
+    zresponse = riak_mroutput_from_riack_mapred(response, params->tsrm_ls);
     call_user_function(NULL, &params->zstreamer, &zfuncname, &zret, 1, &zresponse, params->tsrm_ls);
 #else
-    zresponse = riak_mrresult_from_riack_mapred(response);
+    zresponse = riak_mroutput_from_riack_mapred(response);
     call_user_function(NULL, &params->zstreamer, &zfuncname, &zret, 1, &zresponse);
 #endif
     zval_ptr_dtor(&zresponse);
@@ -179,7 +179,7 @@ PHP_METHOD(RiakMapreduce, run)
                 mapresult_iter = mapresult;
                 while (mapresult_iter) {
                     if (mapresult_iter->response.data != NULL && mapresult_iter->response.data_size > 0) {
-                        zval *add = riak_mrresult_from_riack_mapred(&mapresult_iter->response TSRMLS_CC);
+                        zval *add = riak_mroutput_from_riack_mapred(&mapresult_iter->response TSRMLS_CC);
                         add_next_index_zval(zresult, add);
                     }
                     mapresult_iter = mapresult_iter->next_result;

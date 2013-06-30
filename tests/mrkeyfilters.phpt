@@ -37,7 +37,7 @@ $mrres = $mr->run();
 // Should return 11 objects since we fetch 05-15 both inclusive
 $rescnt = 0;
 foreach ($mrres as $resp) {
-    $rescnt += count($resp->value);
+    $rescnt += count($resp->getValue());
 }
 if ($rescnt !== 11) {
     var_dump($result);
