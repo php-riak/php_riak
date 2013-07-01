@@ -26,7 +26,7 @@
 #include "bucket.h"
 #include "bucket_properties.h"
 #include "exceptions.h"
-#include "stats.h"
+#include "pool_info.h"
 #include "link.h"
 #include "riak_session.h"
 #include "mapreduce.h"
@@ -105,7 +105,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_mroutput_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
-    riak_stats_init(TSRMLS_C);
+    riak_poolinfo_init(TSRMLS_C);
     riak_streaming_init(TSRMLS_C);
     riak_req_inputs_init(TSRMLS_C);
     riak_req_outputs_init(TSRMLS_C);

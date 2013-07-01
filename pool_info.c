@@ -17,47 +17,47 @@
 #include <php.h>
 #include <riack.h>
 #include "php_riak.h"
-#include "stats.h"
+#include "pool_info.h"
 
-zend_class_entry *riak_stats_ce;
+zend_class_entry *riak_poolinfo_ce;
 
-static zend_function_entry riak_stats_methods[] = {
-	PHP_ME(RiakStats, activeConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
-	PHP_ME(RiakStats, activePersistentConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
-	PHP_ME(RiakStats, getNumReconnects, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+static zend_function_entry riak_pool_info_methods[] = {
+    PHP_ME(RiakPoolInfo, activeConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+    PHP_ME(RiakPoolInfo, activePersistentConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+    PHP_ME(RiakPoolInfo, getNumReconnects, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
-/* {{{ proto int RiakStats::activeConnections()
+/* {{{ proto int Riak\PoolInfo::activeConnections()
 Returns number of active riak connections */
-PHP_METHOD(RiakStats, activeConnections)
+PHP_METHOD(RiakPoolInfo, activeConnections)
 {
 	RETURN_LONG(RIAK_GLOBAL(open_connections));
 }
 /* }}} */
 
-/* {{{ proto int RiakStats::activePersistentConnections()
+/* {{{ proto int Riak\PoolInfo::activePersistentConnections()
 Returns number of active persistent riak connections */
-PHP_METHOD(RiakStats, activePersistentConnections)
+PHP_METHOD(RiakPoolInfo, activePersistentConnections)
 {
 	RETURN_LONG(RIAK_GLOBAL(open_connections_persistent));
 }
 /* }}} */
 
-/* {{{ proto int RiakStats::getNumReconnects()
+/* {{{ proto int Riak\PoolInfo::getNumReconnects()
 How many reconnections has been performed, persistent and nonpersistent */
-PHP_METHOD(RiakStats, getNumReconnects)
+PHP_METHOD(RiakPoolInfo, getNumReconnects)
 {
 	long reconnects = RIAK_GLOBAL(reconnects);
 	RETURN_LONG(reconnects);
 }
 /* }}} */
 
-void riak_stats_init(TSRMLS_D) /* {{{ */
+void riak_poolinfo_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;
  
-	INIT_CLASS_ENTRY(ce, "RiakStats", riak_stats_methods);
-	riak_stats_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    INIT_NS_CLASS_ENTRY(ce, "Riak", "PoolInfo", riak_pool_info_methods);
+    riak_poolinfo_ce = zend_register_internal_class(&ce TSRMLS_CC);
 }
 /* }}} */

@@ -15,7 +15,7 @@ if test "$PHP_RIAK" != "no"; then
     bucket_properties.c \
     pool.c \
     link.c \
-    stats.c \
+    pool_info.c \
     riak_session.c \
     mapreduce.c \
     mr_phase.c \

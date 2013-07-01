@@ -15,15 +15,15 @@
    limitations under the License.
 */
 
-#ifndef RIAK_STATS__H__
-#define RIAK_STATS__H__
+#ifndef RIAK_POOL_INFO__H__
+#define RIAK_POOL_INFO__H__
 
-extern zend_class_entry *riak_stats_ce;
+extern zend_class_entry *riak_poolinfo_ce;
 
-PHP_METHOD(RiakStats, activeConnections);
-PHP_METHOD(RiakStats, activePersistentConnections);
-PHP_METHOD(RiakStats, getNumReconnects);
+PHP_METHOD(RiakPoolInfo, activeConnections);
+PHP_METHOD(RiakPoolInfo, activePersistentConnections);
+PHP_METHOD(RiakPoolInfo, getNumReconnects);
 
-void riak_stats_init(TSRMLS_D);
+void riak_poolinfo_init(TSRMLS_D);
 
 #endif

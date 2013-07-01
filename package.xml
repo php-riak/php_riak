@@ -69,8 +69,8 @@
             <file role="src" name="riak_session.h"/>
             <file role="src" name="search.c"/>
             <file role="src" name="search.h"/>
-            <file role="src" name="stats.c"/>
-            <file role="src" name="stats.h"/>
+            <file role="src" name="pool_info.c"/>
+            <file role="src" name="pool_info.h"/>
             <file role="src" name="streaming.c"/>
             <file role="src" name="streaming.h"/>
             <file role="src" name="req_inputs.c"/>
@@ -130,7 +130,7 @@
                 <file name="mapreduce.phpt" role="test" />
                 <file name="mrkeyfilters.phpt" role="test" />
                 <file name="put1.phpt" role="test" />
-                <file name="stats.phpt" role="test" />
+                <file name="pool_info.phpt" role="test" />
                 <file name="indexquery.phpt" role="test" />
                 <file name="metadata.phpt" role="test" />
                 <file name="mrphase.phpt" role="test" />

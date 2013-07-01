@@ -1,30 +1,30 @@
 --TEST--
-Test connection pool accepts limits
+Test Riak\PoolInfo class
 --INI--
+riak.persistent.timeout=10000
 riak.persistent.connections=20
-riak.persistent.timeout=2000
 --FILE--
 <?php
 include_once "connect.inc";
-
 echo \Riak\PoolInfo::activeConnections().PHP_EOL;
-$clients = array();
-for ($i=0; $i<25; ++$i) {
-	$clients[] = new \Riak\Connection($host, $port);
-}
+$client = new \Riak\Connection($host, $port);
 echo \Riak\PoolInfo::activeConnections().PHP_EOL;
 echo \Riak\PoolInfo::activePersistentConnections().PHP_EOL;
-
-$clients = NULL;
-
+$client2 = new \Riak\Connection($host, $port);
+echo \Riak\PoolInfo::activeConnections().PHP_EOL;
+echo \Riak\PoolInfo::activePersistentConnections().PHP_EOL;
+$client = NULL;
+$client2 = NULL;
 echo \Riak\PoolInfo::activeConnections().PHP_EOL;
 echo \Riak\PoolInfo::activePersistentConnections().PHP_EOL;
 echo \Riak\PoolInfo::getNumReconnects().PHP_EOL;
 ?>
 --EXPECT--
 0
-25
-20
+1
+1
+2
+2
 0
 0
 0
