@@ -9,7 +9,7 @@ $c = new \Riak\Connection($host, $port);
 $c->ping();
 sleep(3);
 $c->ping();
-echo \Riak\PoolInfo::getNumReconnects().PHP_EOL;
+echo \Riak\PoolInfo::getNumReconnect().PHP_EOL;
 ?>
 --EXPECT--
 1

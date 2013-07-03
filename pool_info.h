@@ -20,9 +20,9 @@
 
 extern zend_class_entry *riak_poolinfo_ce;
 
-PHP_METHOD(RiakPoolInfo, activeConnections);
-PHP_METHOD(RiakPoolInfo, activePersistentConnections);
-PHP_METHOD(RiakPoolInfo, getNumReconnects);
+PHP_METHOD(RiakPoolInfo, getNumActiveConnection);
+PHP_METHOD(RiakPoolInfo, getNumActivePersistentConnection);
+PHP_METHOD(RiakPoolInfo, getNumReconnect);
 
 void riak_poolinfo_init(TSRMLS_D);
 

@@ -22,31 +22,31 @@
 zend_class_entry *riak_poolinfo_ce;
 
 static zend_function_entry riak_pool_info_methods[] = {
-    PHP_ME(RiakPoolInfo, activeConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
-    PHP_ME(RiakPoolInfo, activePersistentConnections, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
-    PHP_ME(RiakPoolInfo, getNumReconnects, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+    PHP_ME(RiakPoolInfo, getNumActiveConnection, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+    PHP_ME(RiakPoolInfo, getNumActivePersistentConnection, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
+    PHP_ME(RiakPoolInfo, getNumReconnect, NULL, ZEND_ACC_STATIC | ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
-/* {{{ proto int Riak\PoolInfo::activeConnections()
+/* {{{ proto int Riak\PoolInfo::getNumActiveConnection()
 Returns number of active riak connections */
-PHP_METHOD(RiakPoolInfo, activeConnections)
+PHP_METHOD(RiakPoolInfo, getNumActiveConnection)
 {
 	RETURN_LONG(RIAK_GLOBAL(open_connections));
 }
 /* }}} */
 
-/* {{{ proto int Riak\PoolInfo::activePersistentConnections()
+/* {{{ proto int Riak\PoolInfo::getNumActivePersistentConnection()
 Returns number of active persistent riak connections */
-PHP_METHOD(RiakPoolInfo, activePersistentConnections)
+PHP_METHOD(RiakPoolInfo, getNumActivePersistentConnection)
 {
 	RETURN_LONG(RIAK_GLOBAL(open_connections_persistent));
 }
 /* }}} */
 
-/* {{{ proto int Riak\PoolInfo::getNumReconnects()
+/* {{{ proto int Riak\PoolInfo::getNumReconnect()
 How many reconnections has been performed, persistent and nonpersistent */
-PHP_METHOD(RiakPoolInfo, getNumReconnects)
+PHP_METHOD(RiakPoolInfo, getNumReconnect)
 {
 	long reconnects = RIAK_GLOBAL(reconnects);
 	RETURN_LONG(reconnects);
