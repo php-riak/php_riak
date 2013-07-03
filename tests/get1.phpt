@@ -17,10 +17,14 @@ try {
         $cfg = new GetInput();
         $cfg->setReturnHead(true);
         $output = $bucket->get("get_head", $cfg);
-        $objs = $output->getObjectList();
-        if (!is_null($objs[0]->getContent()) && strlen($objs[0]->getContent() > 0)) {
+        if (!$output->hasObject()) {
+            echo "Output did not contain an object".PHP_EOL;
+            var_dump($output);
+        }
+        $obj = $output->getFirstObject();
+        if (!is_null($obj->getContent()) && strlen($obj->getContent() > 0)) {
             echo "Did not expect returned object to have data, when return_head is set".PHP_EOL;
-            var_dump($objs);
+            var_dump($obj);
         }
         $obj = new \Riak\Object("get_test");
         $obj->setContentType("text/plain");
@@ -32,9 +36,9 @@ try {
             echo "Did not expect siblings".PHP_EOL;
             var_dump($output);
         }
-        $objs = $output->getObjectList();
-        $meta0 = $objs[0]->getMetadataMap();
-        if (strcmp($objs[0]->getContent(), $obj->getContent()) == 0 || strcmp($meta0["test"], "test") !== 0 ) {
+        $readdenObj = $output->getFirstObject();
+        $meta = $readdenObj->getMetadataMap();
+        if (strcmp($readdenObj->getContent(), $obj->getContent()) == 0 || strcmp($meta["test"], "test") !== 0 ) {
 		echo "success!";
 	}
 } catch (Exception $e) {

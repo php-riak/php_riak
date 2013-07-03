@@ -30,6 +30,8 @@ static zend_function_entry riak_output_methods[] = {
     PHP_ME(Riak_Output_Output, getVClock, arginfo_riak_output_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Output_Output, getKey, arginfo_riak_output_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Output_Output, hasSiblings, arginfo_riak_output_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Output_Output, hasObject, arginfo_riak_output_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Output_Output, getFirstObject, arginfo_riak_output_noargs, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -158,6 +160,40 @@ PHP_METHOD(Riak_Output_Output, hasSiblings)
         }
     }
     RETURN_BOOL(0);
+}
+/* }}} */
+
+/* {{{ proto bool Riak\Output\Output->hasObject()
+Does this output have atleast one object */
+PHP_METHOD(Riak_Output_Output, hasObject)
+{
+    zval* zlist = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(zlist) == IS_ARRAY) {
+        int elems = zend_hash_num_elements(Z_ARRVAL_P(zlist));
+        if (elems > 0) {
+            RETURN_BOOL(1);
+        }
+    }
+    RETURN_BOOL(0);
+}
+/* }}} */
+
+/* {{{ proto Riak\Object|null Riak\Output\Output->getFirstObject()
+Get first object in objectlist */
+PHP_METHOD(Riak_Output_Output, getFirstObject)
+{
+    // TODO
+    zval* zlist = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(zlist) == IS_ARRAY) {
+        int elems = zend_hash_num_elements(Z_ARRVAL_P(zlist));
+        if (elems > 0) {
+            zval **zfirst;
+            if (zend_hash_index_find(Z_ARRVAL_P(zlist), 0, (void**)&zfirst) == SUCCESS) {
+                RETURN_ZVAL(*zfirst, 1, 0);
+            }
+        }
+    }
+    RETURN_NULL();
 }
 /* }}} */
 
