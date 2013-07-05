@@ -357,11 +357,14 @@ PHP_METHOD(RiakBucket, delete)
         RIAK_REQ_PROP_SET_LONG(Riak_Input_DeleteInput, getPW, props.pw);
         RIAK_CALL_METHOD(Riak_Input_DeleteInput, getVClock, &ztmp, zinput);
         if (Z_TYPE(ztmp) == IS_STRING) {
-            props.vclock.len = Z_STRLEN(ztmp);
-            props.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
+            RMALLOCCOPY(connection->client, props.vclock.clock, props.vclock.len, Z_STRVAL(ztmp), Z_STRLEN(ztmp));
+            zval_dtor(&ztmp);
         }
     }
 	riackResult = riack_delete(connection->client, bucketName, key, &props);
+    if (props.vclock.clock) {
+        RFREE(connection->client, props.vclock.clock);
+    }
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
 /* }}} */
@@ -403,8 +406,8 @@ PHP_METHOD(RiakBucket, put)
         RIAK_REQ_PROP_SET_LONG(Riak_Input_PutInput, getPW, props.pw);
         RIAK_CALL_METHOD(Riak_Input_PutInput, getVClock, &ztmp, zinput);
         if (Z_TYPE(ztmp) == IS_STRING) {
-            obj.vclock.len = Z_STRLEN(ztmp);
-            obj.vclock.clock = (uint8_t*)Z_STRVAL(ztmp);
+            RMALLOCCOPY(connection->client, obj.vclock.clock, obj.vclock.len, Z_STRVAL(ztmp), Z_STRLEN(ztmp));
+            zval_dtor(&ztmp);
         }
     }
     /* Set bucket name */
@@ -418,6 +421,9 @@ PHP_METHOD(RiakBucket, put)
         obj.key.value = 0;
     }
 	riackResult = riack_put(connection->client, obj, &returnedObj, &props);
+    if (obj.vclock.clock) {
+        RFREE(connection->client, obj.vclock.clock);
+    }
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
     // Now make put output from the response
@@ -469,8 +475,8 @@ PHP_METHOD(RiakBucket, get)
         RIAK_CALL_METHOD(Riak_Input_GetInput, getIfModifiedVClock, &ztmp, zinput);
         if (Z_TYPE(ztmp) == IS_STRING) {
             props.if_modified_use = 1;
-            props.if_modified.len = Z_STRLEN(ztmp);
-            props.if_modified.clock = (uint8_t*)Z_STRVAL(ztmp);
+            RMALLOCCOPY(connection->client, props.if_modified.clock, props.if_modified.len, Z_STRVAL(ztmp), Z_STRLEN(ztmp));
+            zval_dtor(&ztmp);
         }
     }
 
@@ -478,6 +484,9 @@ PHP_METHOD(RiakBucket, get)
 	rsKey.len = keyLen;
 	rsKey.value = key;
 	riackResult = riack_get(connection->client, rsBucket, rsKey, &props, &getResult);
+    if (props.if_modified.clock) {
+        RFREE(connection->client, props.if_modified.clock);
+    }
     if (riackResult == RIACK_SUCCESS) {
         contentCount = getResult.object.content_count;
         if (contentCount > 0) {
