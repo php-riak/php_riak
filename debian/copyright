@@ -1,0 +1,20 @@
+This package was debianized by Andras Elso <elso.andras@gmail.com>
+on Mon, 05 Aug 2013 11:02:34 +0200.
+
+It was downloaded from http://pecl.php.net/package/riak
+
+Upstream Author(s):
+
+    Kaspar Bach Pedersen
+
+Copyright:
+
+    Copyright (C) 2013 Kaspar Bach Pedersen
+
+License:
+
+    Apache 2
+
+The Debian packaging is copyright 2009, Andras Elso <elso.andras@gmail.com> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+
