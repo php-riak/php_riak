@@ -1,0 +1,16 @@
+Source: php-riak
+Section: web
+Priority: optional
+Maintainer: Kaspar Pedersen <kaspar@inka-apps.com>
+Build-Depends: debhelper (>= 7), po-debconf, php5-dev
+Standards-Version: 3.8.1
+
+Package: php5-riak
+Architecture: any
+Depends: ${shlibs:Depends}, ${php:Depends}, ${misc:Depends}
+Description: riak module for PHP 5
+ Riak database PHP extension
+ .
+ Fast protocol buffers client for Riak database and session module.
+
+
