@@ -1,3 +1,9 @@
+php-riak (0.5.0-2) unstable; urgency=low
+
+  * Typofix: install riak.ini to the proper directory
+
+ -- Andras Elso <elso.andras@gmail.com>  Thu, 29 Aug 2013 11:43:26 +0200
+
 php-riak (0.5.0-1) unstable; urgency=low
 
   * Initial Release.
