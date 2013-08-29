@@ -46,7 +46,7 @@ install:
 	dh_prep
 	$(MAKE) install INSTALL_ROOT=$(DESTDIR)
 	install -D -m 644 debian/riak.ini \
-		debian/php5-riak/etc/php5/mods-available/riak.ini
+		debian/php5-riak/etc/php5/conf.d/riak.ini
 
 check: build
 	$(MAKE) test
