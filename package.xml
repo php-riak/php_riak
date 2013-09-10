@@ -15,10 +15,10 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-07-05</date>
-    <time>19:00:00</time>
+    <date>2013-09-10</date>
+    <time>07:50:00</time>
     <version>
-        <release>0.5.0</release>
+        <release>0.5.1</release>
         <api>0.5.0</api>
     </version>
     <stability>
@@ -152,6 +152,19 @@ We will avoid breaking API changes from now on.
     <extsrcrelease />
     <changelog>
     <release>
+    <release>
+        <version>
+            <release>0.5.1</release>
+            <api>0.5.0</api>
+        </version>
+        <stability>
+            <release>beta</release>
+            <api>beta</api>
+        </stability>
+        <date>2013-09-10</date>
+        <license>Apache2</license>
+        <notes>Bugfix release</notes>
+    </release>
         <version>
             <release>0.5.0</release>
             <api>0.5.0</api>
@@ -166,6 +179,10 @@ We will avoid breaking API changes from now on.
         We will avoid breaking API changes from now on.</notes>
     </release>
         <release>
+            <version>
+                <release>0.4.3</release>
+                <api>0.4.3</api>
+            </version>
             <version>
                 <release>0.4.3</release>
                 <api>0.4.3</api>
