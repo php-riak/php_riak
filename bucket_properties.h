@@ -28,5 +28,26 @@ PHP_METHOD(RiakBucketProperties, getNValue);
 PHP_METHOD(RiakBucketProperties, setNValue);
 PHP_METHOD(RiakBucketProperties, getAllowMult);
 PHP_METHOD(RiakBucketProperties, setAllowMult);
-
+PHP_METHOD(RiakBucketProperties, getLastWriteWins);
+PHP_METHOD(RiakBucketProperties, setLastWriteWins);
+PHP_METHOD(RiakBucketProperties, getOldVClock);
+PHP_METHOD(RiakBucketProperties, setOldVClock);
+PHP_METHOD(RiakBucketProperties, getYoungVClock);
+PHP_METHOD(RiakBucketProperties, setYoungVClock);
+PHP_METHOD(RiakBucketProperties, getSmallVClock);
+PHP_METHOD(RiakBucketProperties, setSmallVClock);
+PHP_METHOD(RiakBucketProperties, getBigVClock);
+PHP_METHOD(RiakBucketProperties, setBigVClock);
+PHP_METHOD(RiakBucketProperties, getR);
+PHP_METHOD(RiakBucketProperties, setR);
+PHP_METHOD(RiakBucketProperties, getPR);
+PHP_METHOD(RiakBucketProperties, setPR);
+PHP_METHOD(RiakBucketProperties, getW);
+PHP_METHOD(RiakBucketProperties, setW);
+PHP_METHOD(RiakBucketProperties, getDW);
+PHP_METHOD(RiakBucketProperties, setDW);
+PHP_METHOD(RiakBucketProperties, getPW);
+PHP_METHOD(RiakBucketProperties, setPW);
+PHP_METHOD(RiakBucketProperties, getRW);
+PHP_METHOD(RiakBucketProperties, setRW);
 #endif
