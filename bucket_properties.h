@@ -21,6 +21,7 @@
 extern zend_class_entry *riak_bucket_properties_ce;
 
 void riak_bucket_props_init(TSRMLS_D);
+void riak_bucket_props_init(TSRMLS_D);
 
 PHP_METHOD(RiakBucketProperties, __construct);
 
@@ -50,4 +51,34 @@ PHP_METHOD(RiakBucketProperties, getPW);
 PHP_METHOD(RiakBucketProperties, setPW);
 PHP_METHOD(RiakBucketProperties, getRW);
 PHP_METHOD(RiakBucketProperties, setRW);
+
+PHP_METHOD(RiakBucketProperties, getBasicQuorum);
+PHP_METHOD(RiakBucketProperties, setBasicQuorum);
+PHP_METHOD(RiakBucketProperties, getNotFoundOk);
+PHP_METHOD(RiakBucketProperties, setNotFoundOk);
+PHP_METHOD(RiakBucketProperties, getSearchEnabled);
+PHP_METHOD(RiakBucketProperties, setSearchEnabled);
+PHP_METHOD(RiakBucketProperties, setBackend);
+PHP_METHOD(RiakBucketProperties, getBackend);
+
+PHP_METHOD(RiakModuleFunction, __construct);
+PHP_METHOD(RiakModuleFunction, getModule);
+PHP_METHOD(RiakModuleFunction, setModule);
+PHP_METHOD(RiakModuleFunction, getFunction);
+PHP_METHOD(RiakModuleFunction, setFunction);
+
+PHP_METHOD(RiakCommitHook, __construct);
+PHP_METHOD(RiakCommitHook, getName);
+PHP_METHOD(RiakCommitHook, setName);
+PHP_METHOD(RiakCommitHook, getModuleFunction);
+PHP_METHOD(RiakCommitHook, setModuleFunction);
+
+PHP_METHOD(RiakCommitHookList, __construct);
+PHP_METHOD(RiakCommitHookList, offsetExists);
+PHP_METHOD(RiakCommitHookList, offsetGet);
+PHP_METHOD(RiakCommitHookList, offsetSet);
+PHP_METHOD(RiakCommitHookList, offsetUnset);
+PHP_METHOD(RiakCommitHookList, count);
+PHP_METHOD(RiakCommitHookList, getIterator);
+
 #endif
