@@ -49,6 +49,13 @@
         zend_update_property(riak_delete_input_ce, CLIENT, NAME, sizeof(NAME)-1, *ZPP TSRMLS_CC); \
     }
 
+PS_OPEN_FUNC(riak);
+PS_CLOSE_FUNC(riak);
+PS_READ_FUNC(riak);
+PS_WRITE_FUNC(riak);
+PS_DESTROY_FUNC(riak);
+PS_GC_FUNC(riak);
+
 ps_module ps_mod_riak = {
 	PS_MOD(riak)
 };
