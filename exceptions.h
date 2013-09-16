@@ -26,10 +26,8 @@ extern zend_class_entry *riak_connection_exception_ce;
 extern zend_class_entry *riak_communication_exception_ce;
 extern zend_class_entry *riak_response_exception_ce;
 
-extern zend_class_entry *riak_conflicted_object_exception_ce;
 extern zend_class_entry *riak_not_found_exception_ce;
-void riak_exceptions_init(TSRMLS_D);
 
-PHP_METHOD(RiakConflictedObjectException, __construct);
+void riak_exceptions_init(TSRMLS_D);
 
 #endif
