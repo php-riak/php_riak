@@ -24,17 +24,11 @@ zend_class_entry *riak_badarguments_exception_ce;
 zend_class_entry *riak_connection_exception_ce;
 zend_class_entry *riak_communication_exception_ce;
 zend_class_entry *riak_response_exception_ce;
-zend_class_entry *riak_conflicted_object_exception_ce;
 zend_class_entry *riak_not_found_exception_ce;
-
-static zend_function_entry riak_conflicted_exception_methods[] = {
-	PHP_ME(RiakConflictedObjectException, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	{NULL, NULL, NULL}
-};
 
 void riak_exceptions_init(TSRMLS_D) 
 {
-	zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc, ceConflict, ceNotFound;
+	zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc, ceNotFound;
 
     INIT_NS_CLASS_ENTRY(ceRiak, "Riak\\Exception", "RiakException", NULL);
 	riak_exception_ce = zend_register_internal_class_ex(&ceRiak, 
@@ -60,23 +54,4 @@ void riak_exceptions_init(TSRMLS_D)
 	riak_not_found_exception_ce = zend_register_internal_class_ex(&ceNotFound, 
 		riak_exception_ce, NULL TSRMLS_CC);
 
-    INIT_NS_CLASS_ENTRY(ceConflict, "Riak\\Exception", "ConflictedObjectException", riak_conflicted_exception_methods);
-	riak_conflicted_object_exception_ce = zend_register_internal_class_ex(&ceConflict, 
-		riak_exception_ce, NULL TSRMLS_CC);
-
-	zend_declare_property_null(riak_conflicted_object_exception_ce, "vclock", sizeof("vclock")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(riak_conflicted_object_exception_ce, "objects", sizeof("objects")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-}
-
-PHP_METHOD(RiakConflictedObjectException, __construct)
-{
-	char *vclock;
-	int vclock_len;
-	zval *arr_objects;
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", &vclock, &vclock_len, &arr_objects) == FAILURE) {
-		return;
-	}
-	zend_update_property_stringl(riak_conflicted_object_exception_ce, getThis(), 
-		"vclock", sizeof("vclock")-1, vclock, vclock_len TSRMLS_CC);
-	zend_update_property(riak_conflicted_object_exception_ce, getThis(), "objects", sizeof("objects")-1, arr_objects TSRMLS_CC);
 }
