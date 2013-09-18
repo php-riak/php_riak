@@ -161,6 +161,13 @@ static zend_function_entry riak_bucket_properties_methods[] = {
     PHP_ME(RiakBucketProperties, setSearchEnabled, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucketProperties, getBackend, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucketProperties, setBackend, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, getPreCommitHookList, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, setPreCommitHookList, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, getPostCommitHookList, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, setPostCommitHookList, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, getCHashKeyFun, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, setCHashKeyFun, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
+
 	{NULL, NULL, NULL}
 };
 
@@ -189,8 +196,9 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "notFoundOk", sizeof("notFoundOk")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "searchEnabled", sizeof("searchEnabled")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "backend", sizeof("backend")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-
-    //zend_declare_property_null(riak_bucket_properties_ce, "precommit_hooks", sizeof("precommit_hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "precommit_hooks", sizeof("precommit_hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "postcommit_hooks", sizeof("precommit_hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "chash_key_fun", sizeof("chash_key_fun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "ModuleFunction", riak_module_function_methods);
     riak_module_function_ce = zend_register_internal_class(&ce TSRMLS_CC);
@@ -276,7 +284,10 @@ PHP_METHOD(RiakCommitHookList, count)
 
 PHP_METHOD(RiakCommitHookList, getIterator)
 {
-    // TODO Create and return a new array iterator
+    zval *zhooks, *zresult;
+    zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
+    zend_call_method_with_0_params(&zhooks, spl_ce_ArrayObject, NULL, "getiterator", &zresult);
+    RETURN_ZVAL(zresult, 0, 1);
 }
 
 /* {{{ proto void Riak\Property\ModuleFunction->__construct(string $module, string $function)
@@ -360,12 +371,16 @@ Creates a new RiakBucketProperties */
 PHP_METHOD(RiakBucketProperties, __construct)
 {
 	long nVal;
-	zend_bool allowMult;
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lb", &nVal, &allowMult) == FAILURE) {
+    zend_bool allowMult;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|lb", &nVal, &allowMult) == FAILURE) {
 		return;
 	}
-	zend_update_property_long(riak_bucket_properties_ce, getThis(), "nVal", sizeof("nVal")-1, nVal TSRMLS_CC);
-	zend_update_property_bool(riak_bucket_properties_ce, getThis(), "allowMult", sizeof("allowMult")-1, allowMult TSRMLS_CC);
+    if (ZEND_NUM_ARGS() >= 1) {
+        zend_update_property_long(riak_bucket_properties_ce, getThis(), "nVal", sizeof("nVal")-1, nVal TSRMLS_CC);
+    }
+    if (ZEND_NUM_ARGS() == 2) {
+        zend_update_property_bool(riak_bucket_properties_ce, getThis(), "allowMult", sizeof("allowMult")-1, allowMult TSRMLS_CC);
+    }
 }
 /* }}} */
 
@@ -555,3 +570,55 @@ PHP_METHOD(RiakBucketProperties, setBackend)
     RIAK_SETTER_STRING(riak_bucket_properties_ce, "backend")
     RIAK_RETURN_THIS
 }
+
+
+PHP_METHOD(RiakBucketProperties, getPreCommitHookList)
+{
+    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "precommit_hooks")
+}
+
+PHP_METHOD(RiakBucketProperties, setPreCommitHookList)
+{
+    zval* zhooks;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zhooks, riak_commit_hook_list_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "", 501 TSRMLS_CC);
+        return;
+    }
+    zend_update_property(riak_bucket_properties_ce, getThis(), "precommit_hooks", sizeof("precommit_hooks")-1, zhooks TSRMLS_CC);
+    RIAK_RETURN_THIS
+}
+
+
+PHP_METHOD(RiakBucketProperties, getPostCommitHookList)
+{
+    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "postcommit_hooks")
+}
+
+PHP_METHOD(RiakBucketProperties, setPostCommitHookList)
+{
+    zval* zhooks;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zhooks, riak_commit_hook_list_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "", 501 TSRMLS_CC);
+        return;
+    }
+    zend_update_property(riak_bucket_properties_ce, getThis(), "postcommit_hooks", sizeof("postcommit_hooks")-1, zhooks TSRMLS_CC);
+    RIAK_RETURN_THIS
+}
+
+PHP_METHOD(RiakBucketProperties, getCHashKeyFun)
+{
+    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "chash_key_fun")
+}
+
+PHP_METHOD(RiakBucketProperties, setCHashKeyFun)
+{
+    zval* zhooks;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zhooks, riak_module_function_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "", 501 TSRMLS_CC);
+        return;
+    }
+    zend_update_property(riak_bucket_properties_ce, getThis(), "chash_key_fun", sizeof("chash_key_fun")-1, zhooks TSRMLS_CC);
+    RIAK_RETURN_THIS
+}
+
+

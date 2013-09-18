@@ -60,6 +60,12 @@ PHP_METHOD(RiakBucketProperties, getSearchEnabled);
 PHP_METHOD(RiakBucketProperties, setSearchEnabled);
 PHP_METHOD(RiakBucketProperties, setBackend);
 PHP_METHOD(RiakBucketProperties, getBackend);
+PHP_METHOD(RiakBucketProperties, setPreCommitHookList);
+PHP_METHOD(RiakBucketProperties, getPreCommitHookList);
+PHP_METHOD(RiakBucketProperties, setPostCommitHookList);
+PHP_METHOD(RiakBucketProperties, getPostCommitHookList);
+PHP_METHOD(RiakBucketProperties, setCHashKeyFun);
+PHP_METHOD(RiakBucketProperties, getCHashKeyFun);
 
 PHP_METHOD(RiakModuleFunction, __construct);
 PHP_METHOD(RiakModuleFunction, getModule);
