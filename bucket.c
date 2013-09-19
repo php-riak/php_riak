@@ -335,7 +335,7 @@ PHP_METHOD(RiakBucket, getPropertyList)
 	riak_connection *connection;
     RIACK_STRING bucketName;
     int riackResult;
-    zval *ztmp, zdummy, *zbucket_props;
+    zval *ztmp, *zbucket_props;
 
     connection = get_riak_connection(getThis() TSRMLS_CC);
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
@@ -346,42 +346,23 @@ PHP_METHOD(RiakBucket, getPropertyList)
     // TODO get all the properties...
     MAKE_STD_ZVAL(zbucket_props);
     object_init_ex(zbucket_props, riak_bucket_properties_ce);
-    RIAK_CALL_METHOD(RiakBucketProperties, __construct, zbucket_props, zbucket_props);
+    RIAK_CALL_METHOD(RiakBucketProperties, __construct, NULL, zbucket_props);
 
     if (properties->n_val_use) {
-        //classname, name, retval, thisptr, param1
         MAKE_STD_ZVAL(ztmp);
         ZVAL_LONG(ztmp, properties->n_val);
-        RIAK_CALL_METHOD1(RiakBucketProperties, setNValue, &zdummy, zbucket_props, ztmp);
+        RIAK_CALL_METHOD1(RiakBucketProperties, setNValue, zbucket_props, zbucket_props, ztmp);
         zval_ptr_dtor(&ztmp);
     }
     if (properties->allow_mult_use) {
-        //classname, name, retval, thisptr, param1
         MAKE_STD_ZVAL(ztmp);
         ZVAL_BOOL(ztmp, properties->allow_mult);
-        RIAK_CALL_METHOD1(RiakBucketProperties, setNValue, &zdummy, zbucket_props, ztmp);
+        RIAK_CALL_METHOD1(RiakBucketProperties, setAllowMult, zbucket_props, zbucket_props, ztmp);
         zval_ptr_dtor(&ztmp);
     }
 
     riack_free_bucket_properties(connection->client, &properties);
-
-    RETVAL_ZVAL(zbucket_props, 0, 1);
-
-    // TODO remove below
-/*
-    MAKE_STD_ZVAL(zNVal);
-    ZVAL_LONG(zNVal, nVal);
-
-    MAKE_STD_ZVAL(zAllowMult);
-    ZVAL_BOOL(zAllowMult, allowMult);
-
-    MAKE_STD_ZVAL(zBucketProps);
-    object_init_ex(zBucketProps, riak_bucket_properties_ce);
-    RIAK_CALL_METHOD2(RiakBucketProperties, __construct, zBucketProps, zBucketProps, zNVal, zAllowMult);
-    RETVAL_ZVAL(zBucketProps, 0, 1);
-
-    zval_ptr_dtor(&zNVal);
-    zval_ptr_dtor(&zAllowMult);*/
+    RETURN_ZVAL(zbucket_props, 0, 1);
 }
 /* }}} */
 

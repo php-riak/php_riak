@@ -29,7 +29,7 @@ zend_class_entry *riak_module_function_ce;
 zend_class_entry *riak_commit_hook_ce;
 zend_class_entry *riak_commit_hook_list_ce;
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_ctor, 0, ZEND_RETURN_VALUE, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_ctor, 0, ZEND_RETURN_VALUE, 0)
     ZEND_ARG_INFO(0, nVal)
     ZEND_ARG_INFO(0, allowMult)
 ZEND_END_ARG_INFO()
@@ -178,8 +178,8 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     INIT_NS_CLASS_ENTRY(ce, "Riak", "BucketPropertyList", riak_bucket_properties_methods);
 	riak_bucket_properties_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
-    zend_declare_property_long(riak_bucket_properties_ce, "nVal", sizeof("nVal")-1, 3, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_bool(riak_bucket_properties_ce, "allowMult", sizeof("allowMult")-1, 0, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "nVal", sizeof("nVal")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "allowMult", sizeof("allowMult")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
     zend_declare_property_null(riak_bucket_properties_ce, "lastWriteWins", sizeof("lastWriteWins")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "oldVClock", sizeof("oldVClock")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
@@ -196,14 +196,14 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "notFoundOk", sizeof("notFoundOk")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "searchEnabled", sizeof("searchEnabled")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "backend", sizeof("backend")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_properties_ce, "precommit_hooks", sizeof("precommit_hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_properties_ce, "postcommit_hooks", sizeof("precommit_hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "preCommitHooks", sizeof("preCommitHooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "postcommit_hooks", sizeof("postcommit_hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "chash_key_fun", sizeof("chash_key_fun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "ModuleFunction", riak_module_function_methods);
     riak_module_function_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_properties_ce, "module", sizeof("module")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_properties_ce, "function", sizeof("function")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_module_function_ce, "module", sizeof("module")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_module_function_ce, "function", sizeof("function")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "CommitHook", riak_commit_hook_methods);
     riak_commit_hook_ce = zend_register_internal_class(&ce TSRMLS_CC);
@@ -308,23 +308,23 @@ PHP_METHOD(RiakModuleFunction, __construct)
 
 PHP_METHOD(RiakModuleFunction, getModule)
 {
-    RIAK_GETTER_STRING(riak_bucket_properties_ce, "module")
+    RIAK_GETTER_STRING(riak_module_function_ce, "module")
 }
 
 PHP_METHOD(RiakModuleFunction, setModule)
 {
-    RIAK_SETTER_STRING(riak_bucket_properties_ce, "module")
+    RIAK_SETTER_STRING(riak_module_function_ce, "module")
     RIAK_RETURN_THIS
 }
 
 PHP_METHOD(RiakModuleFunction, getFunction)
 {
-    RIAK_GETTER_STRING(riak_bucket_properties_ce, "function")
+    RIAK_GETTER_STRING(riak_module_function_ce, "function")
 }
 
 PHP_METHOD(RiakModuleFunction, setFunction)
 {
-    RIAK_SETTER_STRING(riak_bucket_properties_ce, "function")
+    RIAK_SETTER_STRING(riak_module_function_ce, "function")
     RIAK_RETURN_THIS
 }
 
@@ -574,7 +574,7 @@ PHP_METHOD(RiakBucketProperties, setBackend)
 
 PHP_METHOD(RiakBucketProperties, getPreCommitHookList)
 {
-    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "precommit_hooks")
+    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "preCommitHooks")
 }
 
 PHP_METHOD(RiakBucketProperties, setPreCommitHookList)
@@ -584,7 +584,7 @@ PHP_METHOD(RiakBucketProperties, setPreCommitHookList)
         zend_throw_exception(riak_badarguments_exception_ce, "", 501 TSRMLS_CC);
         return;
     }
-    zend_update_property(riak_bucket_properties_ce, getThis(), "precommit_hooks", sizeof("precommit_hooks")-1, zhooks TSRMLS_CC);
+    zend_update_property(riak_bucket_properties_ce, getThis(), "preCommitHooks", sizeof("preCommitHooks")-1, zhooks TSRMLS_CC);
     RIAK_RETURN_THIS
 }
 
