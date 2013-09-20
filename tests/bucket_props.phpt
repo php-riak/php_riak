@@ -1,5 +1,5 @@
 --TEST--
-Test bucket properties
+Test bucket properties old
 --FILE--
 <?php
 use \Riak\BucketPropertyList;

@@ -331,6 +331,11 @@ PHP_METHOD(RiakBucket, setPropertyList)
 Fetch and return a RiakBucketProperties object with properties for this bucket */
 PHP_METHOD(RiakBucket, getPropertyList)
 {
+#define GET_PROP_SET_ON_LIST(ZVAL_METHOD, SETTER_NAME, PROP_NAME) if (PROP_NAME##_use) { \
+                                                        MAKE_STD_ZVAL(ztmp); \
+                                                        ZVAL_METHOD(ztmp, PROP_NAME); \
+                                                        RIAK_CALL_METHOD1(RiakBucketProperties, SETTER_NAME, zbucket_props, zbucket_props, ztmp); \
+                                                        zval_ptr_dtor(&ztmp); }
     struct RIACK_BUCKET_PROPERTIES *properties;
 	riak_connection *connection;
     RIACK_STRING bucketName;
@@ -343,23 +348,35 @@ PHP_METHOD(RiakBucket, getPropertyList)
     riackResult = riack_get_bucket_props_ext(connection->client,  bucketName, &properties);
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
-    // TODO get all the properties...
     MAKE_STD_ZVAL(zbucket_props);
     object_init_ex(zbucket_props, riak_bucket_properties_ce);
     RIAK_CALL_METHOD(RiakBucketProperties, __construct, NULL, zbucket_props);
 
-    if (properties->n_val_use) {
-        MAKE_STD_ZVAL(ztmp);
-        ZVAL_LONG(ztmp, properties->n_val);
-        RIAK_CALL_METHOD1(RiakBucketProperties, setNValue, zbucket_props, zbucket_props, ztmp);
-        zval_ptr_dtor(&ztmp);
-    }
-    if (properties->allow_mult_use) {
-        MAKE_STD_ZVAL(ztmp);
-        ZVAL_BOOL(ztmp, properties->allow_mult);
-        RIAK_CALL_METHOD1(RiakBucketProperties, setAllowMult, zbucket_props, zbucket_props, ztmp);
-        zval_ptr_dtor(&ztmp);
-    }
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setNValue, properties->n_val);
+    GET_PROP_SET_ON_LIST(ZVAL_BOOL, setAllowMult, properties->allow_mult);
+    GET_PROP_SET_ON_LIST(ZVAL_BOOL, setLastWriteWins, properties->last_write_wins);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setOldVClock, properties->old_vclock);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setYoungVClock, properties->young_vclock);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setSmallVClock, properties->small_vclock);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setBigVClock, properties->big_vclock);
+
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setR, properties->r);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setPR, properties->pr);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setW, properties->w);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setDW, properties->dw);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setPW, properties->pw);
+    GET_PROP_SET_ON_LIST(ZVAL_LONG, setRW, properties->rw);
+
+    GET_PROP_SET_ON_LIST(ZVAL_BOOL, setBasicQuorum, properties->basic_quorum);
+    GET_PROP_SET_ON_LIST(ZVAL_BOOL, setNotFoundOk, properties->notfound_ok);
+    GET_PROP_SET_ON_LIST(ZVAL_BOOL, setSearchEnabled, properties->search);
+
+    // TODO
+    // setBackend
+    // setPreCommitHookList
+    // setPostCommitHookList
+    // setLinkFun
+    // setCHashKeyFun
 
     riack_free_bucket_properties(connection->client, &properties);
     RETURN_ZVAL(zbucket_props, 0, 1);
