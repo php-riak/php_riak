@@ -304,6 +304,7 @@ PHP_METHOD(RiakBucket, setPropertyList)
     SET_PROPLIST_BOOL(getNotFoundOk, notfound_ok);
 
     SET_PROPLIST_BOOL(getSearchEnabled, search);
+
     /*
             RIACK_STRING backend;
 
@@ -326,6 +327,24 @@ PHP_METHOD(RiakBucket, setPropertyList)
     RIAK_RETURN_THIS
 }
 /* }}} */
+
+zval *riak_linkfun_from_riack(struct RIACK_MODULE_FUNCTION* modfun TSRMLS_DC) {
+    zval *zmodfun, *zmod, *zfunc;
+    MAKE_STD_ZVAL(zmodfun);
+
+    MAKE_STD_ZVAL(zmod);
+    ZVAL_STRINGL(zmod, modfun->module.value, modfun->module.len, 1);
+
+    MAKE_STD_ZVAL(zfunc);
+    ZVAL_STRINGL(zfunc, modfun->function.value, modfun->function.len, 1);
+
+    object_init_ex(zmodfun, riak_module_function_ce);
+    RIAK_CALL_METHOD2(RiakModuleFunction, __construct, NULL, zmodfun, zmod, zfunc)
+
+    zval_ptr_dtor(&zmod);
+    zval_ptr_dtor(&zfunc);
+    return zmodfun;
+}
 
 /* {{{ proto Riak\BucketPropertyList Riak\Bucket->getPropertyList()
 Fetch and return a RiakBucketProperties object with properties for this bucket */
@@ -370,13 +389,23 @@ PHP_METHOD(RiakBucket, getPropertyList)
     GET_PROP_SET_ON_LIST(ZVAL_BOOL, setBasicQuorum, properties->basic_quorum);
     GET_PROP_SET_ON_LIST(ZVAL_BOOL, setNotFoundOk, properties->notfound_ok);
     GET_PROP_SET_ON_LIST(ZVAL_BOOL, setSearchEnabled, properties->search);
-
+    if (RSTR_HAS_CONTENT(properties->backend)) {
+        MAKE_STD_ZVAL(ztmp);
+        ZVAL_STRINGL(ztmp, properties->backend.value, properties->backend.len, 1);
+        RIAK_CALL_METHOD1(RiakBucketProperties, setBackend, zbucket_props, zbucket_props, ztmp);
+        zval_ptr_dtor(&ztmp);
+    }
+    if (properties->linkfun_use) {
+        ztmp = riak_linkfun_from_riack(&properties->linkfun TSRMLS_CC);
+        zval_ptr_dtor(&ztmp);
+    }
+    if (properties->chash_keyfun_use) {
+        ztmp = riak_linkfun_from_riack(&properties->linkfun TSRMLS_CC);
+        zval_ptr_dtor(&ztmp);
+    }
     // TODO
-    // setBackend
     // setPreCommitHookList
     // setPostCommitHookList
-    // setLinkFun
-    // setCHashKeyFun
 
     riack_free_bucket_properties(connection->client, &properties);
     RETURN_ZVAL(zbucket_props, 0, 1);
