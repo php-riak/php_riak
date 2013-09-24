@@ -178,6 +178,8 @@ PS_READ_FUNC(riak) /* {{{ */
     ZVAL_STRING(zkey, key, 1);
 
     MAKE_STD_ZVAL(zoutput);
+    object_init_ex(zoutput, riak_output_ce);
+
     RIAK_CALL_METHOD2(RiakBucket, get, zoutput, data->zbucket, zkey, data->zgetprops);
 
     if (!EG(exception)) {

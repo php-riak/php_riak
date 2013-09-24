@@ -20,6 +20,10 @@
 #include <php.h>
 #include <riack.h>
 
+extern zend_class_entry *riak_output_ce;
+extern zend_class_entry *riak_get_output_ce;
+extern zend_class_entry *riak_put_output_ce;
+
 void riak_req_outputs_init(TSRMLS_D);
 
 zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC);
