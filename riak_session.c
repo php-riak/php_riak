@@ -223,6 +223,7 @@ PS_WRITE_FUNC(riak) /* {{{ */
     RIAK_CALL_METHOD2(RiakBucket, put, zobject, data->zbucket, zobject, data->zputprops);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {
+        zend_clear_exception(TSRMLS_C);
         return FAILURE;
     } else {
         return SUCCESS;
@@ -238,6 +239,7 @@ PS_DESTROY_FUNC(riak) /* {{{ */
     RIAK_CALL_METHOD2(RiakBucket, delete, zobject, data->zbucket, zobject, data->zdelprops);
     zval_ptr_dtor(&zobject);
     if (EG(exception)) {
+        zend_clear_exception(TSRMLS_C);
         return FAILURE;
     }
     return SUCCESS;

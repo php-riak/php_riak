@@ -20,13 +20,14 @@ $props = new BucketPropertyList(2, false);
 $bucket->setPropertyList($props);
 
 ini_set('session.save_path',"proto://$host:$port/sessions_violation?w=4&dw=4&pw=4&r=4&rw=4&pr=4");
-try {
+//try {
     session_start();
     $_SESSION['favcolor'] = 'green';
     session_commit();
-} catch (UnexpectedResponseException $exc) {
+//} catch (UnexpectedResponseException $exc) {
+// Exceptions are no longer thrown from session handler
     echo "done!";
-}
+//}
 ?>
 --EXPECTF--
 Warning: session_commit(): Failed to write session data (riak). Please verify that the current setting of session.save_path %s
