@@ -5,9 +5,9 @@ Test bucket properties
 use \Riak\BucketPropertyList;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new \Riak\Bucket($client, "test_bucket_props_ext_");
+$bucket = new \Riak\Bucket($client, "test_bucket_props_ext");
 $oldProps = $bucket->getPropertyList();
-var_dump($oldProps);
+
 $newProps = new BucketPropertyList();
 $newProps->setSearchEnabled(true)
          ->setR(1)
