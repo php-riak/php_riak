@@ -25,6 +25,5 @@
 
 PS_FUNCS(riak);
 
-
 #endif
 #endif
