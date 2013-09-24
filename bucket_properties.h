@@ -69,6 +69,8 @@ PHP_METHOD(RiakBucketProperties, setPostCommitHookList);
 PHP_METHOD(RiakBucketProperties, getPostCommitHookList);
 PHP_METHOD(RiakBucketProperties, setCHashKeyFun);
 PHP_METHOD(RiakBucketProperties, getCHashKeyFun);
+PHP_METHOD(RiakBucketProperties, setLinkFun);
+PHP_METHOD(RiakBucketProperties, getLinkFun);
 
 PHP_METHOD(RiakModuleFunction, __construct);
 PHP_METHOD(RiakModuleFunction, getModule);
@@ -77,10 +79,11 @@ PHP_METHOD(RiakModuleFunction, getFunction);
 PHP_METHOD(RiakModuleFunction, setFunction);
 
 PHP_METHOD(RiakCommitHook, __construct);
-PHP_METHOD(RiakCommitHook, getName);
-PHP_METHOD(RiakCommitHook, setName);
-PHP_METHOD(RiakCommitHook, getModuleFunction);
-PHP_METHOD(RiakCommitHook, setModuleFunction);
+PHP_METHOD(RiakCommitHook, getJsName);
+PHP_METHOD(RiakCommitHook, getErlModule);
+PHP_METHOD(RiakCommitHook, getErlFunction);
+PHP_METHOD(RiakCommitHook, isJavascript);
+PHP_METHOD(RiakCommitHook, isErlang);
 
 PHP_METHOD(RiakCommitHookList, __construct);
 PHP_METHOD(RiakCommitHookList, offsetExists);

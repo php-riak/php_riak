@@ -38,6 +38,14 @@ zend_class_entry *riak_bucket_ce;
     RIAK_CALL_METHOD(CLASS_ALIAS, GETTER, &ztmp, zinput); \
     if (Z_TYPE(ztmp) == IS_BOOL && Z_BVAL(ztmp)) { TARGET##_use = TARGET = 1; }
 
+#define RIAK_GET_STR_COPY_TO(CLASSNAME, GETTER, ZOBJ, TARGET, TARGET_LEN) { \
+    zval *z_getter_res; MAKE_STD_ZVAL(z_getter_res); \
+    RIAK_CALL_METHOD(CLASSNAME, GETTER, z_getter_res, ZOBJ); \
+    if (Z_TYPE_P(z_getter_res) == IS_STRING && Z_STRLEN_P(z_getter_res) > 0) { \
+        RMALLOCCOPY(connection->client, TARGET, TARGET_LEN, Z_STRVAL_P(z_getter_res), Z_STRLEN_P(z_getter_res)); \
+    } \
+    zval_ptr_dtor(&z_getter_res); }
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_ctor, 0, ZEND_RETURN_VALUE, 2)
     ZEND_ARG_INFO(0, client)
     ZEND_ARG_INFO(0, name)
@@ -305,9 +313,30 @@ PHP_METHOD(RiakBucket, setPropertyList)
 
     SET_PROPLIST_BOOL(getSearchEnabled, search);
 
-    /*
-            RIACK_STRING backend;
+    RIAK_GET_STR_COPY_TO(RiakBucketProperties, getBackend, zprop_obj, properties.backend.value, properties.backend.len);
 
+    MAKE_STD_ZVAL(ztmp);
+    RIAK_CALL_METHOD(RiakBucketProperties, getLinkFun, ztmp, zprop_obj);
+    if (Z_TYPE_P(ztmp) == IS_OBJECT) {
+        properties.linkfun_use = 1;
+        RIAK_GET_STR_COPY_TO(RiakModuleFunction, getFunction, ztmp,
+                             properties.linkfun.function.value, properties.linkfun.function.len);
+        RIAK_GET_STR_COPY_TO(RiakModuleFunction, getModule, ztmp,
+                             properties.linkfun.module.value, properties.linkfun.module.len);
+    }
+    zval_ptr_dtor(&ztmp);
+    MAKE_STD_ZVAL(ztmp);
+    RIAK_CALL_METHOD(RiakBucketProperties, getCHashKeyFun, ztmp, zprop_obj);
+    if (Z_TYPE_P(ztmp) == IS_OBJECT) {
+        properties.chash_keyfun_use = 1;
+        RIAK_GET_STR_COPY_TO(RiakModuleFunction, getFunction, ztmp,
+                             properties.chash_keyfun.function.value, properties.chash_keyfun.function.len);
+        RIAK_GET_STR_COPY_TO(RiakModuleFunction, getModule, ztmp,
+                             properties.chash_keyfun.module.value, properties.chash_keyfun.module.len);
+    }
+    zval_ptr_dtor(&ztmp);
+
+    /*
             uint8_t has_precommit_hooks;
             size_t precommit_hook_count;
             struct RIACK_COMMIT_HOOK* precommit_hooks;
@@ -315,13 +344,13 @@ PHP_METHOD(RiakBucket, setPropertyList)
             uint8_t has_postcommit_hooks;
             size_t postcommit_hook_count;
             struct RIACK_COMMIT_HOOK* postcommit_hooks;
-
-            uint8_t linkfun_use;
-            struct RIACK_MODULE_FUNCTION linkfun;
-            uint8_t crash_keyfun_use;
-            struct RIACK_MODULE_FUNCTION crash_keyfun;
      */
     riackResult = riack_set_bucket_props_ext(connection->client, bucketName, &properties);
+    RSTR_SAFE_FREE(connection->client, properties.backend);
+    RSTR_SAFE_FREE(connection->client, properties.linkfun.module);
+    RSTR_SAFE_FREE(connection->client, properties.linkfun.function);
+    RSTR_SAFE_FREE(connection->client, properties.chash_keyfun.module);
+    RSTR_SAFE_FREE(connection->client, properties.chash_keyfun.function);
  	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
     RIAK_RETURN_THIS
@@ -397,10 +426,12 @@ PHP_METHOD(RiakBucket, getPropertyList)
     }
     if (properties->linkfun_use) {
         ztmp = riak_linkfun_from_riack(&properties->linkfun TSRMLS_CC);
+        RIAK_CALL_METHOD1(RiakBucketProperties, setLinkFun, zbucket_props, zbucket_props, ztmp);
         zval_ptr_dtor(&ztmp);
     }
     if (properties->chash_keyfun_use) {
-        ztmp = riak_linkfun_from_riack(&properties->linkfun TSRMLS_CC);
+        ztmp = riak_linkfun_from_riack(&properties->chash_keyfun TSRMLS_CC);
+        RIAK_CALL_METHOD1(RiakBucketProperties, setCHashKeyFun, zbucket_props, zbucket_props, ztmp);
         zval_ptr_dtor(&ztmp);
     }
     // TODO
