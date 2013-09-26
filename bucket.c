@@ -130,13 +130,17 @@ zval* create_bucket_object(zval* zclient, char* name, int name_len TSRMLS_DC) /*
 Create a new Riak\Bucket */
 PHP_METHOD(RiakBucket, __construct)
 {
-	char *name;
-	int nameLen;
-    zval* zconnection;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "os", &zconnection, &name, &nameLen) == FAILURE) {
-		return;
-	}
-	zend_update_property_stringl(riak_bucket_ce, getThis(), "name", sizeof("name")-1, name, nameLen TSRMLS_CC);
+    char *name;
+    int nameLen;
+    zval *id, *zconnection;
+
+    if (zend_parse_method_parameters(ZEND_NUM_ARGS() TSRMLS_CC, getThis(), "OOs", &id, riak_bucket_ce, &zconnection, riak_connection_ce, &name, &nameLen) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "First parameter must be an instance of Riak\\Connection.", 500 TSRMLS_CC);
+
+        RETURN_NULL();
+    }
+
+    zend_update_property_stringl(riak_bucket_ce, getThis(), "name", sizeof("name")-1, name, nameLen TSRMLS_CC);
     zend_update_property(riak_bucket_ce, getThis(), "connection", sizeof("connection")-1, zconnection TSRMLS_CC);
 }
 /* }}} */
