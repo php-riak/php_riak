@@ -288,7 +288,7 @@ PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addArray)
     call_user_function(EG(function_table), NULL, &zfuncname, zcombinedarr, 2, zarr TSRMLS_CC);
 
     zend_update_property(riak_mrinput_keylist_ce, getThis(), "inputList", sizeof("inputList")-1, zcombinedarr TSRMLS_CC);
-    zval_ptr_dtor(&zarr[0]);
+    //zval_ptr_dtor(&zarr[0]);
     zval_ptr_dtor(&zcombinedarr);
 
     RIAK_RETURN_THIS

@@ -236,7 +236,9 @@ PHP_METHOD(RiakMapreduce, toArray)
     /* Build result array */
     MAKE_STD_ZVAL(zarray);
     array_init(zarray);
+	zval_addref_p(zinputval);
     add_assoc_zval_ex(zarray, "inputs", sizeof("inputs"), zinputval);
+	zval_addref_p(zqueryarr);
     add_assoc_zval_ex(zarray, "query", sizeof("query"), zqueryarr);
 
     RETURN_ZVAL(zarray, 0, 1);
