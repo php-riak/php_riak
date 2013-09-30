@@ -17,6 +17,8 @@
 
 #include <php.h>
 #include <riack.h>
+#include <ext/spl/spl_iterators.h>
+#include <ext/spl/spl_array.h>
 #include "php_riak.h"
 #include "bucket.h"
 #include "bucket_properties.h"
@@ -336,6 +338,35 @@ PHP_METHOD(RiakBucket, setPropertyList)
     }
     zval_ptr_dtor(&ztmp);
 
+    zval_ptr_dtor(&ztmp);
+    MAKE_STD_ZVAL(ztmp);
+    RIAK_CALL_METHOD(RiakBucketProperties, getPreCommitHookList, ztmp, zprop_obj);
+    if (Z_TYPE_P(ztmp) == IS_OBJECT) {
+        zval *ziter;
+        MAKE_STD_ZVAL(ziter);
+        object_init(ziter);
+        RIAK_CALL_METHOD(RiakCommitHookList, getIterator, ziter, ztmp);
+        if (Z_TYPE_P(ziter) == IS_OBJECT) {
+            zval *zhook, zcurrname, znextname;
+            zend_bool done;
+            ZVAL_STRING(&zcurrname, "current", 0);
+            ZVAL_STRING(&znextname, "next", 0);
+            done = 0;
+            while (!done) {
+                MAKE_STD_ZVAL(zhook);
+                call_user_function(NULL, &ziter, &zcurrname, zhook, 0, NULL TSRMLS_CC);
+                if (Z_TYPE_P(zhook) == IS_OBJECT) {
+                    // TODO
+                    call_user_function(NULL, &ziter, &znextname, NULL, 0, NULL TSRMLS_CC);
+                } else {
+                    done = 1;
+                }
+                zval_ptr_dtor(&zhook);
+            }
+        }
+        zval_ptr_dtor(&ziter);
+    }
+    zval_ptr_dtor(&ztmp);
     /*
             uint8_t has_precommit_hooks;
             size_t precommit_hook_count;
