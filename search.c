@@ -266,21 +266,29 @@ zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* doc
 {
     int cnt, i;
     zval *zresult, *zarr;
-    MAKE_STD_ZVAL(zarr);
+    MAKE_STD_ZVAL(zarr)
     array_init(zarr);
 
-    MAKE_STD_ZVAL(zresult);
+    MAKE_STD_ZVAL(zresult)
     object_init_ex(zresult, riak_search_doc_ce);
 
     cnt = document->field_count;
     for (i=0; i<cnt; ++i) {
+        char* szkey;
+        size_t key_len;
         struct RIACK_PAIR *current_pair = &document->fields[i];
+        key_len = current_pair->key.len;
+        // Silly... we need to make a copy because add_assoc relies on zero terminated string
+        // riack will not zero terminate since it includes a length.
+        // However estrndup will be nice enough to add a zero termination for us...
+        szkey = estrndup(current_pair->key.value, key_len);
         if (current_pair->value_present) {
-            add_assoc_stringl_ex(zarr, (char*)current_pair->key.value, current_pair->key.len+1,
+            add_assoc_stringl_ex(zarr, szkey, key_len + 1,
                                  (char*)current_pair->value, current_pair->value_len, 1);
         } else {
-            add_assoc_null_ex(zarr, (char*)current_pair->key.value, current_pair->key.len+1);
+            add_assoc_null_ex(zarr,  szkey, key_len+1);
         }
+        efree(szkey);
     }
     zend_update_property(riak_search_doc_ce, zresult, "fields", sizeof("fields")-1, zarr TSRMLS_CC);
     zval_ptr_dtor(&zarr);
