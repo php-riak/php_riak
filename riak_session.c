@@ -192,7 +192,7 @@ PS_READ_FUNC(riak) /* {{{ */
 
     RIAK_CALL_METHOD2(RiakBucket, get, zoutput, data->zbucket, zkey, data->zgetprops);
 
-    if (!EG(exception)) {
+    if (!EG(exception) && Z_TYPE_P(zoutput) == IS_OBJECT) {
         zval *zobjarr;
 
         MAKE_STD_ZVAL(zobjarr);
@@ -214,7 +214,7 @@ PS_READ_FUNC(riak) /* {{{ */
         }
 
         zval_ptr_dtor(&zobjarr);
-    } else {
+    } else if (EG(exception)) {
         zend_clear_exception(TSRMLS_C);
     }
 

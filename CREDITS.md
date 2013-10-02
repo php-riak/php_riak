@@ -5,3 +5,6 @@
 
 ##chobie - https://github.com/chobie
 - PHP-5.3 compatability
+
+##weltling - https://github.com/weltling
+- Windows compatibility
