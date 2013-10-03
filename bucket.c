@@ -338,7 +338,6 @@ PHP_METHOD(RiakBucket, setPropertyList)
     }
     zval_ptr_dtor(&ztmp);
 
-    zval_ptr_dtor(&ztmp);
     MAKE_STD_ZVAL(ztmp);
     RIAK_CALL_METHOD(RiakBucketProperties, getPreCommitHookList, ztmp, zprop_obj);
     if (Z_TYPE_P(ztmp) == IS_OBJECT) {
@@ -465,10 +464,54 @@ PHP_METHOD(RiakBucket, getPropertyList)
         RIAK_CALL_METHOD1(RiakBucketProperties, setCHashKeyFun, zbucket_props, zbucket_props, ztmp);
         zval_ptr_dtor(&ztmp);
     }
-    // TODO
-    // setPreCommitHookList
-    // setPostCommitHookList
+    if (properties->has_precommit_hooks) {
+        // TODO Extract into a function and do the same for postcommit
+        // setPreCommitHookList
+        zval *zhook_list;
+        size_t i;
+        MAKE_STD_ZVAL(zhook_list);
+        object_init_ex(zhook_list, riak_commit_hook_list_ce);
+        RIAK_CALL_METHOD(RiakCommitHookList, __construct, zhook_list, zhook_list);
+        for (i=0; i<properties->precommit_hook_count; ++i) {
+            struct RIACK_COMMIT_HOOK* current_hook;
+            zval* zhook, *zoffset;
+            current_hook = &properties->precommit_hooks[i];
 
+            // Create hook
+            MAKE_STD_ZVAL(zhook);
+            object_init_ex(zhook, riak_commit_hook_ce);
+
+            if (RSTR_HAS_CONTENT(current_hook->name)) {
+                zval *zname;
+                // We have name so this is a js function
+                MAKE_STD_ZVAL(zname);
+                ZVAL_STRINGL(zname, current_hook->name.value, current_hook->name.len, 1);
+                RIAK_CALL_METHOD1(RiakCommitHook, __construct, zhook, zhook, zname);
+                zval_ptr_dtor(&zname);
+            } else {
+                zval *zmod, *zfun;
+                // No name present, so must be mod/fun
+                MAKE_STD_ZVAL(zfun);
+                MAKE_STD_ZVAL(zmod);
+                ZVAL_STRINGL(zfun, current_hook->modfun.function.value, current_hook->modfun.function.len, 1);
+                ZVAL_STRINGL(zmod, current_hook->modfun.module.value, current_hook->modfun.module.len, 1);
+                RIAK_CALL_METHOD2(RiakCommitHook, __construct, zhook, zhook, zmod, zfun);
+                zval_ptr_dtor(&zfun);
+                zval_ptr_dtor(&zmod);
+            }
+            MAKE_STD_ZVAL(zoffset);
+            ZVAL_LONG(zoffset, i);
+            RIAK_CALL_METHOD2(RiakCommitHookList, offsetSet, NULL, zhook_list, zoffset, zhook);
+            zval_ptr_dtor(&zoffset);
+            zval_ptr_dtor(&zhook);
+        }
+        RIAK_CALL_METHOD1(RiakBucketProperties, setPreCommitHookList, zbucket_props, zbucket_props, zhook_list);
+
+        zval_ptr_dtor(&zhook_list);
+    }
+    if (properties->has_postcommit_hooks) {
+        // setPostCommitHookList
+    }
     riack_free_bucket_properties(connection->client, &properties);
     RETURN_ZVAL(zbucket_props, 0, 1);
 }

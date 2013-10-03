@@ -19,6 +19,7 @@ $newProps->setSearchEnabled(true)
 $bucket->setPropertyList($newProps);
 
 $currentProps = $bucket->getPropertyList();
+var_dump($currentProps);
 if ($currentProps->getNValue() === 1 &&
     $currentProps->getAllowMult() === false &&
     $currentProps->getSearchEnabled() === true &&
