@@ -114,6 +114,7 @@ PHP_METHOD(Riak_MapReduce_Phase_MapPhase, toArray)
     zarg = zend_read_property(riak_mr_mapphase_ce, getThis(), "arg", sizeof("arg")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zarg) != IS_NULL) {
         add_assoc_zval_ex(zarray, "arg", sizeof("arg"), zarg);
+        zval_addref_p(zarg);
     }
     RETURN_ZVAL(zarray, 0, 1);
 }
@@ -164,6 +165,7 @@ PHP_METHOD(Riak_MapReduce_Phase_ReducePhase, toArray)
     add_assoc_zval_ex(zarray, "reduce", sizeof("reduce"), zfuncarray);
     zarg = zend_read_property(riak_mr_reducephase_ce, getThis(), "arg", sizeof("arg")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zarg) != IS_NULL) {
+        zval_addref_p(zarg);
         add_assoc_zval_ex(zarray, "arg", sizeof("arg"), zarg);
     }
     RETURN_ZVAL(zarray, 0, 1);

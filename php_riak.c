@@ -155,7 +155,7 @@ PHP_GSHUTDOWN_FUNCTION(riak) /* {{{ */
 void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)/* {{{ */
 {
     if (errorStatus == RIACK_ERROR_COMMUNICATION) {
-        zend_throw_exception(riak_communication_exception_ce, "Communcation error", 1001 TSRMLS_CC);
+        zend_throw_exception(riak_communication_exception_ce, "Communication error", 1001 TSRMLS_CC);
     } else if (errorStatus == RIACK_ERROR_RESPONSE) {
         if (client->last_error) {
             zend_throw_exception(riak_response_exception_ce, client->last_error, 1002 TSRMLS_CC);
@@ -175,11 +175,12 @@ void *riack_php_alloc(void* ptr, size_t size)/* {{{ */
     if (size == 0) {
         return 0;
     }
+
     return pemalloc(size, 0);
 }
 /* }}} */
 
-void riack_php_free (void *ptr, void *data)/* {{{ */
+void riack_php_free(void *ptr, void *data)/* {{{ */
 {
     if (data) {
         pefree(data, 0);
@@ -192,6 +193,7 @@ void *riack_php_persistent_alloc(void *ptr, size_t size)/* {{{ */
     if (size == 0) {
         return 0;
     }
+
     return pemalloc(size, 1);
 }
 /* }}} */

@@ -13,6 +13,7 @@ autom4te.cache/
 *.files
 *.includes
 *.user
+*.mem
 
 .libs/
 .deps

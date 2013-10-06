@@ -738,13 +738,27 @@ PHP_METHOD(RiakBucket, get)
             zval *zout = get_output_from_riack_get_object(&getResult, zKey TSRMLS_CC);
             RETVAL_ZVAL(zout, 0, 1);
 		} else {
-            /* Throw not found exception */
-            zend_throw_exception(riak_not_found_exception_ce, "Not Found", 2000 TSRMLS_CC);
+            // Hack warning!!
+            // Work around for session module, when session.auto_start is enabled read is called before a stackframe has been setup
+            // in that case we cannot throw exception without halting execution, return null instead.
+            if (!EG(current_execute_data)) {
+                // No stack dont throw
+                RETVAL_NULL();
+            } else {
+                /* Throw not found exception */
+                zend_throw_exception(riak_not_found_exception_ce, "Not Found", 2000 TSRMLS_CC);
+            }
         }
 		riack_free_get_object(connection->client, &getResult);
-	} else {
-		zval_ptr_dtor(&zKey);
-		CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
+    } else {
+        connection->needs_reconnect = 1;
+        // Hack warning, same as above
+        if (!EG(current_execute_data)) {
+            // No stack dont throw
+            RETVAL_NULL();
+        } else {
+            riak_throw_exception(connection->client,  riackResult TSRMLS_CC);
+        }
 	}
     zval_ptr_dtor(&zKey);
 }

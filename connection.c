@@ -54,6 +54,7 @@ void riak_connection_init(TSRMLS_D) /* {{{ */
 	zend_class_entry ce;
  
     INIT_NS_CLASS_ENTRY(ce, "Riak", "Connection", riak_connection_methods);
+
 	ce.create_object = create_client_data;
     riak_connection_ce = zend_register_internal_class(&ce TSRMLS_CC);
   
@@ -68,9 +69,10 @@ zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC) /* 
 	client_data *tobj;
  
 	tobj = emalloc(sizeof(client_data));
-	memset(tobj, 0, sizeof(client_data));
 
+	memset(tobj, 0, sizeof(client_data));
 	zend_object_std_init((zend_object *) &tobj->std, class_type TSRMLS_CC);
+
 #if ZEND_MODULE_API_NO >= 20100525
 	object_properties_init((zend_object*) &tobj->std, class_type);
 #else
@@ -79,9 +81,11 @@ zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC) /* 
 		zend_hash_copy(tobj->std.properties, &class_type->default_properties, (copy_ctor_func_t)zval_add_ref, (void *)&tmp, sizeof(zval *));
 	}
 #endif
+
 	retval.handle = zend_objects_store_put(tobj, (zend_objects_store_dtor_t) zend_objects_destroy_object, 
 		(zend_objects_free_object_storage_t) free_client_data, NULL TSRMLS_CC);
 	retval.handlers = zend_get_std_object_handlers();
+
 	return retval;
 }
 /* }}} */
@@ -89,7 +93,9 @@ zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC) /* 
 void free_client_data(void *object TSRMLS_DC) /* {{{ */
 {
 	client_data* data = (client_data*)object;
+
 	zend_object_std_dtor(&data->std TSRMLS_CC);
+
 	if (data->connection) {
 		release_connection(data->connection TSRMLS_CC);
 	}
@@ -127,9 +133,11 @@ PHP_METHOD(RiakConnection, __construct)
 	int hostLen;
 	long port = DEFAULT_PORT;
     zval* zbucketarr;
+
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|l", &host, &hostLen, &port) == FAILURE) {
 		return;
 	}
+
     zend_update_property_stringl(riak_connection_ce, getThis(), "host", sizeof("host")-1, host, hostLen TSRMLS_CC);
     zend_update_property_long(riak_connection_ce, getThis(), "port", sizeof("port")-1, port TSRMLS_CC);
 
@@ -139,7 +147,9 @@ PHP_METHOD(RiakConnection, __construct)
     zval_ptr_dtor(&zbucketarr);
 
 	data = (client_data*)zend_object_store_get_object(getThis() TSRMLS_CC);
+
 	data->connection = take_connection(host, hostLen, port TSRMLS_CC);
+
 	if (!data->connection) {
 		zend_throw_exception(riak_connection_exception_ce, "Connection error", 1000 TSRMLS_CC);
 	}
@@ -157,6 +167,7 @@ PHP_METHOD(RiakConnection, ping)
 	ensure_connected(connection TSRMLS_CC);
 
 	pingStatus = riack_ping(connection->client);
+
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, pingStatus);
 }
 /* }}} */
@@ -184,19 +195,25 @@ PHP_METHOD(RiakConnection, getBucket)
     char* name;
     int name_len;
     zval* zbucketarr, *zbucket;
+
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
         return;
     }
+
     // Se if we have a bucket with that name already
     zbucketarr = zend_read_property(riak_connection_ce, getThis(), "buckets", sizeof("buckets")-1, 1 TSRMLS_CC);
+
     if (Z_TYPE_P(zbucketarr) == IS_ARRAY) {
         zval **ztmp;
+
         if (zend_hash_find(Z_ARRVAL_P(zbucketarr), name, name_len+1, (void**)&ztmp) == SUCCESS) {
             RETURN_ZVAL(*ztmp, 1, 0);
         }
     }
+
     // If we are here we did not find an existing bucket, create a new
     zbucket = create_bucket_object(getThis(), name, name_len TSRMLS_CC);
+    
     RETURN_ZVAL(zbucket, 0, 1);
 }
 /* }}} */
