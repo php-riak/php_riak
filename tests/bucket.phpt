@@ -15,4 +15,4 @@ try {
 ?>
 --EXPECTF--
 Warning: Riak\Bucket::__construct() expects parameter 1 to be Riak\Connection, null given in %s on line %d
-First parameter must be an instance of Riak\Connection.
+Bad or missing argument
