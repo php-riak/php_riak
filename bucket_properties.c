@@ -200,7 +200,7 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "searchEnabled", sizeof("searchEnabled")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "backend", sizeof("backend")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "preCommitHooks", sizeof("preCommitHooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_null(riak_bucket_properties_ce, "postcommit_hooks", sizeof("postcommit_hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "postCommitHooks", sizeof("postCommitHooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "chashKeyFun", sizeof("chashKeyFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "linkFun", sizeof("linkFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
@@ -277,10 +277,7 @@ PHP_METHOD(RiakCommitHookList, offsetUnset)
 
 PHP_METHOD(RiakCommitHookList, count)
 {
-    zval *zoffset, *zhooks, *zresult;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zoffset) == FAILURE) {
-        return;
-    }
+    zval *zhooks, *zresult;
     zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
     zend_call_method_with_0_params(&zhooks, spl_ce_ArrayObject, NULL, "count", &zresult);
     RETURN_ZVAL(zresult, 0, 1);
@@ -366,7 +363,7 @@ PHP_METHOD(RiakCommitHook, getErlFunction)
 
 PHP_METHOD(RiakCommitHook, isJavascript)
 {
-    zval* ztmp = zend_read_property(riak_commit_hook_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC); \
+    zval* ztmp = zend_read_property(riak_commit_hook_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(ztmp) == IS_STRING) {
         RETURN_FALSE;
     }
@@ -375,7 +372,7 @@ PHP_METHOD(RiakCommitHook, isJavascript)
 
 PHP_METHOD(RiakCommitHook, isErlang)
 {
-    zval* ztmp = zend_read_property(riak_commit_hook_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC); \
+    zval* ztmp = zend_read_property(riak_commit_hook_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(ztmp) == IS_STRING) {
         RETURN_TRUE;
     }
@@ -608,7 +605,7 @@ PHP_METHOD(RiakBucketProperties, setPreCommitHookList)
 
 PHP_METHOD(RiakBucketProperties, getPostCommitHookList)
 {
-    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "postcommit_hooks")
+    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "postCommitHooks")
 }
 
 PHP_METHOD(RiakBucketProperties, setPostCommitHookList)
@@ -618,7 +615,7 @@ PHP_METHOD(RiakBucketProperties, setPostCommitHookList)
         zend_throw_exception(riak_badarguments_exception_ce, "", 501 TSRMLS_CC);
         return;
     }
-    zend_update_property(riak_bucket_properties_ce, getThis(), "postcommit_hooks", sizeof("postcommit_hooks")-1, zhooks TSRMLS_CC);
+    zend_update_property(riak_bucket_properties_ce, getThis(), "postCommitHooks", sizeof("postCommitHooks")-1, zhooks TSRMLS_CC);
     RIAK_RETURN_THIS
 }
 
