@@ -58,6 +58,13 @@ typedef struct _riak_session_data {
    zval *zdelprops;
 } riak_session_data;
 
+PS_OPEN_FUNC(riak);
+PS_CLOSE_FUNC(riak);
+PS_READ_FUNC(riak);
+PS_WRITE_FUNC(riak);
+PS_DESTROY_FUNC(riak);
+PS_GC_FUNC(riak);
+
 ps_module ps_mod_riak = {
 	PS_MOD(riak)
 };
