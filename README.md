@@ -29,13 +29,20 @@ Module is now installed but it needs to be added to the appropriate php.ini as w
 Migh vary depending on you php installation though.
 
 ## ini settings
-You can override the following settings in your php.ini  
+You can override the following settings in your php.ini (settings shown below are the default settings if not specified in php.ini)
 
 	; How many persistent connections pr. host:port so if you are connecting to 5 differenct servers there will be 20 persistent connections to each.  
 	; If you do not want to reuse connections between request set this value to 0  
-	riak.persistent.connections=20
-	; If a connection has not been active within this time frame, automatically reconnect before using it again  
-	riak.persistent.timeout=1000
+        riak.persistent.connections=20
+        ; If a connection has not been active within this time frame, automatically reconnect before using it again
+        ; (in seconds)
+        riak.persistent.timeout=1800
+        ; Keep sockets alive (recommended)
+        riak.socket.keep_alive=1
+        ; Socket receive timeout [ms]
+        riak.socket.recv_timeout=10000
+        ; Socket send timeout [ms]
+        riak.socket.send_timeout=10000
 
 ## Usage
 

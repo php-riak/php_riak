@@ -39,21 +39,26 @@ zend_bool ensure_connected(riak_connection *connection TSRMLS_DC) /* {{{ */
 
 zend_bool ensure_connected_init(riak_connection *connection, char* host, int host_len, int port TSRMLS_DC) /* {{{ */
 {
-   char *szHost;
-   zend_bool result;
-   result = 0;
-   
-   if (connection->client->sockfd <= 0) {
-      szHost = pestrndup(host, host_len, 0);
-      if (riack_connect(connection->client, szHost, port, NULL) == RIACK_SUCCESS) {
-         connection->needs_reconnect = 0;
-         result = 1;
-      }
-      pefree(szHost, 0);
-   } else {
-      result = ensure_connected(connection TSRMLS_CC);
-   }
-   return result;
+    char *szHost;
+    zend_bool result;
+    result = 0;
+
+    if (connection->client->sockfd <= 0) {
+        struct RIACK_CONNECTION_OPTIONS options;
+        options.send_timeout_ms = RIAK_GLOBAL(send_timeout);
+        options.recv_timeout_ms = RIAK_GLOBAL(recv_timeout);
+        options.keep_alive_enabled = RIAK_GLOBAL(keep_alive);
+
+        szHost = pestrndup(host, host_len, 0);
+        if (riack_connect(connection->client, szHost, port, &options) == RIACK_SUCCESS) {
+            connection->needs_reconnect = 0;
+            result = 1;
+        }
+        pefree(szHost, 0);
+    } else {
+        result = ensure_connected(connection TSRMLS_CC);
+    }
+    return result;
 }
 /* }}} */
 

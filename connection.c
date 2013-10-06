@@ -47,6 +47,8 @@ static zend_function_entry riak_connection_methods[] = {
 	{NULL, NULL, NULL}
 };
 
+
+
 void riak_connection_init(TSRMLS_D) /* {{{ */
 {
 	zend_class_entry ce;

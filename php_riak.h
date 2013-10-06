@@ -148,6 +148,10 @@ ZEND_BEGIN_MODULE_GLOBALS(riak)
   long persistent_connections;
   long persistent_timeout;
 
+  long keep_alive;
+  long recv_timeout;
+  long send_timeout;
+
   long open_connections;
   long open_connections_persistent;
 

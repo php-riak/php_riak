@@ -83,8 +83,11 @@ zend_module_entry riak_module_entry = {
 ZEND_GET_MODULE(riak)
 
 PHP_INI_BEGIN()
-  STD_PHP_INI_ENTRY("riak.persistent.connections", "20", PHP_INI_ALL, OnUpdateLong, persistent_connections, zend_riak_globals, riak_globals)
-  STD_PHP_INI_ENTRY("riak.persistent.timeout", "5", PHP_INI_ALL,   OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.persistent.connections", "20",   PHP_INI_ALL, OnUpdateLong, persistent_connections, zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.persistent.timeout",     "1800", PHP_INI_ALL, OnUpdateLong, persistent_timeout,     zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.socket.keep_alive",      "1",    PHP_INI_ALL, OnUpdateBool, keep_alive,             zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.socket.recv_timeout",    "10000",PHP_INI_ALL, OnUpdateLong, recv_timeout,           zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.socket.send_timeout",    "10000",PHP_INI_ALL, OnUpdateLong, send_timeout,           zend_riak_globals, riak_globals)
 PHP_INI_END()
 
 PHP_MINIT_FUNCTION(riak) /* {{{ */
@@ -133,6 +136,9 @@ PHP_GINIT_FUNCTION(riak) /* {{{ */
     riak_globals->open_connections = 0;
     riak_globals->open_connections_persistent = 0;
     riak_globals->reconnects = 0;
+    riak_globals->keep_alive = 1;
+    riak_globals->recv_timeout = 10000;
+    riak_globals->send_timeout = 10000;
 #ifdef ZTS
     riak_globals->pool_mutex = tsrm_mutex_alloc();
 #endif
