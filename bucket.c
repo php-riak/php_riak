@@ -302,14 +302,14 @@ void riak_set_commit_hooks_properties(riak_connection *connection, zval *zhook_l
             *hook_count = Z_LVAL_P(zcount);
             *hooks = RMALLOC(connection->client, sizeof(struct RIACK_COMMIT_HOOK) * Z_LVAL_P(zcount));
 
-            ZVAL_STRING(&zcurrname, "current", 0)
-            ZVAL_STRING(&znextname, "next", 0)
-            ZVAL_STRING(&zvalidname, "valid", 0)
+            ZVAL_STRING(&zcurrname, "current", 0);
+            ZVAL_STRING(&znextname, "next", 0);
+            ZVAL_STRING(&zvalidname, "valid", 0);
 
             done = 0;
             while (!done) {
                 zval* zvalid;
-                MAKE_STD_ZVAL(zvalid)
+                MAKE_STD_ZVAL(zvalid);
                 call_user_function(NULL, &ziter, &zvalidname, zvalid, 0, NULL TSRMLS_CC);
                 if (Z_TYPE_P(zvalid) == IS_BOOL && Z_BVAL_P(zvalid)) {
                     zval *zhook;
