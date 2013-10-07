@@ -289,33 +289,43 @@ void riak_set_commit_hooks_properties(riak_connection *connection, zval *zhook_l
     if (Z_TYPE_P(zhook_list) != IS_NULL && Z_TYPE_P(zhook_list) == IS_OBJECT) {
         zval *ziter, *zcount;
         MAKE_STD_ZVAL(zcount);
-        RIAK_CALL_METHOD(RiakCommitHookList, count, zcount, zhook_list);
+        RIAK_CALL_METHOD(RiakCommitHookList, count, zcount, zhook_list)
 
         MAKE_STD_ZVAL(ziter);
         object_init(ziter);
-        RIAK_CALL_METHOD(RiakCommitHookList, getIterator, ziter, zhook_list);
+        RIAK_CALL_METHOD(RiakCommitHookList, getIterator, ziter, zhook_list)
         if (Z_TYPE_P(zcount) == IS_LONG && Z_TYPE_P(ziter) == IS_OBJECT) {
-            zval *zhook, zcurrname, znextname;
+            zval zcurrname, znextname, zvalidname;
             zend_bool done;
             int i=0;
             *has_hooks = 1;
             *hook_count = Z_LVAL_P(zcount);
             *hooks = RMALLOC(connection->client, sizeof(struct RIACK_COMMIT_HOOK) * Z_LVAL_P(zcount));
 
-            ZVAL_STRING(&zcurrname, "current", 0);
-            ZVAL_STRING(&znextname, "next", 0);
+            ZVAL_STRING(&zcurrname, "current", 0)
+            ZVAL_STRING(&znextname, "next", 0)
+            ZVAL_STRING(&zvalidname, "valid", 0)
+
             done = 0;
             while (!done) {
-                MAKE_STD_ZVAL(zhook);
-                call_user_function(NULL, &ziter, &zcurrname, zhook, 0, NULL TSRMLS_CC);
-                if (Z_TYPE_P(zhook) == IS_OBJECT) {
-                    zval zret;
-                    riak_set_riack_commit_hook(connection, zhook, &((*hooks)[i++]) TSRMLS_CC);
-                    call_user_function(NULL, &ziter, &znextname, &zret, 0, NULL TSRMLS_CC);
+                zval* zvalid;
+                MAKE_STD_ZVAL(zvalid)
+                call_user_function(NULL, &ziter, &zvalidname, zvalid, 0, NULL TSRMLS_CC);
+                if (Z_TYPE_P(zvalid) == IS_BOOL && Z_BVAL_P(zvalid)) {
+                    zval *zhook;
+                    MAKE_STD_ZVAL(zhook)
+                    call_user_function(NULL, &ziter, &zcurrname, zhook, 0, NULL TSRMLS_CC);
+                    if (Z_TYPE_P(zhook) == IS_OBJECT) {
+                        zval zret;
+                        riak_set_riack_commit_hook(connection, zhook, &((*hooks)[i++]) TSRMLS_CC);
+                        call_user_function(NULL, &ziter, &znextname, &zret, 0, NULL TSRMLS_CC);
+                    }
+                    zval_ptr_dtor(&zhook);
                 } else {
                     done = 1;
                 }
-                zval_ptr_dtor(&zhook);
+                zval_ptr_dtor(&zvalid);
+
             }
         }
         zval_ptr_dtor(&ziter);
