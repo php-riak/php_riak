@@ -3,6 +3,7 @@ Test bucket properties
 --FILE--
 <?php
 use \Riak\BucketPropertyList;
+use \Riak\Property\ReplicationMode as RM;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
 $bucket = new \Riak\Bucket($client, "test_bucket_asdf_props_ext");
@@ -19,7 +20,8 @@ $newProps->setSearchEnabled(true)
          ->setRW(1)
          ->setDW(1)
          ->setPostCommitHookList($postCommitHooks)
-         ->setBigVClock(5000);
+         ->setBigVClock(5000)
+         ->setReplicationMode(new RM\FullSyncOnly());
 
 $bucket->setPropertyList($newProps);
 $currentProps = $bucket->getPropertyList();
@@ -34,6 +36,10 @@ if ($currentProps->getNValue() === 1 &&
     $postHooks = $currentProps->getPostCommitHookList();
     $foundJs = false;
     $foundErl = false;
+    $replMode = $currentProps->getReplicationMode();
+    if (!is_a($replMode, 'Riak\Property\ReplicationMode\FullSyncOnly')) {
+        var_dump($replMode);
+    }
     foreach ($postHooks as $hook) {
         if ($hook->isJavascript() && $hook->getJsName() == "js_name") {
             $foundJs = true;

@@ -23,6 +23,11 @@ extern zend_class_entry *riak_module_function_ce;
 extern zend_class_entry *riak_commit_hook_ce;
 extern zend_class_entry *riak_commit_hook_list_ce;
 
+extern zend_class_entry *riak_replication_mode_full_only_ce;
+extern zend_class_entry *riak_replication_mode_disabled_ce;
+extern zend_class_entry *riak_replication_mode_realtime_and_full_ce;
+extern zend_class_entry *riak_replication_mode_realtime_only_ce;
+
 void riak_bucket_props_init(TSRMLS_D);
 void riak_bucket_props_init(TSRMLS_D);
 
@@ -71,6 +76,9 @@ PHP_METHOD(RiakBucketProperties, setCHashKeyFun);
 PHP_METHOD(RiakBucketProperties, getCHashKeyFun);
 PHP_METHOD(RiakBucketProperties, setLinkFun);
 PHP_METHOD(RiakBucketProperties, getLinkFun);
+
+PHP_METHOD(RiakBucketProperties, getReplicationMode);
+PHP_METHOD(RiakBucketProperties, setReplicationMode);
 
 PHP_METHOD(RiakModuleFunction, __construct);
 PHP_METHOD(RiakModuleFunction, getModule);

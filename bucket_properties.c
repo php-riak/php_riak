@@ -29,6 +29,12 @@ zend_class_entry *riak_module_function_ce;
 zend_class_entry *riak_commit_hook_ce;
 zend_class_entry *riak_commit_hook_list_ce;
 
+zend_class_entry *riak_replication_mode_ce;
+zend_class_entry *riak_replication_mode_full_only_ce;
+zend_class_entry *riak_replication_mode_disabled_ce;
+zend_class_entry *riak_replication_mode_realtime_and_full_ce;
+zend_class_entry *riak_replication_mode_realtime_only_ce;
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_ctor, 0, ZEND_RETURN_VALUE, 0)
     ZEND_ARG_INFO(0, nVal)
     ZEND_ARG_INFO(0, allowMult)
@@ -171,7 +177,14 @@ static zend_function_entry riak_bucket_properties_methods[] = {
     PHP_ME(RiakBucketProperties, getLinkFun, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucketProperties, setLinkFun, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
 
+    PHP_ME(RiakBucketProperties, getReplicationMode, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, setReplicationMode, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
+
 	{NULL, NULL, NULL}
+};
+
+static zend_function_entry riak_replication_mode_functions[] = {
+    {NULL, NULL, NULL}
 };
 
 void riak_bucket_props_init(TSRMLS_D)/* {{{ */
@@ -203,6 +216,7 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "postCommitHooks", sizeof("postCommitHooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "chashKeyFun", sizeof("chashKeyFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "linkFun", sizeof("linkFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "replicationMode", sizeof("replicationMode")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "ModuleFunction", riak_module_function_methods);
     riak_module_function_ce = zend_register_internal_class(&ce TSRMLS_CC);
@@ -218,6 +232,26 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     riak_commit_hook_list_ce = zend_register_internal_class(&ce TSRMLS_CC);
     zend_class_implements(riak_commit_hook_list_ce TSRMLS_CC, 3, spl_ce_ArrayAccess, spl_ce_Aggregate, spl_ce_Countable);
     zend_declare_property_null(riak_commit_hook_list_ce, "hooks", sizeof("hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "ReplicationMode", riak_replication_mode_functions);
+    riak_replication_mode_ce = zend_register_internal_interface(&ce TSRMLS_CC);
+
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "FullSyncOnly", riak_replication_mode_functions);
+    riak_replication_mode_full_only_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_class_implements(riak_replication_mode_full_only_ce TSRMLS_CC, 1, riak_replication_mode_ce);
+
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "Disabled", riak_replication_mode_functions);
+    riak_replication_mode_disabled_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_class_implements(riak_replication_mode_disabled_ce TSRMLS_CC, 1, riak_replication_mode_ce);
+
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "RealTimeAndFullSync", riak_replication_mode_functions);
+    riak_replication_mode_realtime_and_full_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_class_implements(riak_replication_mode_realtime_and_full_ce TSRMLS_CC, 1, riak_replication_mode_ce);
+
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "RealTimeOnly", riak_replication_mode_functions);
+    riak_replication_mode_realtime_only_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_class_implements(riak_replication_mode_realtime_only_ce TSRMLS_CC, 1, riak_replication_mode_ce);
+
 }
 /* }}} */
 
@@ -650,3 +684,20 @@ PHP_METHOD(RiakBucketProperties, setLinkFun)
     zend_update_property(riak_bucket_properties_ce, getThis(), "linkFun", sizeof("linkFun")-1, zhooks TSRMLS_CC);
     RIAK_RETURN_THIS
 }
+
+PHP_METHOD(RiakBucketProperties, setReplicationMode)
+{
+    zval* zmode;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zmode, riak_replication_mode_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "", 501 TSRMLS_CC);
+        return;
+    }
+    zend_update_property(riak_bucket_properties_ce, getThis(), "replicationMode", sizeof("replicationMode")-1, zmode TSRMLS_CC);
+    RIAK_RETURN_THIS
+}
+
+PHP_METHOD(RiakBucketProperties, getReplicationMode)
+{
+    RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "replicationMode")
+}
+

@@ -420,6 +420,26 @@ PHP_METHOD(RiakBucket, setPropertyList)
                                      &properties.postcommit_hooks TSRMLS_CC);
     zval_ptr_dtor(&ztmp);
 
+    MAKE_STD_ZVAL(ztmp);
+    RIAK_CALL_METHOD(RiakBucketProperties, getReplicationMode, ztmp, zprop_obj);
+    if (Z_TYPE_P(ztmp) == IS_OBJECT) {
+        zend_class_entry *ce;
+        ce = Z_OBJCE_P(ztmp);
+        properties.replication_mode_use = 1;
+        if (instanceof_function(ce, riak_replication_mode_disabled_ce TSRMLS_CC)) {
+            properties.replication_mode = DISABLED;
+        } else if  (instanceof_function(ce, riak_replication_mode_full_only_ce TSRMLS_CC)) {
+            properties.replication_mode = FULLSYNC;
+        } else if (instanceof_function(ce, riak_replication_mode_realtime_and_full_ce TSRMLS_CC)) {
+            properties.replication_mode = REALTIME_AND_FULLSYNC;
+        } else if (instanceof_function(ce, riak_replication_mode_realtime_only_ce TSRMLS_CC)) {
+            properties.replication_mode = REALTIME;
+        } else {
+            properties.replication_mode_use = 0;
+        }
+    }
+    zval_ptr_dtor(&ztmp);
+
     riackResult = riack_set_bucket_props_ext(connection->client, bucketName, &properties);
 
     RSTR_SAFE_FREE(connection->client, properties.backend);
@@ -567,6 +587,32 @@ PHP_METHOD(RiakBucket, getPropertyList)
         zhook_list = zhook_list_from_riack(properties->postcommit_hook_count, properties->postcommit_hooks TSRMLS_CC);
         RIAK_CALL_METHOD1(RiakBucketProperties, setPostCommitHookList, zbucket_props, zbucket_props, zhook_list);
         zval_ptr_dtor(&zhook_list);
+    }
+    if (properties->replication_mode_use) {
+        zend_class_entry *ce = NULL;
+        switch (properties->replication_mode) {
+        case FULLSYNC:
+            ce = riak_replication_mode_full_only_ce;
+            break;
+        case REALTIME:
+            ce = riak_replication_mode_realtime_only_ce;
+            break;
+        case REALTIME_AND_FULLSYNC:
+            ce = riak_replication_mode_realtime_and_full_ce;
+            break;
+        case DISABLED:
+            ce = riak_replication_mode_disabled_ce;
+            break;
+        default:
+            break;
+        }
+        if (ce != NULL) {
+            zval *zrepclass;
+            MAKE_STD_ZVAL(zrepclass);
+            object_init_ex(zrepclass, ce);
+            RIAK_CALL_METHOD1(RiakBucketProperties, setReplicationMode, zbucket_props, zbucket_props, zrepclass);
+            zval_ptr_dtor(&zrepclass);
+        }
     }
     riack_free_bucket_properties(connection->client, &properties);
     RETURN_ZVAL(zbucket_props, 0, 1);
