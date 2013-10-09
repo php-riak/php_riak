@@ -15,11 +15,11 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-10-02</date>
-    <time>18:42:00</time>
+    <date>2013-10-09</date>
+    <time>19:28:00</time>
     <version>
-        <release>0.5.4</release>
-        <api>0.5.0</api>
+        <release>0.6.0</release>
+        <api>0.6.0</api>
     </version>
     <stability>
         <release>beta</release>
@@ -27,10 +27,22 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
         <notes>
-This release fixes:
-  Issue36: SessionHandler intermitently cannot save session data
-  Issue35: Memoryleak in MapReduce and search has been fixed.
-  Issue37: session.auto_start breaks session handling
+Improvements:
+    - Added extended bucket properties that can be set and read on riak 1.4 and later.
+    - Enable keep-alive on sockets.
+
+    - New .ini options added:
+     ; Keep sockets alive (recommended)
+     riak.socket.keep_alive=1
+     ; Socket receive timeout [ms]
+     riak.socket.recv_timeout=10000
+     ; Socket send timeout [ms]
+     riak.socket.send_timeout=10000
+
+    - default connection timeout is changed to 1800 seconds.
+
+Bug fixes:
+    - Issue38: Windows build failing
         </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -153,6 +165,49 @@ This release fixes:
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+    <release>
+        <version>
+            <release>0.6.0</release>
+            <api>0.6.0</api>
+        </version>
+        <stability>
+            <release>beta</release>
+            <api>beta</api>
+        </stability>
+        <date>2013-10-09</date>
+        <license>Apache2</license>
+        <notes>
+        Improvements:
+            - Added extended bucket properties that can be set and read on riak 1.4 and later.
+            - Enable keep-alive on sockets.
+
+            - New .ini options added:
+             ; Keep sockets alive (recommended)
+             riak.socket.keep_alive=1
+             ; Socket receive timeout [ms]
+             riak.socket.recv_timeout=10000
+             ; Socket send timeout [ms]
+             riak.socket.send_timeout=10000
+
+            - default connection timeout is changed to 1800 seconds.
+
+        Bug fixes:
+            - Issue38: Windows build failing
+</notes>
+    </release>
+    <release>
+        <version>
+            <release>0.5.2</release>
+            <api>0.5.0</api>
+        </version>
+        <stability>
+            <release>beta</release>
+            <api>beta</api>
+        </stability>
+        <date>2013-09-24</date>
+        <license>Apache2</license>
+        <notes>Bugfixes in the session handler</notes>
+    </release>
     <release>
         <version>
             <release>0.5.3</release>

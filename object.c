@@ -19,6 +19,7 @@
 #include "php_riak.h"
 #include "link.h"
 #include "ht_utils.h"
+#include "exceptions.h"
 
 zend_class_entry *riak_object_ce;
 
