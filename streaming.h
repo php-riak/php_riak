@@ -20,6 +20,10 @@
 #include <php.h>
 #include <riack.h>
 
+extern zend_class_entry *riak_key_streamer_ce;
+extern zend_class_entry *riak_mr_streamer_ce;
+
+
 void riak_streaming_init(TSRMLS_D);
 
 #endif

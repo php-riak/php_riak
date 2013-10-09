@@ -271,6 +271,7 @@ PHP_METHOD(RiakCommitHookList, offsetExists)
 {
     zval *zoffset, *zhooks, *zresult;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zoffset) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
     zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
@@ -282,6 +283,7 @@ PHP_METHOD(RiakCommitHookList, offsetGet)
 {
     zval *zoffset, *zhooks, *zresult;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zoffset) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
     zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
@@ -293,6 +295,7 @@ PHP_METHOD(RiakCommitHookList, offsetSet)
 {
     zval *zoffset, *zvalue, *zhooks;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zO", &zoffset, &zvalue, riak_commit_hook_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
     zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
@@ -303,6 +306,7 @@ PHP_METHOD(RiakCommitHookList, offsetUnset)
 {
     zval *zoffset, *zhooks;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zoffset) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
     zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
@@ -333,6 +337,7 @@ PHP_METHOD(RiakModuleFunction, __construct)
     int module_len, efunction_len;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &module, &module_len, &efunction, &efunction_len) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
 
@@ -371,6 +376,7 @@ PHP_METHOD(RiakCommitHook, __construct)
     int mod_or_name_len, fun_len;
     fun_len = 0;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &mod_or_name, &mod_or_name_len, &fun, &fun_len) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
     zend_update_property_stringl(riak_commit_hook_ce, getThis(), "moduleOrName", sizeof("moduleOrName")-1, mod_or_name, mod_or_name_len TSRMLS_CC);
@@ -421,6 +427,7 @@ PHP_METHOD(RiakBucketProperties, __construct)
 	long nVal;
     zend_bool allowMult;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|lb", &nVal, &allowMult) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
 		return;
 	}
     if (ZEND_NUM_ARGS() >= 1) {

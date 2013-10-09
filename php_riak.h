@@ -72,17 +72,17 @@
 
 #define RIAK_SETTER_LONG(CE, PROPERTY_NAME) \
     long val; \
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &val) == FAILURE) { return; } \
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &val) == FAILURE) { zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC); return; } \
     zend_update_property_long(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val TSRMLS_CC);
 
 #define RIAK_SETTER_BOOL(CE, PROPERTY_NAME) \
     zend_bool val; \
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b", &val) == FAILURE) { return; } \
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b", &val) == FAILURE) { zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC); return; } \
     zend_update_property_bool(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val TSRMLS_CC);
 
 #define RIAK_SETTER_STRING(CE, PROPERTY_NAME) \
     char* val; int val_len; \
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &val, &val_len) == FAILURE) { return; } \
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &val, &val_len) == FAILURE) { zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC); return; } \
     zend_update_property_stringl(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val, val_len TSRMLS_CC);
 
 #define RIAK_CALL_METHOD_BASE(classname, name) zim_##classname##_##name

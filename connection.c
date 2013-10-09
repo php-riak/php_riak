@@ -135,6 +135,7 @@ PHP_METHOD(RiakConnection, __construct)
     zval* zbucketarr;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|l", &host, &hostLen, &port) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
 		return;
 	}
 
@@ -197,6 +198,7 @@ PHP_METHOD(RiakConnection, getBucket)
     zval* zbucketarr, *zbucket;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
 

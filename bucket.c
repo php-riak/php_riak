@@ -27,6 +27,7 @@
 #include "exceptions.h"
 #include "req_inputs.h"
 #include "req_outputs.h"
+#include "streaming.h"
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 
@@ -180,7 +181,8 @@ PHP_METHOD(RiakBucket, getKeyStream)
     riak_connection *connection;
     zval* zstreamer;
     int riackstatus;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &zstreamer) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zstreamer, riak_key_streamer_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
     connection = get_riak_connection(getThis() TSRMLS_CC);
@@ -235,6 +237,7 @@ PHP_METHOD(RiakBucket, index)
     zval *zresult;
     tolen = 0; to = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss|s", &index, &indexlen, &from, &fromlen, &to, &tolen) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
     connection = get_riak_connection(getThis() TSRMLS_CC);
@@ -630,6 +633,7 @@ PHP_METHOD(RiakBucket, delete)
 	int riackResult;
     zinput = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|o", &zparam, &zinput) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
 		return;
 	}
     memset(&props, 0, sizeof(props));
@@ -641,6 +645,7 @@ PHP_METHOD(RiakBucket, delete)
         key.len = Z_STRLEN_P(zparam);
         key.value = Z_STRVAL_P(zparam);
     } else {
+        // TODO Check the object is acutally an riak object
         /* If zparam is not a string it should be a RiakObject, get the key from the object. */
         GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, zparam, "key", zTmp, key) {
             zend_throw_exception(riak_badarguments_exception_ce, "key missing from object", 5001 TSRMLS_CC);
@@ -684,7 +689,8 @@ PHP_METHOD(RiakBucket, put)
 
     options = 0;
     zinput = NULL;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o|o", &zObject, &zinput) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|O", &zObject, riak_object_ce, &zinput, riak_put_input_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
 		return;
 	}
     connection = get_riak_connection(getThis() TSRMLS_CC);
@@ -757,6 +763,7 @@ PHP_METHOD(RiakBucket, get)
 	
     zinput = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|o", &key, &keyLen, &zinput) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
 		return;
     }
     connection = get_riak_connection(getThis() TSRMLS_CC);
