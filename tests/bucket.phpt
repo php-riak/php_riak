@@ -7,7 +7,9 @@ try {
     $connection = null;
     $bucket     = new \Riak\Bucket($connection, 'test');
 
-    echo "done!" . PHP_EOL;
+    if ($bucket->getName() == 'test') {
+        echo "done!" . PHP_EOL;
+    }
 } catch (\Riak\Exception\BadArgumentsException $e) {
     echo $e->getMessage();
 }

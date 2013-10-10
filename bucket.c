@@ -831,14 +831,14 @@ PHP_METHOD(RiakBucket, get)
 Get bucket name */
 PHP_METHOD(RiakBucket, getName)
 {
-    RIAK_GETTER_STRING(riak_object_ce, "name");
+    RIAK_GETTER_STRING(riak_bucket_ce, "name");
 }
 /* }}} */
 
 /* {{{ proto string Riak\Bucket->getConnection() */
 PHP_METHOD(RiakBucket, getConnection)
 {
-    RIAK_GETTER_OBJECT(riak_object_ce, "connection");
+    RIAK_GETTER_OBJECT(riak_bucket_ce, "connection");
 }
 /* }}} */
 
