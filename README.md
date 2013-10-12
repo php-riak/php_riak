@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/TriKaspar/php_riak.png)](https://travis-ci.org/TriKaspar/php_riak)
 
-More documentation can be found at http://phpriak.bachpedersen.dk/  
+Generated documentation can be found at http://phpriak.bachpedersen.dk/docs  
+More documentation and examples can be found at http://phpriak.bachpedersen.dk/  
+
 Stubs for editor autocompletion at https://github.com/TriKaspar/php_riak_stub  
 
 # Riak PHP extension
@@ -31,8 +33,8 @@ Migh vary depending on you php installation though.
 ## ini settings
 You can override the following settings in your php.ini (settings shown below are the default settings if not specified in php.ini)
 
-	; How many persistent connections pr. host:port so if you are connecting to 5 differenct servers there will be 20 persistent connections to each.  
-	; If you do not want to reuse connections between request set this value to 0  
+        ; How many persistent connections pr. host:port so if you are connecting to 5 differenct servers there will be 20 persistent connections to each.  
+        ; If you do not want to reuse connections between request set this value to 0  
         riak.persistent.connections=20
         ; If a connection has not been active within this time frame, automatically reconnect before using it again
         ; (in seconds)
@@ -49,8 +51,8 @@ You can override the following settings in your php.ini (settings shown below ar
 ### Riak session
 This extension includes a session module that can replace the default PHP session handler, no code changes needed just setup the following in your php.ini:
 
-	session.save_handler=riak
-	session.save_path=proto://HOST:PORT/SESSIONBUCKET
+        session.save_handler=riak
+        session.save_path=proto://HOST:PORT/SESSIONBUCKET
 
 You can specify w, dw, pw, r, rw and pr values by adding them to the session.save_path.
 For instance to use a local riak with w and r values of 2:
