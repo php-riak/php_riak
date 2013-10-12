@@ -228,7 +228,7 @@ zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *se
 
 PHP_METHOD(Riak_Search_Output_Output, hasMaxScore)
 {
-    zval *zprop = zend_read_property(riak_search_output_ce, getThis(), "maxScore", sizeof("maxScore"), 1 TSRMLS_CC);
+    zval *zprop = zend_read_property(riak_search_output_ce, getThis(), "maxScore", sizeof("maxScore")-1, 1 TSRMLS_CC);
     if (!zprop || Z_TYPE_P(zprop) == IS_NULL) {
         RETURN_BOOL(0);
     }
@@ -242,7 +242,7 @@ PHP_METHOD(Riak_Search_Output_Output, getMaxScore)
 
 PHP_METHOD(Riak_Search_Output_Output, hasNumFound)
 {
-    zval *zprop = zend_read_property(riak_search_output_ce, getThis(), "numFound", sizeof("numFound"), 1 TSRMLS_CC);
+    zval *zprop = zend_read_property(riak_search_output_ce, getThis(), "numFound", sizeof("numFound")-1, 1 TSRMLS_CC);
     if (zprop == NULL || Z_TYPE_P(zprop) == IS_NULL) {
         RETURN_BOOL(0);
     }

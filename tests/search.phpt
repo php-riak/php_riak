@@ -28,6 +28,9 @@ $search = new Search($riak);
 $si = new ParameterBag();
 $si->setDefaultField('name');
 $res = $search->search("testsearch", "apple", $si);
+if (!$res->hasMaxScore() && !$res->hasNumFound()) {
+    echo "Did not find any results :(".PHP_EOL;
+}
 foreach ($res->getDocuments() as $doc) {
     $fields = $doc->getFields();
     if ($fields["name"] != "apple") {
