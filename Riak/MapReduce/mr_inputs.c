@@ -20,9 +20,9 @@
 #include "ext/standard/php_array.h"
 #include "php_riak.h"
 #include "ht_utils.h"
-#include "object.h"
-#include "bucket.h"
-#include "exceptions.h"
+#include "Riak/object.h"
+#include "Riak/bucket.h"
+#include "Riak/exceptions.h"
 
 zend_class_entry *riak_mrinput_ce;
 zend_class_entry *riak_mrinput_bucket_ce;

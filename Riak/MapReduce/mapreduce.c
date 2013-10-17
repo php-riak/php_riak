@@ -15,11 +15,11 @@
    limitations under the License.
 */
 #include "mapreduce.h"
-#include "connection.h"
-#include "exceptions.h"
 #include "mr_output.h"
 #include "mr_inputs.h"
 #include "mr_phase.h"
+#include "Riak/connection.h"
+#include "Riak/exceptions.h"
 #include "ht_utils.h"
 #include "php_riak.h"
 #include "ext/json/php_json.h"

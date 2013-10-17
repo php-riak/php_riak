@@ -24,7 +24,7 @@ zend_class_entry *riak_mrphase_ce;
 zend_class_entry *riak_mr_mapphase_ce;
 zend_class_entry *riak_mr_reducephase_ce;
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mrphase_xx_ctor, 0, ZEND_RETURN_VALUE, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_mrphase_xx_ctor, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, function)
     ZEND_ARG_INFO(0, keep)
     ZEND_ARG_INFO(0, args)

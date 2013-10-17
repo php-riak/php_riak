@@ -21,11 +21,11 @@
 
 // #ifdef PHP_SESSION
 #include <zend_exceptions.h>
-#include "connection.h"
-#include "bucket.h"
-#include "object.h"
-#include "req_inputs.h"
-#include "req_outputs.h"
+#include "Riak/connection.h"
+#include "Riak/bucket.h"
+#include "Riak/object.h"
+#include "Riak/req_inputs.h"
+#include "Riak/req_outputs.h"
 #include "SAPI.h"
 #include <ext/standard/php_string.h>
 #include <ext/standard/url.h>

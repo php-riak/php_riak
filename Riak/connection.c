@@ -18,11 +18,11 @@
 #include <zend_exceptions.h>
 #include <riack.h>
 #include "php_riak.h"
-#include "connection.h"
-#include "object.h"
-#include "bucket.h"
-#include "pool.h"
-#include "exceptions.h"
+#include "Riak/connection.h"
+#include "Riak/object.h"
+#include "Riak/bucket.h"
+#include "Riak/pool.h"
+#include "Riak/exceptions.h"
 
 zend_class_entry *riak_connection_ce;
 
