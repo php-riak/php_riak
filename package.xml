@@ -33,50 +33,56 @@ Bug fixes:
         </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
-            <file role="src" name="bucket_properties.c"/>
-            <file role="src" name="bucket_properties.h"/>
-            <file role="src" name="bucket.c"/>
-            <file role="src" name="bucket.h"/>
-            <file role="src" name="connection.c"/>
-            <file role="src" name="connection.h"/>
+            <file role="doc" name="LICENSE"/>
+            <file role="doc" name="README.md"/>
             <file role="src" name="config.m4"/>
             <file role="src" name="config.w32"/>
-            <file role="src" name="exceptions.c"/>
-            <file role="src" name="exceptions.h"/>
             <file role="src" name="ht_utils.c"/>
             <file role="src" name="ht_utils.h"/>
-            <file role="doc" name="LICENSE"/>
-            <file role="src" name="link.c"/>
-            <file role="src" name="link.h"/>
-            <file role="src" name="mapreduce.c"/>
-            <file role="src" name="mapreduce.h"/>
-            <file role="src" name="mr_functions.c"/>
-            <file role="src" name="mr_functions.h"/>
-            <file role="src" name="mr_inputs.c"/>
-            <file role="src" name="mr_inputs.h"/>
-            <file role="src" name="mr_phase.c"/>
-            <file role="src" name="mr_phase.h"/>
-            <file role="src" name="mr_output.c"/>
-            <file role="src" name="mr_output.h"/>
-            <file role="src" name="object.c"/>
-            <file role="src" name="object.h"/>
-            <file role="src" name="php_riak.c"/>
-            <file role="src" name="php_riak.h"/>
-            <file role="src" name="pool.c"/>
-            <file role="src" name="pool.h"/>
-            <file role="doc" name="README.md"/>
             <file role="src" name="riak_session.c"/>
             <file role="src" name="riak_session.h"/>
-            <file role="src" name="search.c"/>
-            <file role="src" name="search.h"/>
-            <file role="src" name="pool_info.c"/>
-            <file role="src" name="pool_info.h"/>
-            <file role="src" name="streaming.c"/>
-            <file role="src" name="streaming.h"/>
-            <file role="src" name="req_inputs.c"/>
-            <file role="src" name="req_inputs.h"/>
-            <file role="src" name="req_outputs.c"/>
-            <file role="src" name="req_outputs.h"/>
+            <file role="src" name="php_riak.c"/>
+            <file role="src" name="php_riak.h"/>
+            <dir name="Riak">
+                <file role="src" name="bucket_properties.c"/>
+                <file role="src" name="bucket_properties.h"/>
+                <file role="src" name="bucket.c"/>
+                <file role="src" name="bucket.h"/>
+                <file role="src" name="connection.c"/>
+                <file role="src" name="connection.h"/>
+                <file role="src" name="exceptions.c"/>
+                <file role="src" name="exceptions.h"/>
+                <file role="src" name="link.c"/>
+                <file role="src" name="link.h"/>
+                <file role="src" name="object.c"/>
+                <file role="src" name="object.h"/>
+                <file role="src" name="pool.c"/>
+                <file role="src" name="pool.h"/>
+                <file role="src" name="pool_info.c"/>
+                <file role="src" name="pool_info.h"/>
+                <file role="src" name="streaming.c"/>
+                <file role="src" name="streaming.h"/>
+                <file role="src" name="req_inputs.c"/>
+                <file role="src" name="req_inputs.h"/>
+                <file role="src" name="req_outputs.c"/>
+                <file role="src" name="req_outputs.h"/>
+                <dir name="MapReduce">
+                    <file role="src" name="mapreduce.c"/>
+                    <file role="src" name="mapreduce.h"/>
+                    <file role="src" name="mr_functions.c"/>
+                    <file role="src" name="mr_functions.h"/>
+                    <file role="src" name="mr_inputs.c"/>
+                    <file role="src" name="mr_inputs.h"/>
+                    <file role="src" name="mr_phase.c"/>
+                    <file role="src" name="mr_phase.h"/>
+                    <file role="src" name="mr_output.c"/>
+                    <file role="src" name="mr_output.h"/>
+                </dir>
+                <dir name="Search">
+                    <file role="src" name="search.c"/>
+                    <file role="src" name="search.h"/>
+                </dir>
+            </dir>
             
             <dir name="riack">
                 <dir name="src">

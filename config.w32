@@ -6,8 +6,9 @@ if (PHP_RIAK != "no") {
 	if (CHECK_HEADER_ADD_INCLUDE("riack.h", "CFLAGS_RIAK", PHP_RIAK + ";" + configure_module_dirname + "/riack/src"))
 	{
                 EXTENSION("riak", "php_riak.c riak_session.c  ht_utils.c ", true, "/I" + configure_module_dirname + "/riack/src");
-                ADD_SOURCES(configure_module_dirname + "/Riak", "connection.c bucket.c object.c exceptions.c bucket_properties.c pool.c link.c pool_info.c req_inputs.c req_outputs.c search.c streaming.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/Riak", "connection.c bucket.c object.c exceptions.c bucket_properties.c pool.c link.c pool_info.c req_inputs.c req_outputs.c streaming.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/Riak/MapReduce", "mapreduce.c mr_phase.c mr_functions.c mr_inputs.c mr_output.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/Riak/Search", "search.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riack/src", "riack_sock.c riack.c riack_kv.c riack_search.c riack_msg.c riack_mem.c riack_helpers.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riack/src/google/protobuf-c", "protobuf-c.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riack/src/protocol", "riak_msg_codes.c riak_search.pb-c.c riak.pb-c.c riak_kv.pb-c.c", "riak");

@@ -16,7 +16,7 @@
 #include <php.h>
 #include <riack.h>
 #include "php_riak.h"
-#include "connection.h"
+#include "Riak/connection.h"
 #include "search.h"
 
 zend_class_entry *riak_search_ce;

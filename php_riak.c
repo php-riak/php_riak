@@ -37,7 +37,7 @@
 #include "Riak/streaming.h"
 #include "Riak/req_inputs.h"
 #include "Riak/req_outputs.h"
-#include "Riak/search.h"
+#include "Riak/Search/search.h"
 
 #ifdef PHP_SESSION
   extern ps_module ps_mod_riak;

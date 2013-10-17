@@ -10,7 +10,6 @@ autom4te.cache/
 
 *.config
 *.creator
-*.files
 *.includes
 *.user
 *.mem

@@ -18,15 +18,15 @@ if test "$PHP_RIAK" != "no"; then
     Riak/pool.c \
     Riak/link.c \
     Riak/pool_info.c \
+    Riak/streaming.c \
+    Riak/req_inputs.c \
+    Riak/req_outputs.c \
+    Riak/Search/search.c \
     Riak/MapReduce/mapreduce.c \
     Riak/MapReduce/mr_phase.c \
     Riak/MapReduce/mr_functions.c \
     Riak/MapReduce/mr_inputs.c \
-    Riak/MapReduce/mr_output.c \ 
-    Riak/search.c \
-    Riak/streaming.c \
-    Riak/req_inputs.c \
-    Riak/req_outputs.c \
+    Riak/MapReduce/mr_output.c \
     riack/src/riack_sock.c \
     riack/src/riack.c \
     riack/src/riack_kv.c \
