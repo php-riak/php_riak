@@ -12,6 +12,7 @@ if (PHP_RIAK != "no") {
                 ADD_SOURCES(configure_module_dirname + "/riack/src/google/protobuf-c", "protobuf-c.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riack/src/protocol", "riak_msg_codes.c riak_search.pb-c.c riak.pb-c.c riak_kv.pb-c.c", "riak");
 
+		ADD_FLAG("CFLAGS_RIAK", "/I " + configure_module_dirname);
 		ADD_FLAG("CFLAGS_RIAK", "/D riack_EXPORTS");
 		AC_DEFINE('HAVE_RIAK', 1);
 		ADD_EXTENSION_DEP('riak', 'json');
