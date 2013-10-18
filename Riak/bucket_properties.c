@@ -15,18 +15,16 @@
 */
 
 #include "bucket_properties.h"
-
+#include "Property/module_function.h"
+#include "Riak/exceptions.h"
 #include <zend_interfaces.h>
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
 #include "bucket.h"
 #include "connection.h"
 #include "object.h"
-#include "exceptions.h"
-
 
 zend_class_entry *riak_bucket_properties_ce;
-zend_class_entry *riak_module_function_ce;
 zend_class_entry *riak_commit_hook_ce;
 zend_class_entry *riak_commit_hook_list_ce;
 
@@ -64,18 +62,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_set_rwpr, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_module_function_ctor, 0, ZEND_RETURN_VALUE, 2)
-    ZEND_ARG_INFO(0, module)
-    ZEND_ARG_INFO(0, function)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_module_function_set, 0, ZEND_RETURN_VALUE, 1)
-    ZEND_ARG_INFO(0, value)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_module_function_noargs, 0, ZEND_RETURN_VALUE, 0)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_ctor, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, moduleOrName)
     ZEND_ARG_INFO(0, function)
@@ -102,22 +88,17 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_list_noargs, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
-static zend_function_entry riak_module_function_methods[] = {
-    PHP_ME(RiakModuleFunction, __construct, arginfo_module_function_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakModuleFunction, getModule, arginfo_module_function_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakModuleFunction, setModule, arginfo_module_function_set, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakModuleFunction, getFunction, arginfo_module_function_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakModuleFunction, setFunction, arginfo_module_function_set, ZEND_ACC_PUBLIC)
-    {NULL, NULL, NULL}
-};
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_properties_noargs, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
+
 
 static zend_function_entry riak_commit_hook_methods[] = {
     PHP_ME(RiakCommitHook, __construct, arginfo_commit_hook_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakCommitHook, getJsName, arginfo_module_function_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHook, getErlModule, arginfo_module_function_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakCommitHook, getJsName, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakCommitHook, getErlModule, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakCommitHook, getErlFunction, arginfo_commit_hook_set, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHook, isJavascript, arginfo_module_function_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHook, isErlang, arginfo_module_function_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakCommitHook, isJavascript, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakCommitHook, isErlang, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -218,11 +199,6 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "chashKeyFun", sizeof("chashKeyFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "linkFun", sizeof("linkFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "replicationMode", sizeof("replicationMode")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "ModuleFunction", riak_module_function_methods);
-    riak_module_function_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(riak_module_function_ce, "module", sizeof("module")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_null(riak_module_function_ce, "function", sizeof("function")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "CommitHook", riak_commit_hook_methods);
     riak_commit_hook_ce = zend_register_internal_class(&ce TSRMLS_CC);
@@ -328,45 +304,6 @@ PHP_METHOD(RiakCommitHookList, getIterator)
     zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
     zend_call_method_with_0_params(&zhooks, spl_ce_ArrayObject, NULL, "getiterator", &zresult);
     RETURN_ZVAL(zresult, 0, 1);
-}
-
-/* {{{ proto void Riak\Property\ModuleFunction->__construct(string $module, string $function)
-Creates a new Riak\Property\ModuleFunction */
-PHP_METHOD(RiakModuleFunction, __construct)
-{
-    char *module, *efunction;
-    int module_len, efunction_len;
-
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &module, &module_len, &efunction, &efunction_len) == FAILURE) {
-        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-        return;
-    }
-
-    zend_update_property_stringl(riak_module_function_ce, getThis(), "module", sizeof("module")-1, module, module_len TSRMLS_CC);
-    zend_update_property_stringl(riak_module_function_ce, getThis(), "function", sizeof("function")-1, efunction, efunction_len TSRMLS_CC);
-}
-/* }}} */
-
-PHP_METHOD(RiakModuleFunction, getModule)
-{
-    RIAK_GETTER_STRING(riak_module_function_ce, "module")
-}
-
-PHP_METHOD(RiakModuleFunction, setModule)
-{
-    RIAK_SETTER_STRING(riak_module_function_ce, "module")
-    RIAK_RETURN_THIS
-}
-
-PHP_METHOD(RiakModuleFunction, getFunction)
-{
-    RIAK_GETTER_STRING(riak_module_function_ce, "function")
-}
-
-PHP_METHOD(RiakModuleFunction, setFunction)
-{
-    RIAK_SETTER_STRING(riak_module_function_ce, "function")
-    RIAK_RETURN_THIS
 }
 
 /* {{{ proto void Riak\Property\CommitHook->__construct(string $name, ModuleFunction $moduleFunction)

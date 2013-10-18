@@ -67,6 +67,10 @@ Bug fixes:
                 <file role="src" name="req_inputs.h"/>
                 <file role="src" name="req_outputs.c"/>
                 <file role="src" name="req_outputs.h"/>
+                <dir name="Property">
+                    <file role="src" name="module_function.c"/>
+                    <file role="src" name="module_function.h"/>
+                </dir>
                 <dir name="MapReduce">
                     <file role="src" name="mapreduce.c"/>
                     <file role="src" name="mapreduce.h"/>

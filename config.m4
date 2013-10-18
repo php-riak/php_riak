@@ -22,6 +22,7 @@ if test "$PHP_RIAK" != "no"; then
     Riak/streaming.c \
     Riak/req_inputs.c \
     Riak/req_outputs.c \
+    Riak/Property/module_function.c \
     Riak/Search/search.c \
     Riak/Search/Input/parameter_bag.c \
     Riak/Search/Output/document_output.c \

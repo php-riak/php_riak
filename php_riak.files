@@ -145,3 +145,5 @@ Riak/Search/Output/document_output.h
 php_riak_internal.h
 Riak/pool_info.h
 Riak/pool_info.c
+Riak/Property/module_function.c
+Riak/Property/module_function.h

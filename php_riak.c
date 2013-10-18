@@ -39,6 +39,7 @@
 #include "Riak/Search/search.h"
 #include "Riak/Search/Input/parameter_bag.h"
 #include "Riak/Search/Output/output.h"
+#include "Riak/Property/module_function.h"
 
 #ifdef PHP_RIAK_SESSION
   extern ps_module ps_mod_riak;
@@ -101,6 +102,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_link_init(TSRMLS_C);
     riak_bucket_init(TSRMLS_C);
     riak_bucket_props_init(TSRMLS_C);
+    riak_property_module_function_init(TSRMLS_C);
 
     riak_mapreduce_init(TSRMLS_C);
     riak_mrphase_init(TSRMLS_C);
