@@ -14,11 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
+
+#include "connection.h"
 #include <zend_exceptions.h>
-#include <riack.h>
-#include "php_riak.h"
-#include "Riak/connection.h"
 #include "Riak/object.h"
 #include "Riak/bucket.h"
 #include "Riak/pool.h"

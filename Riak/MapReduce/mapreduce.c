@@ -21,7 +21,7 @@
 #include "Riak/connection.h"
 #include "Riak/exceptions.h"
 #include "ht_utils.h"
-#include "php_riak.h"
+#include "php_riak_internal.h"
 #include "ext/json/php_json.h"
 
 zend_class_entry *riak_mapreduce_ce;

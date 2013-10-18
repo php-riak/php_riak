@@ -13,13 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
-#include <riack.h>
-#include "php_riak.h"
+
+#include "search.h"
 #include "Riak/connection.h"
 #include "Input/parameter_bag.h"
 #include "Output/output.h"
-#include "search.h"
 
 zend_class_entry *riak_search_ce;
 

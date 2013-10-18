@@ -14,10 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
-#include <riack.h>
+
 #include "link.h"
-#include "php_riak.h"
 
 zend_class_entry *riak_link_ce;
 

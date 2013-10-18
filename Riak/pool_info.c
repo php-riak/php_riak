@@ -14,9 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
-#include <riack.h>
-#include "php_riak.h"
+
 #include "pool_info.h"
 
 zend_class_entry *riak_poolinfo_ce;

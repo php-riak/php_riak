@@ -17,6 +17,8 @@
 #ifndef RIAK_SEARCH__OUTPUT__OUTPUT__H__
 #define RIAK_SEARCH__OUTPUT__OUTPUT__H__
 
+#include "php_riak_internal.h"
+
 extern zend_class_entry *riak_search_output_ce;
 
 void riak_search_output_output_init(TSRMLS_D);

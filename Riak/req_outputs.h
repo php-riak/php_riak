@@ -17,8 +17,7 @@
 #ifndef RIAK_OUTPUTS__H__
 #define RIAK_OUTPUTS__H__
 
-#include <php.h>
-#include <riack.h>
+#include "php_riak_internal.h"
 
 extern zend_class_entry *riak_output_ce;
 extern zend_class_entry *riak_get_output_ce;

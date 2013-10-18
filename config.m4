@@ -1,10 +1,11 @@
 dnl lines starting with "dnl" are comments
 
 PHP_ARG_ENABLE(riak, whether to enable Riak extension, [  --enable-riak   Enable Riak extension])
-
+PHP_ARG_ENABLE(riak-session, whether to enable riak sessions, [ --disable-riak-session Disable riak session support], yes, no)
 if test "$PHP_RIAK" != "no"; then
-
-  AC_DEFINE(PHP_SESSION,1,[riak session])
+  if test "$PHP_RIAK_SESSION" != "no"; then
+    AC_DEFINE(PHP_RIAK_SESSION,1,[riak session])
+  fi
 
   dnl this defines the extension
   PHP_NEW_EXTENSION(riak, php_riak.c \

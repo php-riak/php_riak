@@ -15,7 +15,7 @@
    limitations under the License.
 */
 #include "mr_output.h"
-#include "php_riak.h"
+#include "php_riak_internal.h"
 #include "ext/json/php_json.h"
 
 zend_class_entry *riak_mroutput_ce;

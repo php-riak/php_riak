@@ -18,6 +18,8 @@
 #ifndef RIAK_POOL_INFO__H__
 #define RIAK_POOL_INFO__H__
 
+#include "php_riak_internal.h"
+
 extern zend_class_entry *riak_poolinfo_ce;
 
 PHP_METHOD(RiakPoolInfo, getNumActiveConnection);

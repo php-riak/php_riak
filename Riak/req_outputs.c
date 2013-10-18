@@ -15,7 +15,6 @@
 */
 
 #include "req_outputs.h"
-#include "php_riak.h"
 #include "object.h"
 
 zend_class_entry *riak_output_ce;

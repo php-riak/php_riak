@@ -43,6 +43,7 @@ Bug fixes:
             <file role="src" name="riak_session.h"/>
             <file role="src" name="php_riak.c"/>
             <file role="src" name="php_riak.h"/>
+            <file role="src" name="php_riak_internal.h"/>
             <dir name="Riak">
                 <file role="src" name="bucket_properties.c"/>
                 <file role="src" name="bucket_properties.h"/>

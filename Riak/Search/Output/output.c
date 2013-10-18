@@ -13,9 +13,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
-#include <riack.h>
-#include "php_riak.h"
 #include "output.h"
 #include "document_output.h"
 

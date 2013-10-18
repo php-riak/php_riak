@@ -18,6 +18,7 @@ if (PHP_RIAK != "no") {
 		ADD_FLAG("CFLAGS_RIAK", "/I " + configure_module_dirname);
 		ADD_FLAG("CFLAGS_RIAK", "/D riack_EXPORTS");
 		AC_DEFINE('HAVE_RIAK', 1);
+                AC_DEFINE('PHP_RIAK_SESSION', 1);
 		ADD_EXTENSION_DEP('riak', 'json');
                 ADD_EXTENSION_DEP('riak', 'spl');
 		ADD_EXTENSION_DEP('riak', 'session');

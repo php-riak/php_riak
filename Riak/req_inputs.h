@@ -17,8 +17,7 @@
 #ifndef RIAK_REQ_CONFIGS__H__
 #define RIAK_REQ_CONFIGS__H__
 
-#include <php.h>
-#include <riack.h>
+#include "php_riak_internal.h"
 
 extern zend_class_entry *riak_get_input_ce;
 extern zend_class_entry *riak_put_input_ce;

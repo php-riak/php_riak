@@ -16,7 +16,6 @@
 */
 
 #include "object.h"
-#include "php_riak.h"
 #include "link.h"
 #include "ht_utils.h"
 #include "exceptions.h"

@@ -18,7 +18,7 @@
 #ifndef RIAK_MR_PHASE__H__
 #define RIAK_MR_PHASE__H__
 
-#include <php.h>
+#include "php_riak_internal.h"
 
 extern zend_class_entry *riak_mrphase_ce;
 

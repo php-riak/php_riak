@@ -18,6 +18,7 @@
 #ifndef RIAK_POOL__H__
 #define RIAK_POOL__H__
 
+#include "php_riak_internal.h"
 #include <php.h>
 #include <time.h>
 

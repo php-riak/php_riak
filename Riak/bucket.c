@@ -15,11 +15,6 @@
    limitations under the License.
 */
 
-#include <php.h>
-#include <riack.h>
-#include <ext/spl/spl_iterators.h>
-#include <ext/spl/spl_array.h>
-#include "php_riak.h"
 #include "bucket.h"
 #include "bucket_properties.h"
 #include "connection.h"
@@ -28,6 +23,8 @@
 #include "req_inputs.h"
 #include "req_outputs.h"
 #include "streaming.h"
+#include <ext/spl/spl_iterators.h>
+#include <ext/spl/spl_array.h>
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 

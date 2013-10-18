@@ -14,11 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
-#include <riack.h>
 #include "mr_inputs.h"
 #include "ext/standard/php_array.h"
-#include "php_riak.h"
 #include "ht_utils.h"
 #include "Riak/object.h"
 #include "Riak/bucket.h"

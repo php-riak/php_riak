@@ -17,6 +17,8 @@
 #ifndef RIAK_SEARCH__H__
 #define RIAK_SEARCH__H__
 
+#include "php_riak_internal.h"
+
 extern zend_class_entry *riak_search_ce;
 
 /* helpers */

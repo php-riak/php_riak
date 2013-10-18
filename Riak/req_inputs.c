@@ -14,7 +14,6 @@
    limitations under the License.
 */
 #include "req_inputs.h"
-#include "php_riak.h"
 
 zend_class_entry *riak_get_input_ce;
 zend_class_entry *riak_put_input_ce;

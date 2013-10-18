@@ -18,7 +18,7 @@
 #ifndef RIAK_CONNECTION__H__
 #define RIAK_CONNECTION__H__
 
-#include <riack.h>
+#include "php_riak_internal.h"
 #include "pool.h"
 
 extern zend_class_entry *riak_connection_ce;

@@ -17,6 +17,8 @@
 #ifndef RIAK_SEARCH__INPUT__PARAMETER_BAG__H__
 #define RIAK_SEARCH__INPUT__PARAMETER_BAG__H__
 
+#include "php_riak_internal.h"
+
 extern zend_class_entry *riak_search_input_ce;
 
 void riak_search_input_parameterbag_init(TSRMLS_D);

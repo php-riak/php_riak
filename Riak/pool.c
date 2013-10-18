@@ -15,9 +15,6 @@
    limitations under the License.
 */
 #include "pool.h"
-#include "php_riak.h"
-#include <php.h>
-#include <riack.h>
 
 zend_bool ensure_connected(riak_connection *connection TSRMLS_DC) /* {{{ */
 {

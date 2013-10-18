@@ -15,10 +15,9 @@
    limitations under the License.
 */
 
-#include <php.h>
-#include <php_ini.h>
-#include <riack.h>
+#include "php_riak_internal.h"
 #include "php_riak.h"
+#include <php_ini.h>
 
 #include "Riak/pool.h"
 #include "Riak/connection.h"
@@ -41,7 +40,7 @@
 #include "Riak/Search/Input/parameter_bag.h"
 #include "Riak/Search/Output/output.h"
 
-#ifdef PHP_SESSION
+#ifdef PHP_RIAK_SESSION
   extern ps_module ps_mod_riak;
 #endif
 
@@ -118,7 +117,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_search_input_parameterbag_init(TSRMLS_C);
     riak_search_output_output_init(TSRMLS_C);
 
-#ifdef PHP_SESSION
+#ifdef PHP_RIAK_SESSION
     php_session_register_module(&ps_mod_riak);
 #endif
     return SUCCESS;

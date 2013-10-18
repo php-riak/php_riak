@@ -13,16 +13,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
+
+#include "bucket_properties.h"
+
 #include <zend_interfaces.h>
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
-#include "bucket_properties.h"
 #include "bucket.h"
 #include "connection.h"
 #include "object.h"
 #include "exceptions.h"
-#include "php_riak.h"
+
 
 zend_class_entry *riak_bucket_properties_ce;
 zend_class_entry *riak_module_function_ce;

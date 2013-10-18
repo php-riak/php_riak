@@ -18,7 +18,7 @@
 #ifndef RIAK_MR_FUNCTION__H__
 #define RIAK_MR_FUNCTION__H__
 
-#include <php.h>
+#include "php_riak_internal.h"
 
 extern zend_class_entry *riak_mrfunction_ce;
 

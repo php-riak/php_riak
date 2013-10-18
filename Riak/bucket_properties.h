@@ -18,6 +18,8 @@
 #ifndef RIAK_BUCKET__PROPERTIES__H__
 #define RIAK_BUCKET__PROPERTIES__H__
 
+#include "php_riak_internal.h"
+
 extern zend_class_entry *riak_bucket_properties_ce;
 extern zend_class_entry *riak_module_function_ce;
 extern zend_class_entry *riak_commit_hook_ce;

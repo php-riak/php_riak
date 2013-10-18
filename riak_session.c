@@ -15,11 +15,10 @@
    limitations under the License.
 */
 
-#include <php.h>
-#include <riack.h>
 #include "riak_session.h"
 
-// #ifdef PHP_SESSION
+#ifdef PHP_RIAK_SESSION
+
 #include <zend_exceptions.h>
 #include "Riak/connection.h"
 #include "Riak/bucket.h"
@@ -284,5 +283,4 @@ PS_GC_FUNC(riak) /* {{{ */
 }
 /* }}} */
 
-//#endif
-
+#endif // PHP_RIAK_SESSION

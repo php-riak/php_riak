@@ -18,7 +18,7 @@
 #ifndef RIAK_LINK__H__
 #define RIAK_LINK__H__
 
-#include <php.h>
+#include "php_riak_internal.h"
 
 extern zend_class_entry *riak_link_ce;
 
