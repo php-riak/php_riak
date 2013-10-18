@@ -1,3 +1,3 @@
 [submodule "LibRiack"]
 	path = LibRiack
-	url = git@github.com:trifork/riack.git
+	url = https://github.com/trifork/riack.git 
