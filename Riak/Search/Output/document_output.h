@@ -14,23 +14,16 @@
    limitations under the License.
 */
 
-#ifndef RIAK_SEARCH__H__
-#define RIAK_SEARCH__H__
+#ifndef RIAK__SEARCH__OUTPUT__DOCUMENT_OUTPUT__H__
+#define RIAK__SEARCH__OUTPUT__DOCUMENT_OUTPUT__H__
 
-extern zend_class_entry *riak_search_ce;
+extern zend_class_entry *riak_search_doc_ce;
 
-/* helpers */
-
-void riak_search_init(TSRMLS_D);
-void riak_search_set_optional_params(struct RIACK_CLIENT *client, zval* zparams, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC);
-void riak_search_free_optional_params(struct RIACK_CLIENT *client, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC);
-
-zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *search_result TSRMLS_DC);
+void riak_search_output_document_output_init(TSRMLS_D);
 zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* document TSRMLS_DC);
 
-/* Search */
 
-PHP_METHOD(Riak_Search, __construct);
-PHP_METHOD(Riak_Search, search);
+/* Riak\Search\Output\DocumentOutput */
+PHP_METHOD(Riak_Search_Output_DocumentOutput, getFields);
 
-#endif
+#endif //#ifndef RIAK__SEARCH__OUTPUT__DOCUMENT_OUTPUT__H__

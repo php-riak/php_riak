@@ -38,6 +38,8 @@
 #include "Riak/req_inputs.h"
 #include "Riak/req_outputs.h"
 #include "Riak/Search/search.h"
+#include "Riak/Search/Input/parameter_bag.h"
+#include "Riak/Search/Output/output.h"
 
 #ifdef PHP_SESSION
   extern ps_module ps_mod_riak;
@@ -113,6 +115,8 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_req_inputs_init(TSRMLS_C);
     riak_req_outputs_init(TSRMLS_C);
     riak_search_init(TSRMLS_C);
+    riak_search_input_parameterbag_init(TSRMLS_C);
+    riak_search_output_output_init(TSRMLS_C);
 
 #ifdef PHP_SESSION
     php_session_register_module(&ps_mod_riak);

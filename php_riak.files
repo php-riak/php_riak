@@ -136,3 +136,9 @@ tests/property_commit_hook.phpt
 tests/bucket_props_ext.phpt
 tests/session_autostart.php
 tests/bucket.phpt
+Riak/Search/Input/parameter_bag.c
+Riak/Search/Input/parameter_bag.h
+Riak/Search/Output/output.c
+Riak/Search/Output/output.h
+Riak/Search/Output/document_output.c
+Riak/Search/Output/document_output.h

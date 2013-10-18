@@ -81,10 +81,20 @@ Bug fixes:
                 <dir name="Search">
                     <file role="src" name="search.c"/>
                     <file role="src" name="search.h"/>
+                    <dir name="Input">
+                        <file role="src" name="parameter_bag.c"/>
+                        <file role="src" name="parameter_bag.h"/>
+                    </dir>
+                    <dir name="Output">
+                        <file role="src" name="output.c"/>
+                        <file role="src" name="output.h"/>
+                        <file role="src" name="document_output.c"/>
+                        <file role="src" name="document_output.h"/>
+                    </dir>
                 </dir>
             </dir>
             
-            <dir name="riack">
+            <dir name="LibRiack">
                 <dir name="src">
                     <file role="src" name="ints.h"/>
                     <file role="src" name="riack_defines.h"/>

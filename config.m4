@@ -22,35 +22,38 @@ if test "$PHP_RIAK" != "no"; then
     Riak/req_inputs.c \
     Riak/req_outputs.c \
     Riak/Search/search.c \
+    Riak/Search/Input/parameter_bag.c \
+    Riak/Search/Output/document_output.c \
+    Riak/Search/Output/output.c \
     Riak/MapReduce/mapreduce.c \
     Riak/MapReduce/mr_phase.c \
     Riak/MapReduce/mr_functions.c \
     Riak/MapReduce/mr_inputs.c \
     Riak/MapReduce/mr_output.c \
-    riack/src/riack_sock.c \
-    riack/src/riack.c \
-    riack/src/riack_kv.c \
-    riack/src/riack_search.c \
-    riack/src/riack_msg.c \
-    riack/src/riack_mem.c \
-    riack/src/riack_helpers.c \
-    riack/src/protocol/riak_msg_codes.c \
-    riack/src/protocol/riak_search.pb-c.c \
-    riack/src/protocol/riak.pb-c.c \
-    riack/src/protocol/riak_kv.pb-c.c \
-    riack/src/google/protobuf-c/protobuf-c.c, $ext_shared)
+    LibRiack/src/riack_sock.c \
+    LibRiack/src/riack.c \
+    LibRiack/src/riack_kv.c \
+    LibRiack/src/riack_search.c \
+    LibRiack/src/riack_msg.c \
+    LibRiack/src/riack_mem.c \
+    LibRiack/src/riack_helpers.c \
+    LibRiack/src/protocol/riak_msg_codes.c \
+    LibRiack/src/protocol/riak_search.pb-c.c \
+    LibRiack/src/protocol/riak.pb-c.c \
+    LibRiack/src/protocol/riak_kv.pb-c.c \
+    LibRiack/src/google/protobuf-c/protobuf-c.c, $ext_shared)
 
-  PHP_ADD_BUILD_DIR([$ext_builddir/riack/src], 1)
-  PHP_ADD_INCLUDE([$ext_builddir/riack/src])
-  PHP_ADD_INCLUDE([$ext_srcdir/riack/src])
+  PHP_ADD_BUILD_DIR([$ext_builddir/LibRiack/src], 1)
+  PHP_ADD_INCLUDE([$ext_builddir/LibRiack/src])
+  PHP_ADD_INCLUDE([$ext_srcdir/LibRiack/src])
 
-  PHP_ADD_BUILD_DIR([$ext_builddir/riack/src/protocol], 1)
-  PHP_ADD_INCLUDE([$ext_builddir/riack/src/protocol])
-  PHP_ADD_INCLUDE([$ext_srcdir/riack/src/protocol])
+  PHP_ADD_BUILD_DIR([$ext_builddir/LibRiack/src/protocol], 1)
+  PHP_ADD_INCLUDE([$ext_builddir/LibRiack/src/protocol])
+  PHP_ADD_INCLUDE([$ext_srcdir/LibRiack/src/protocol])
 
-  PHP_ADD_BUILD_DIR([$ext_builddir/riack/src/google/protobuf-c], 1)
-  PHP_ADD_INCLUDE([$ext_builddir/riack/src/google/protobuf-c])
-  PHP_ADD_INCLUDE([$ext_srcdir/riack/src/google/protobuf-c])
+  PHP_ADD_BUILD_DIR([$ext_builddir/LibRiack/src/google/protobuf-c], 1)
+  PHP_ADD_INCLUDE([$ext_builddir/LibRiack/src/google/protobuf-c])
+  PHP_ADD_INCLUDE([$ext_srcdir/LibRiack/src/google/protobuf-c])
 
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in
