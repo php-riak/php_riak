@@ -3,9 +3,9 @@
 
 ARG_ENABLE("riak", "Riak php support", "no");
 if (PHP_RIAK != "no") {
-	if (CHECK_HEADER_ADD_INCLUDE("riack.h", "CFLAGS_RIAK", PHP_RIAK + ";" + configure_module_dirname + "/riack/src"))
+        if (CHECK_HEADER_ADD_INCLUDE("riack.h", "CFLAGS_RIAK", PHP_RIAK + ";" + configure_module_dirname + "/LibRiack/src"))
 	{
-                EXTENSION("riak", "php_riak.c riak_session.c  ht_utils.c ", true, "/I" + configure_module_dirname + "/riack/src");
+                EXTENSION("riak", "php_riak.c riak_session.c  ht_utils.c ", true, "/I" + configure_module_dirname + "/LibRiack/src");
                 ADD_SOURCES(configure_module_dirname + "/riak", "connection.c bucket.c object.c exceptions.c bucket_properties.c pool.c link.c pool_info.c req_inputs.c req_outputs.c streaming.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/map_reduce", "mapreduce.c mr_phase.c mr_functions.c mr_inputs.c mr_output.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/search", "search.c", "riak");
