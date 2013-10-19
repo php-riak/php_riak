@@ -17,10 +17,10 @@
 
 #include "connection.h"
 #include <zend_exceptions.h>
-#include "Riak/object.h"
-#include "Riak/bucket.h"
-#include "Riak/pool.h"
-#include "Riak/exceptions.h"
+#include "object.h"
+#include "bucket.h"
+#include "pool.h"
+#include "exceptions.h"
 
 zend_class_entry *riak_connection_ce;
 

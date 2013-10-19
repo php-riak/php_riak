@@ -1,6 +1,5 @@
 /*
-   Copyright 2013 Trifork A/S
-   Author: Kaspar Bach Pedersen
+   Copyright 2013: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,7 +14,7 @@
    limitations under the License.
 */
 #include "module_function.h"
-#include "Riak/exceptions.h"
+#include "riak/exceptions.h"
 
 zend_class_entry *riak_module_function_ce;
 

@@ -11,27 +11,29 @@ if test "$PHP_RIAK" != "no"; then
   PHP_NEW_EXTENSION(riak, php_riak.c \
     ht_utils.c \
     riak_session.c \
-    Riak/connection.c \
-    Riak/bucket.c \
-    Riak/object.c \
-    Riak/exceptions.c \
-    Riak/bucket_properties.c \
-    Riak/pool.c \
-    Riak/link.c \
-    Riak/pool_info.c \
-    Riak/streaming.c \
-    Riak/req_inputs.c \
-    Riak/req_outputs.c \
-    Riak/Property/module_function.c \
-    Riak/Search/search.c \
-    Riak/Search/Input/parameter_bag.c \
-    Riak/Search/Output/document_output.c \
-    Riak/Search/Output/output.c \
-    Riak/MapReduce/mapreduce.c \
-    Riak/MapReduce/mr_phase.c \
-    Riak/MapReduce/mr_functions.c \
-    Riak/MapReduce/mr_inputs.c \
-    Riak/MapReduce/mr_output.c \
+    riak/connection.c \
+    riak/bucket.c \
+    riak/object.c \
+    riak/exceptions.c \
+    riak/bucket_properties.c \
+    riak/pool.c \
+    riak/link.c \
+    riak/pool_info.c \
+    riak/streaming.c \
+    riak/req_inputs.c \
+    riak/req_outputs.c \
+    riak/property/module_function.c \
+    riak/property/commit_hook.c \
+    riak/property/commit_hook_list.c \
+    riak/search/search.c \
+    riak/search/input/parameter_bag.c \
+    riak/search/output/document_output.c \
+    riak/search/output/output.c \
+    riak/map_reduce/mapreduce.c \
+    riak/map_reduce/mr_phase.c \
+    riak/map_reduce/mr_functions.c \
+    riak/map_reduce/mr_inputs.c \
+    riak/map_reduce/mr_output.c \
     LibRiack/src/riack_sock.c \
     LibRiack/src/riack.c \
     LibRiack/src/riack_kv.c \

@@ -13,21 +13,21 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
-#ifndef RIAK_PROPERTY__MODULE_FUNCTION__H__
-#define RIAK_PROPERTY__MODULE_FUNCTION__H__
+#ifndef RIAK_PROPERTY__COMMIT_HOOK_LIST__H__
+#define RIAK_PROPERTY__COMMIT_HOOK_LIST__H__
 
 #include "php_riak_internal.h"
 
-extern zend_class_entry *riak_module_function_ce;
+extern zend_class_entry *riak_commit_hook_list_ce;
 
-void riak_property_module_function_init(TSRMLS_D);
+void riak_property_commit_hook_list_init(TSRMLS_D);
 
-PHP_METHOD(RiakModuleFunction, __construct);
-PHP_METHOD(RiakModuleFunction, getModule);
-PHP_METHOD(RiakModuleFunction, setModule);
-PHP_METHOD(RiakModuleFunction, getFunction);
-PHP_METHOD(RiakModuleFunction, setFunction);
-
+PHP_METHOD(RiakCommitHookList, __construct);
+PHP_METHOD(RiakCommitHookList, offsetExists);
+PHP_METHOD(RiakCommitHookList, offsetGet);
+PHP_METHOD(RiakCommitHookList, offsetSet);
+PHP_METHOD(RiakCommitHookList, offsetUnset);
+PHP_METHOD(RiakCommitHookList, count);
+PHP_METHOD(RiakCommitHookList, getIterator);
 
 #endif

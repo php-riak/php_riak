@@ -15,18 +15,15 @@
 */
 
 #include "bucket_properties.h"
-#include "Property/module_function.h"
-#include "Riak/exceptions.h"
-#include <zend_interfaces.h>
-#include <ext/spl/spl_iterators.h>
-#include <ext/spl/spl_array.h>
+#include "property/module_function.h"
+#include "property/commit_hook.h"
+#include "property/commit_hook_list.h"
+#include "riak/exceptions.h"
 #include "bucket.h"
 #include "connection.h"
 #include "object.h"
 
 zend_class_entry *riak_bucket_properties_ce;
-zend_class_entry *riak_commit_hook_ce;
-zend_class_entry *riak_commit_hook_list_ce;
 
 zend_class_entry *riak_replication_mode_ce;
 zend_class_entry *riak_replication_mode_full_only_ce;
@@ -62,56 +59,9 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_set_rwpr, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_ctor, 0, ZEND_RETURN_VALUE, 1)
-    ZEND_ARG_INFO(0, moduleOrName)
-    ZEND_ARG_INFO(0, function)
-ZEND_END_ARG_INFO()
-
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_set, 0, ZEND_RETURN_VALUE, 1)
-    ZEND_ARG_INFO(0, value)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_set_noargs, 0, ZEND_RETURN_VALUE, 0)
-ZEND_END_ARG_INFO()
-
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_list_offset_exists, 0, ZEND_RETURN_VALUE, 1)
-    ZEND_ARG_INFO(0, offset)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_list_offset_set, 0, ZEND_RETURN_VALUE, 2)
-    ZEND_ARG_INFO(0, offset)
-    ZEND_ARG_INFO(0, value)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_commit_hook_list_noargs, 0, ZEND_RETURN_VALUE, 0)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_properties_noargs, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
-
-static zend_function_entry riak_commit_hook_methods[] = {
-    PHP_ME(RiakCommitHook, __construct, arginfo_commit_hook_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakCommitHook, getJsName, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHook, getErlModule, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHook, getErlFunction, arginfo_commit_hook_set, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHook, isJavascript, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHook, isErlang, arginfo_bucket_properties_noargs, ZEND_ACC_PUBLIC)
-    {NULL, NULL, NULL}
-};
-
-static zend_function_entry riak_commit_hook_list_methods[] = {
-    PHP_ME(RiakCommitHookList, __construct, arginfo_commit_hook_list_noargs, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-    PHP_ME(RiakCommitHookList, offsetExists, arginfo_commit_hook_list_offset_exists, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHookList, offsetGet, arginfo_commit_hook_list_offset_exists, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHookList, offsetSet, arginfo_commit_hook_list_offset_set, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHookList, offsetUnset, arginfo_commit_hook_list_offset_exists, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHookList, count, arginfo_commit_hook_list_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(RiakCommitHookList, getIterator, arginfo_commit_hook_list_noargs, ZEND_ACC_PUBLIC)
-    {NULL, NULL, NULL}
-};
 
 static zend_function_entry riak_bucket_properties_methods[] = {
 	PHP_ME(RiakBucketProperties, __construct, arginfo_bucket_props_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
@@ -200,16 +150,6 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "linkFun", sizeof("linkFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "replicationMode", sizeof("replicationMode")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "CommitHook", riak_commit_hook_methods);
-    riak_commit_hook_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(riak_commit_hook_ce, "moduleOrName", sizeof("moduleOrName")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-    zend_declare_property_null(riak_commit_hook_ce, "function", sizeof("function")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property", "CommitHookList", riak_commit_hook_list_methods);
-    riak_commit_hook_list_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_class_implements(riak_commit_hook_list_ce TSRMLS_CC, 3, spl_ce_ArrayAccess, spl_ce_Aggregate, spl_ce_Countable);
-    zend_declare_property_null(riak_commit_hook_list_ce, "hooks", sizeof("hooks")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "ReplicationMode", riak_replication_mode_functions);
     riak_replication_mode_ce = zend_register_internal_interface(&ce TSRMLS_CC);
 
@@ -231,132 +171,6 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
 
 }
 /* }}} */
-
-/* {{{ proto void Riak\Property\RiakCommitHookList->__construct()
-Creates a new Riak\Property\RiakCommitHookList */
-PHP_METHOD(RiakCommitHookList, __construct)
-{
-    zval* zhooks;
-    // Start with an empty array
-    MAKE_STD_ZVAL(zhooks);
-    object_init_ex(zhooks, spl_ce_ArrayObject);
-    zend_update_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, zhooks TSRMLS_CC);
-    zval_ptr_dtor(&zhooks);
-}/* }}} */
-
-PHP_METHOD(RiakCommitHookList, offsetExists)
-{
-    zval *zoffset, *zhooks, *zresult;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zoffset) == FAILURE) {
-        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-        return;
-    }
-    zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
-    zend_call_method_with_1_params(&zhooks, spl_ce_ArrayObject, NULL, "offsetexists", &zresult, zoffset);
-    RETURN_ZVAL(zresult, 0, 1);
-}
-
-PHP_METHOD(RiakCommitHookList, offsetGet)
-{
-    zval *zoffset, *zhooks, *zresult;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zoffset) == FAILURE) {
-        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-        return;
-    }
-    zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
-    zend_call_method_with_1_params(&zhooks, spl_ce_ArrayObject, NULL, "offsetget", &zresult, zoffset);
-    RETURN_ZVAL(zresult, 0, 1);
-}
-
-PHP_METHOD(RiakCommitHookList, offsetSet)
-{
-    zval *zoffset, *zvalue, *zhooks;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zO", &zoffset, &zvalue, riak_commit_hook_ce) == FAILURE) {
-        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-        return;
-    }
-    zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
-    zend_call_method_with_2_params(&zhooks, spl_ce_ArrayObject, NULL, "offsetset", NULL, zoffset, zvalue);
-}
-
-PHP_METHOD(RiakCommitHookList, offsetUnset)
-{
-    zval *zoffset, *zhooks;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zoffset) == FAILURE) {
-        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-        return;
-    }
-    zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
-    zend_call_method_with_1_params(&zhooks, spl_ce_ArrayObject, NULL, "offsetunset", NULL, zoffset);
-}
-
-PHP_METHOD(RiakCommitHookList, count)
-{
-    zval *zhooks, *zresult;
-    zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
-    zend_call_method_with_0_params(&zhooks, spl_ce_ArrayObject, NULL, "count", &zresult);
-    RETURN_ZVAL(zresult, 0, 1);
-}
-
-PHP_METHOD(RiakCommitHookList, getIterator)
-{
-    zval *zhooks, *zresult;
-    zhooks = zend_read_property(riak_commit_hook_list_ce, getThis(), "hooks", sizeof("hooks")-1, 1 TSRMLS_CC);
-    zend_call_method_with_0_params(&zhooks, spl_ce_ArrayObject, NULL, "getiterator", &zresult);
-    RETURN_ZVAL(zresult, 0, 1);
-}
-
-/* {{{ proto void Riak\Property\CommitHook->__construct(string $name, ModuleFunction $moduleFunction)
-Creates a new Riak\Property\CommitHook */
-PHP_METHOD(RiakCommitHook, __construct)
-{
-    char *mod_or_name, *fun;
-    int mod_or_name_len, fun_len;
-    fun_len = 0;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &mod_or_name, &mod_or_name_len, &fun, &fun_len) == FAILURE) {
-        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-        return;
-    }
-    zend_update_property_stringl(riak_commit_hook_ce, getThis(), "moduleOrName", sizeof("moduleOrName")-1, mod_or_name, mod_or_name_len TSRMLS_CC);
-    if (fun_len > 0) {
-        zend_update_property_stringl(riak_commit_hook_ce, getThis(), "function", sizeof("function")-1, fun, fun_len TSRMLS_CC);
-    }
-}
-/* }}} */
-
-PHP_METHOD(RiakCommitHook, getJsName)
-{
-    RIAK_GETTER_STRING(riak_commit_hook_ce, "moduleOrName")
-}
-
-PHP_METHOD(RiakCommitHook, getErlModule)
-{
-    RIAK_GETTER_STRING(riak_commit_hook_ce, "moduleOrName")
-}
-
-PHP_METHOD(RiakCommitHook, getErlFunction)
-{
-    RIAK_GETTER_STRING(riak_commit_hook_ce, "function")
-}
-
-PHP_METHOD(RiakCommitHook, isJavascript)
-{
-    zval* ztmp = zend_read_property(riak_commit_hook_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC);
-    if (Z_TYPE_P(ztmp) == IS_STRING) {
-        RETURN_FALSE;
-    }
-    RETURN_TRUE;
-}
-
-PHP_METHOD(RiakCommitHook, isErlang)
-{
-    zval* ztmp = zend_read_property(riak_commit_hook_ce, getThis(), "function", sizeof("function")-1, 1 TSRMLS_CC);
-    if (Z_TYPE_P(ztmp) == IS_STRING) {
-        RETURN_TRUE;
-    }
-    RETURN_FALSE;
-}
-
 
 /* {{{ proto void Riak\BucketProperties->__construct(int $nVal, bool $allowMult)
 Creates a new RiakBucketProperties */

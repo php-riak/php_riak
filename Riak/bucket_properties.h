@@ -21,8 +21,6 @@
 #include "php_riak_internal.h"
 
 extern zend_class_entry *riak_bucket_properties_ce;
-extern zend_class_entry *riak_commit_hook_ce;
-extern zend_class_entry *riak_commit_hook_list_ce;
 
 extern zend_class_entry *riak_replication_mode_full_only_ce;
 extern zend_class_entry *riak_replication_mode_disabled_ce;
@@ -80,19 +78,5 @@ PHP_METHOD(RiakBucketProperties, getLinkFun);
 PHP_METHOD(RiakBucketProperties, getReplicationMode);
 PHP_METHOD(RiakBucketProperties, setReplicationMode);
 
-PHP_METHOD(RiakCommitHook, __construct);
-PHP_METHOD(RiakCommitHook, getJsName);
-PHP_METHOD(RiakCommitHook, getErlModule);
-PHP_METHOD(RiakCommitHook, getErlFunction);
-PHP_METHOD(RiakCommitHook, isJavascript);
-PHP_METHOD(RiakCommitHook, isErlang);
-
-PHP_METHOD(RiakCommitHookList, __construct);
-PHP_METHOD(RiakCommitHookList, offsetExists);
-PHP_METHOD(RiakCommitHookList, offsetGet);
-PHP_METHOD(RiakCommitHookList, offsetSet);
-PHP_METHOD(RiakCommitHookList, offsetUnset);
-PHP_METHOD(RiakCommitHookList, count);
-PHP_METHOD(RiakCommitHookList, getIterator);
 
 #endif

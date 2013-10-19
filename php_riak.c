@@ -19,27 +19,29 @@
 #include "php_riak.h"
 #include <php_ini.h>
 
-#include "Riak/pool.h"
-#include "Riak/connection.h"
-#include "Riak/object.h"
-#include "Riak/bucket.h"
-#include "Riak/bucket_properties.h"
-#include "Riak/exceptions.h"
-#include "Riak/pool_info.h"
-#include "Riak/link.h"
+#include "riak/pool.h"
+#include "riak/connection.h"
+#include "riak/object.h"
+#include "riak/bucket.h"
+#include "riak/bucket_properties.h"
+#include "riak/exceptions.h"
+#include "riak/pool_info.h"
+#include "riak/link.h"
 #include "riak_session.h"
-#include "Riak/MapReduce/mapreduce.h"
-#include "Riak/MapReduce/mr_phase.h"
-#include "Riak/MapReduce/mr_functions.h"
-#include "Riak/MapReduce/mr_inputs.h"
-#include "Riak/MapReduce/mr_output.h"
-#include "Riak/streaming.h"
-#include "Riak/req_inputs.h"
-#include "Riak/req_outputs.h"
-#include "Riak/Search/search.h"
-#include "Riak/Search/Input/parameter_bag.h"
-#include "Riak/Search/Output/output.h"
-#include "Riak/Property/module_function.h"
+#include "riak/map_reduce/mapreduce.h"
+#include "riak/map_reduce/mr_phase.h"
+#include "riak/map_reduce/mr_functions.h"
+#include "riak/map_reduce/mr_inputs.h"
+#include "riak/map_reduce/mr_output.h"
+#include "riak/streaming.h"
+#include "riak/req_inputs.h"
+#include "riak/req_outputs.h"
+#include "riak/search/search.h"
+#include "riak/search/input/parameter_bag.h"
+#include "riak/search/output/output.h"
+#include "riak/Property/module_function.h"
+#include "riak/Property/commit_hook.h"
+#include "riak/Property/commit_hook_list.h"
 
 #ifdef PHP_RIAK_SESSION
   extern ps_module ps_mod_riak;
@@ -103,6 +105,8 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_bucket_init(TSRMLS_C);
     riak_bucket_props_init(TSRMLS_C);
     riak_property_module_function_init(TSRMLS_C);
+    riak_property_commit_hook_init(TSRMLS_C);
+    riak_property_commit_hook_list_init(TSRMLS_C);
 
     riak_mapreduce_init(TSRMLS_C);
     riak_mrphase_init(TSRMLS_C);

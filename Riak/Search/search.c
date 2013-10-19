@@ -15,9 +15,9 @@
 */
 
 #include "search.h"
-#include "Riak/connection.h"
-#include "Input/parameter_bag.h"
-#include "Output/output.h"
+#include "riak/connection.h"
+#include "input/parameter_bag.h"
+#include "output/output.h"
 
 zend_class_entry *riak_search_ce;
 

@@ -17,6 +17,9 @@
 
 #include "bucket.h"
 #include "bucket_properties.h"
+#include "property/commit_hook.h"
+#include "property/commit_hook_list.h"
+#include "property/module_function.h"
 #include "connection.h"
 #include "object.h"
 #include "exceptions.h"

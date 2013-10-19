@@ -17,9 +17,9 @@
 #include "mr_inputs.h"
 #include "ext/standard/php_array.h"
 #include "ht_utils.h"
-#include "Riak/object.h"
-#include "Riak/bucket.h"
-#include "Riak/exceptions.h"
+#include "riak/object.h"
+#include "riak/bucket.h"
+#include "riak/exceptions.h"
 
 zend_class_entry *riak_mrinput_ce;
 zend_class_entry *riak_mrinput_bucket_ce;

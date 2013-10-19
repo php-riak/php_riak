@@ -20,11 +20,11 @@
 #ifdef PHP_RIAK_SESSION
 
 #include <zend_exceptions.h>
-#include "Riak/connection.h"
-#include "Riak/bucket.h"
-#include "Riak/object.h"
-#include "Riak/req_inputs.h"
-#include "Riak/req_outputs.h"
+#include "riak/connection.h"
+#include "riak/bucket.h"
+#include "riak/object.h"
+#include "riak/req_inputs.h"
+#include "riak/req_outputs.h"
 #include "SAPI.h"
 #include <ext/standard/php_string.h>
 #include <ext/standard/url.h>

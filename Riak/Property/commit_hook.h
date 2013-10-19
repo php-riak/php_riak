@@ -14,20 +14,20 @@
    limitations under the License.
 */
 
-#ifndef RIAK_PROPERTY__MODULE_FUNCTION__H__
-#define RIAK_PROPERTY__MODULE_FUNCTION__H__
+#ifndef RIAK_PROPERTY__COMMIT_HOOK__H__
+#define RIAK_PROPERTY__COMMIT_HOOK__H__
 
 #include "php_riak_internal.h"
 
-extern zend_class_entry *riak_module_function_ce;
+extern zend_class_entry *riak_commit_hook_ce;
 
-void riak_property_module_function_init(TSRMLS_D);
+void riak_property_commit_hook_init(TSRMLS_D);
 
-PHP_METHOD(RiakModuleFunction, __construct);
-PHP_METHOD(RiakModuleFunction, getModule);
-PHP_METHOD(RiakModuleFunction, setModule);
-PHP_METHOD(RiakModuleFunction, getFunction);
-PHP_METHOD(RiakModuleFunction, setFunction);
-
+PHP_METHOD(RiakCommitHook, __construct);
+PHP_METHOD(RiakCommitHook, getJsName);
+PHP_METHOD(RiakCommitHook, getErlModule);
+PHP_METHOD(RiakCommitHook, getErlFunction);
+PHP_METHOD(RiakCommitHook, isJavascript);
+PHP_METHOD(RiakCommitHook, isErlang);
 
 #endif

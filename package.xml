@@ -44,7 +44,7 @@ Bug fixes:
             <file role="src" name="php_riak.c"/>
             <file role="src" name="php_riak.h"/>
             <file role="src" name="php_riak_internal.h"/>
-            <dir name="Riak">
+            <dir name="riak">
                 <file role="src" name="bucket_properties.c"/>
                 <file role="src" name="bucket_properties.h"/>
                 <file role="src" name="bucket.c"/>
@@ -67,11 +67,15 @@ Bug fixes:
                 <file role="src" name="req_inputs.h"/>
                 <file role="src" name="req_outputs.c"/>
                 <file role="src" name="req_outputs.h"/>
-                <dir name="Property">
+                <dir name="property">
                     <file role="src" name="module_function.c"/>
                     <file role="src" name="module_function.h"/>
+                    <file role="src" name="commit_hook.c"/>
+                    <file role="src" name="commit_hook.h"/>
+                    <file role="src" name="commit_hook_list.c"/>
+                    <file role="src" name="commit_hook_list.h"/>
                 </dir>
-                <dir name="MapReduce">
+                <dir name="map_reduce">
                     <file role="src" name="mapreduce.c"/>
                     <file role="src" name="mapreduce.h"/>
                     <file role="src" name="mr_functions.c"/>
@@ -83,14 +87,14 @@ Bug fixes:
                     <file role="src" name="mr_output.c"/>
                     <file role="src" name="mr_output.h"/>
                 </dir>
-                <dir name="Search">
+                <dir name="search">
                     <file role="src" name="search.c"/>
                     <file role="src" name="search.h"/>
-                    <dir name="Input">
+                    <dir name="input">
                         <file role="src" name="parameter_bag.c"/>
                         <file role="src" name="parameter_bag.h"/>
                     </dir>
-                    <dir name="Output">
+                    <dir name="output">
                         <file role="src" name="output.c"/>
                         <file role="src" name="output.h"/>
                         <file role="src" name="document_output.c"/>
