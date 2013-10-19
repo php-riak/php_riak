@@ -39,9 +39,9 @@
 #include "riak/search/search.h"
 #include "riak/search/input/parameter_bag.h"
 #include "riak/search/output/output.h"
-#include "riak/Property/module_function.h"
-#include "riak/Property/commit_hook.h"
-#include "riak/Property/commit_hook_list.h"
+#include "riak/property/module_function.h"
+#include "riak/property/commit_hook.h"
+#include "riak/property/commit_hook_list.h"
 
 #ifdef PHP_RIAK_SESSION
   extern ps_module ps_mod_riak;
