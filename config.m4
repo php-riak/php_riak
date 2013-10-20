@@ -14,17 +14,20 @@ if test "$PHP_RIAK" != "no"; then
     riak/connection.c \
     riak/bucket.c \
     riak/object.c \
-    riak/exceptions.c \
+    riak/exception/exception.c \
     riak/bucket_properties.c \
     riak/pool.c \
     riak/link.c \
     riak/pool_info.c \
     riak/streaming.c \
     riak/req_inputs.c \
-    riak/req_outputs.c \
+    riak/output/output.c \
+    riak/output/get_output.c \
+    riak/output/put_output.c \
     riak/property/module_function.c \
     riak/property/commit_hook.c \
     riak/property/commit_hook_list.c \
+    riak/property/replication_mode/replication_mode.c \
     riak/search/search.c \
     riak/search/input/parameter_bag.c \
     riak/search/output/document_output.c \

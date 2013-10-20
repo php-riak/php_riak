@@ -6,12 +6,15 @@ if (PHP_RIAK != "no") {
         if (CHECK_HEADER_ADD_INCLUDE("riack.h", "CFLAGS_RIAK", PHP_RIAK + ";" + configure_module_dirname + "/LibRiack/src"))
 	{
                 EXTENSION("riak", "php_riak.c riak_session.c  ht_utils.c ", true, "/I" + configure_module_dirname + "/LibRiack/src");
-                ADD_SOURCES(configure_module_dirname + "/riak", "connection.c bucket.c object.c exceptions.c bucket_properties.c pool.c link.c pool_info.c req_inputs.c req_outputs.c streaming.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riak", "connection.c bucket.c object.c exceptions.c bucket_properties.c pool.c link.c pool_info.c req_inputs.c streaming.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/map_reduce", "mapreduce.c mr_phase.c mr_functions.c mr_inputs.c mr_output.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riak/output", "output.c get_output.c put_output.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riak/exception", "exception.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/search", "search.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/search/input", "parameter_bag.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/search/output", "output.c document_output.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/property", "module_function.c commit_hook.c commit_hook_list.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riak/property/replication_mode", "replication_mode.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/LibRiack/src", "riack_sock.c riack.c riack_kv.c riack_search.c riack_msg.c riack_mem.c riack_helpers.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/LibRiack/src/google/protobuf-c", "protobuf-c.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/LibRiack/src/protocol", "riak_msg_codes.c riak_search.pb-c.c riak.pb-c.c riak_kv.pb-c.c", "riak");
@@ -24,6 +27,6 @@ if (PHP_RIAK != "no") {
                 ADD_EXTENSION_DEP('riak', 'spl');
 		ADD_EXTENSION_DEP('riak', 'session');
 	} else {
-		WARNING("Riack header not found, did you remember to checkout the riack submodule?");
+                WARNING("Riack header not found, did you remember to checkout the LibRiack submodule?");
 	}
 }

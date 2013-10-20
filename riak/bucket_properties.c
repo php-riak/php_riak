@@ -18,18 +18,13 @@
 #include "property/module_function.h"
 #include "property/commit_hook.h"
 #include "property/commit_hook_list.h"
-#include "riak/exceptions.h"
+#include "property/replication_mode/replication_mode.h"
+#include "exception/exception.h"
 #include "bucket.h"
 #include "connection.h"
 #include "object.h"
 
 zend_class_entry *riak_bucket_properties_ce;
-
-zend_class_entry *riak_replication_mode_ce;
-zend_class_entry *riak_replication_mode_full_only_ce;
-zend_class_entry *riak_replication_mode_disabled_ce;
-zend_class_entry *riak_replication_mode_realtime_and_full_ce;
-zend_class_entry *riak_replication_mode_realtime_only_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_ctor, 0, ZEND_RETURN_VALUE, 0)
     ZEND_ARG_INFO(0, nVal)
@@ -115,10 +110,6 @@ static zend_function_entry riak_bucket_properties_methods[] = {
 	{NULL, NULL, NULL}
 };
 
-static zend_function_entry riak_replication_mode_functions[] = {
-    {NULL, NULL, NULL}
-};
-
 void riak_bucket_props_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
@@ -149,25 +140,6 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "chashKeyFun", sizeof("chashKeyFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "linkFun", sizeof("linkFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "replicationMode", sizeof("replicationMode")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "ReplicationMode", riak_replication_mode_functions);
-    riak_replication_mode_ce = zend_register_internal_interface(&ce TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "FullSyncOnly", riak_replication_mode_functions);
-    riak_replication_mode_full_only_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_class_implements(riak_replication_mode_full_only_ce TSRMLS_CC, 1, riak_replication_mode_ce);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "Disabled", riak_replication_mode_functions);
-    riak_replication_mode_disabled_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_class_implements(riak_replication_mode_disabled_ce TSRMLS_CC, 1, riak_replication_mode_ce);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "RealTimeAndFullSync", riak_replication_mode_functions);
-    riak_replication_mode_realtime_and_full_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_class_implements(riak_replication_mode_realtime_and_full_ce TSRMLS_CC, 1, riak_replication_mode_ce);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Property\\ReplicationMode", "RealTimeOnly", riak_replication_mode_functions);
-    riak_replication_mode_realtime_only_ce = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_class_implements(riak_replication_mode_realtime_only_ce TSRMLS_CC, 1, riak_replication_mode_ce);
 
 }
 /* }}} */

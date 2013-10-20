@@ -14,7 +14,7 @@
    limitations under the License.
 */
 #include "commit_hook_list.h"
-#include "riak/exceptions.h"
+#include "riak/exception/exception.h"
 #include "commit_hook.h"
 #include <zend_interfaces.h>
 #include <ext/spl/spl_iterators.h>

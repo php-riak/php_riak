@@ -77,8 +77,8 @@ config.sub
 configure
 configure.in
 debug.php
-riak/exceptions.c
-riak/exceptions.h
+riak/exception/exception.c
+riak/exception/exception.h
 install-sh
 riak/object.c
 riak/object.h
@@ -127,8 +127,8 @@ riak/search/search.h
 tests/search.phpt
 tests/search_input.phpt
 CREDITS.md
-riak/req_outputs.c
-riak/req_outputs.h
+riak/output/output.c
+riak/output/output.h
 tests/connection.phpt
 tests/property_commit_hook.phpt
 tests/bucket_props_ext.phpt
@@ -149,3 +149,9 @@ riak/property/commit_hook.c
 riak/property/commit_hook.h
 riak/property/commit_hook_list.c
 riak/property/commit_hook_list.h
+riak/property/replication_mode/replication_mode.c
+riak/property/replication_mode/replication_mode.h
+riak/output/get_output.c
+riak/output/get_output.h
+riak/output/put_output.c
+riak/output/put_output.h

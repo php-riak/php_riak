@@ -22,11 +22,6 @@
 
 extern zend_class_entry *riak_bucket_properties_ce;
 
-extern zend_class_entry *riak_replication_mode_full_only_ce;
-extern zend_class_entry *riak_replication_mode_disabled_ce;
-extern zend_class_entry *riak_replication_mode_realtime_and_full_ce;
-extern zend_class_entry *riak_replication_mode_realtime_only_ce;
-
 void riak_bucket_props_init(TSRMLS_D);
 
 PHP_METHOD(RiakBucketProperties, __construct);

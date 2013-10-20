@@ -20,10 +20,8 @@
 #include "php_riak_internal.h"
 
 extern zend_class_entry *riak_output_ce;
-extern zend_class_entry *riak_get_output_ce;
-extern zend_class_entry *riak_put_output_ce;
 
-void riak_req_outputs_init(TSRMLS_D);
+void riak_output_init(TSRMLS_D);
 
 zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC);
 zval *put_output_from_riack_object(struct RIACK_OBJECT* obj, zval* zkey TSRMLS_DC);
@@ -34,7 +32,5 @@ PHP_METHOD(Riak_Output_Output, getKey);
 PHP_METHOD(Riak_Output_Output, hasSiblings);
 PHP_METHOD(Riak_Output_Output, hasObject);
 PHP_METHOD(Riak_Output_Output, getFirstObject);
-
-PHP_METHOD(Riak_Output_GetOutput, isUnchanged);
 
 #endif

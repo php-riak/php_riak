@@ -18,7 +18,7 @@
 #include "object.h"
 #include "link.h"
 #include "ht_utils.h"
-#include "exceptions.h"
+#include "exception/exception.h"
 
 zend_class_entry *riak_object_ce;
 

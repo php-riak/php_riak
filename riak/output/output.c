@@ -14,12 +14,12 @@
    limitations under the License.
 */
 
-#include "req_outputs.h"
-#include "object.h"
+#include "output.h"
+#include "riak/object.h"
+#include "get_output.h"
+#include "put_output.h"
 
 zend_class_entry *riak_output_ce;
-zend_class_entry *riak_get_output_ce;
-zend_class_entry *riak_put_output_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_output_noargs, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
@@ -34,16 +34,8 @@ static zend_function_entry riak_output_methods[] = {
     {NULL, NULL, NULL}
 };
 
-static zend_function_entry riak_get_output_methods[] = {
-    PHP_ME(Riak_Output_GetOutput, isUnchanged, arginfo_riak_output_noargs, ZEND_ACC_PUBLIC)
-    {NULL, NULL, NULL}
-};
 
-static zend_function_entry riak_put_output_methods[] = {
-    {NULL, NULL, NULL}
-};
-
-void riak_req_outputs_init(TSRMLS_D)/* {{{ */
+void riak_output_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
@@ -52,13 +44,6 @@ void riak_req_outputs_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_output_ce, "vClock", sizeof("vClock")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_output_ce, "objectList", sizeof("objectList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_output_ce, "key", sizeof("key")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Output", "GetOutput", riak_get_output_methods);
-    riak_get_output_ce = zend_register_internal_class_ex(&ce, riak_output_ce, NULL TSRMLS_CC);
-    zend_declare_property_null(riak_get_output_ce, "unchanged", sizeof("unchanged")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\Output", "PutOutput", riak_put_output_methods);
-    riak_put_output_ce = zend_register_internal_class_ex(&ce, riak_output_ce, NULL TSRMLS_CC);
 }
 /* }}} */
 
@@ -181,7 +166,7 @@ PHP_METHOD(Riak_Output_Output, hasObject)
 Get first object in objectlist */
 PHP_METHOD(Riak_Output_Output, getFirstObject)
 {
-    // TODO
+    // TODO change when list is object
     zval* zlist = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zlist) == IS_ARRAY) {
         int elems = zend_hash_num_elements(Z_ARRVAL_P(zlist));
@@ -193,22 +178,5 @@ PHP_METHOD(Riak_Output_Output, getFirstObject)
         }
     }
     RETURN_NULL();
-}
-/* }}} */
-
-
-/*************************************************************
-* Implementation: Riak\Output\GetOutput
-*************************************************************/
-
-/* {{{ proto bool|null Riak\Output\GetOutput->isUnchanged()
-Is unchanged */
-PHP_METHOD(Riak_Output_GetOutput, isUnchanged)
-{
-    zval* zunc = zend_read_property(riak_get_output_ce, getThis(), "unchanged", sizeof("unchanged")-1, 1 TSRMLS_CC);
-    if (Z_TYPE_P(zunc) == IS_BOOL) {
-        RETURN_BOOL(Z_BVAL_P(zunc));
-    }
-    RETURN_BOOL(0);
 }
 /* }}} */

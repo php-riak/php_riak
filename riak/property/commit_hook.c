@@ -14,7 +14,7 @@
    limitations under the License.
 */
 #include "commit_hook.h"
-#include "riak/exceptions.h"
+#include "riak/exception/exception.h"
 
 zend_class_entry *riak_commit_hook_ce;
 

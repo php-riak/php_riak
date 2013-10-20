@@ -1,6 +1,5 @@
 /*
-   Copyright 2013 Trifork A/S
-   Author: Kaspar Bach Pedersen
+   Copyright 2013: Kaspar Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,19 +14,20 @@
    limitations under the License.
 */
 
-#ifndef RIAK_EXCEPTIONS__H__
-#define RIAK_EXCEPTIONS__H__
+#include "put_output.h"
+#include "output.h"
 
-#include <zend_exceptions.h>
+zend_class_entry *riak_put_output_ce;
 
-extern zend_class_entry *riak_badarguments_exception_ce;
+static zend_function_entry riak_put_output_methods[] = {
+    {NULL, NULL, NULL}
+};
 
-extern zend_class_entry *riak_connection_exception_ce;
-extern zend_class_entry *riak_communication_exception_ce;
-extern zend_class_entry *riak_response_exception_ce;
+void riak_output_put_output_init(TSRMLS_D)/* {{{ */
+{
+    zend_class_entry ce;
 
-extern zend_class_entry *riak_not_found_exception_ce;
-
-void riak_exceptions_init(TSRMLS_D);
-
-#endif
+    INIT_NS_CLASS_ENTRY(ce, "Riak\\Output", "PutOutput", riak_put_output_methods);
+    riak_put_output_ce = zend_register_internal_class_ex(&ce, riak_output_ce, NULL TSRMLS_CC);
+}
+/* }}} */

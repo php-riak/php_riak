@@ -20,7 +20,7 @@
 #include "object.h"
 #include "bucket.h"
 #include "pool.h"
-#include "exceptions.h"
+#include "exception/exception.h"
 
 zend_class_entry *riak_connection_ce;
 

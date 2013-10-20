@@ -51,8 +51,6 @@ Bug fixes:
                 <file role="src" name="bucket.h"/>
                 <file role="src" name="connection.c"/>
                 <file role="src" name="connection.h"/>
-                <file role="src" name="exceptions.c"/>
-                <file role="src" name="exceptions.h"/>
                 <file role="src" name="link.c"/>
                 <file role="src" name="link.h"/>
                 <file role="src" name="object.c"/>
@@ -65,8 +63,18 @@ Bug fixes:
                 <file role="src" name="streaming.h"/>
                 <file role="src" name="req_inputs.c"/>
                 <file role="src" name="req_inputs.h"/>
-                <file role="src" name="req_outputs.c"/>
-                <file role="src" name="req_outputs.h"/>
+                <dir name="exception">
+                    <file role="src" name="exception.c"/>
+                    <file role="src" name="exception.h"/>
+                </dir>
+                <dir name="output">
+                    <file role="src" name="output.c"/>
+                    <file role="src" name="output.h"/>
+                    <file role="src" name="get_output.c"/>
+                    <file role="src" name="get_output.h"/>
+                    <file role="src" name="put_output.c"/>
+                    <file role="src" name="put_output.h"/>
+                </dir>
                 <dir name="property">
                     <file role="src" name="module_function.c"/>
                     <file role="src" name="module_function.h"/>
@@ -74,6 +82,10 @@ Bug fixes:
                     <file role="src" name="commit_hook.h"/>
                     <file role="src" name="commit_hook_list.c"/>
                     <file role="src" name="commit_hook_list.h"/>
+                    <dir name="replication_mode">
+                        <file role="src" name="replication_mode.c"/>
+                        <file role="src" name="replication_mode.h"/>
+                    </dir>
                 </dir>
                 <dir name="map_reduce">
                     <file role="src" name="mapreduce.c"/>

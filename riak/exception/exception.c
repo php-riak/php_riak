@@ -14,9 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include <php.h>
-#include <zend_exceptions.h>
-#include "exceptions.h"
+
+#include "exception.h"
 
 zend_class_entry *riak_exception_ce;
 

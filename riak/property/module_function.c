@@ -14,7 +14,7 @@
    limitations under the License.
 */
 #include "module_function.h"
-#include "riak/exceptions.h"
+#include "riak/exception/exception.h"
 
 zend_class_entry *riak_module_function_ce;
 

@@ -19,7 +19,7 @@
 #include "mr_inputs.h"
 #include "mr_phase.h"
 #include "riak/connection.h"
-#include "riak/exceptions.h"
+#include "riak/exception/exception.h"
 #include "ht_utils.h"
 #include "php_riak_internal.h"
 #include "ext/json/php_json.h"

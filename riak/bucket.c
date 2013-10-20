@@ -20,11 +20,12 @@
 #include "property/commit_hook.h"
 #include "property/commit_hook_list.h"
 #include "property/module_function.h"
+#include "property/replication_mode/replication_mode.h"
+#include "exception/exception.h"
 #include "connection.h"
 #include "object.h"
-#include "exceptions.h"
 #include "req_inputs.h"
-#include "req_outputs.h"
+#include "output/output.h"
 #include "streaming.h"
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>

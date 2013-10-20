@@ -14,7 +14,7 @@ PHP extension for interfacing with Riak.
 - Riak PHP session store replacement, that can be enabled directly in php.ini no code needed.
 
 ## Building
-First make sure you have the riack submodule checked out, if not do it:
+First make sure you have the LibRiack submodule checked out, if not do it:
 
 	git submodule init
 	git submodule update

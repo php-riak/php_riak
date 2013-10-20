@@ -24,7 +24,7 @@
 #include "riak/bucket.h"
 #include "riak/object.h"
 #include "riak/req_inputs.h"
-#include "riak/req_outputs.h"
+#include "riak/output/output.h"
 #include "SAPI.h"
 #include <ext/standard/php_string.h>
 #include <ext/standard/url.h>

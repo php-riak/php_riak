@@ -24,10 +24,10 @@
 #include "riak/object.h"
 #include "riak/bucket.h"
 #include "riak/bucket_properties.h"
-#include "riak/exceptions.h"
 #include "riak/pool_info.h"
 #include "riak/link.h"
 #include "riak_session.h"
+#include "riak/exception/exception.h"
 #include "riak/map_reduce/mapreduce.h"
 #include "riak/map_reduce/mr_phase.h"
 #include "riak/map_reduce/mr_functions.h"
@@ -35,7 +35,9 @@
 #include "riak/map_reduce/mr_output.h"
 #include "riak/streaming.h"
 #include "riak/req_inputs.h"
-#include "riak/req_outputs.h"
+#include "riak/output/output.h"
+#include "riak/output/get_output.h"
+#include "riak/output/put_output.h"
 #include "riak/search/search.h"
 #include "riak/search/input/parameter_bag.h"
 #include "riak/search/output/output.h"
@@ -114,11 +116,15 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_mrinputs_init(TSRMLS_C);
     riak_mroutput_init(TSRMLS_C);
 
+    riak_output_init(TSRMLS_C);
+    riak_output_get_output_init(TSRMLS_C);
+    riak_output_put_output_init(TSRMLS_C);
+
     riak_exceptions_init(TSRMLS_C);
     riak_poolinfo_init(TSRMLS_C);
     riak_streaming_init(TSRMLS_C);
     riak_req_inputs_init(TSRMLS_C);
-    riak_req_outputs_init(TSRMLS_C);
+
     riak_search_init(TSRMLS_C);
     riak_search_input_parameterbag_init(TSRMLS_C);
     riak_search_output_output_init(TSRMLS_C);
