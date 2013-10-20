@@ -44,6 +44,7 @@
 #include "riak/property/module_function.h"
 #include "riak/property/commit_hook.h"
 #include "riak/property/commit_hook_list.h"
+#include "riak/property/replication_mode/replication_mode.h"
 
 #ifdef PHP_RIAK_SESSION
   extern ps_module ps_mod_riak;
@@ -109,6 +110,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_property_module_function_init(TSRMLS_C);
     riak_property_commit_hook_init(TSRMLS_C);
     riak_property_commit_hook_list_init(TSRMLS_C);
+    riak_property_replication_mode_init(TSRMLS_C);
 
     riak_mapreduce_init(TSRMLS_C);
     riak_mrphase_init(TSRMLS_C);
