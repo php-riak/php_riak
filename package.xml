@@ -67,6 +67,12 @@ Bug fixes:
                     <file role="src" name="exception.c"/>
                     <file role="src" name="exception.h"/>
                 </dir>
+                <dir name="input">
+                    <file role="src" name="input.c"/>
+                    <file role="src" name="input.h"/>
+                    <file role="src" name="delete_input.c"/>
+                    <file role="src" name="delete_input.h"/>
+                </dir>
                 <dir name="output">
                     <file role="src" name="output.c"/>
                     <file role="src" name="output.h"/>

@@ -21,7 +21,6 @@
 
 extern zend_class_entry *riak_get_input_ce;
 extern zend_class_entry *riak_put_input_ce;
-extern zend_class_entry *riak_delete_input_ce;
 
 void riak_req_inputs_init(TSRMLS_D);
 
@@ -58,21 +57,5 @@ PHP_METHOD(Riak_Input_PutInput, getIfNoneMatch);
 PHP_METHOD(Riak_Input_PutInput, setIfNoneMatch);
 PHP_METHOD(Riak_Input_PutInput, getIfNotModified);
 PHP_METHOD(Riak_Input_PutInput, setIfNotModified);
-
-/* Riak\Input\DeleteInput */
-PHP_METHOD(Riak_Input_DeleteInput, setR);
-PHP_METHOD(Riak_Input_DeleteInput, getR);
-PHP_METHOD(Riak_Input_DeleteInput, setPR);
-PHP_METHOD(Riak_Input_DeleteInput, getPR);
-PHP_METHOD(Riak_Input_DeleteInput, setRW);
-PHP_METHOD(Riak_Input_DeleteInput, getRW);
-PHP_METHOD(Riak_Input_DeleteInput, setW);
-PHP_METHOD(Riak_Input_DeleteInput, getW);
-PHP_METHOD(Riak_Input_DeleteInput, setDW);
-PHP_METHOD(Riak_Input_DeleteInput, getDW);
-PHP_METHOD(Riak_Input_DeleteInput, setPW);
-PHP_METHOD(Riak_Input_DeleteInput, getPW);
-PHP_METHOD(Riak_Input_DeleteInput, setVClock);
-PHP_METHOD(Riak_Input_DeleteInput, getVClock);
 
 #endif

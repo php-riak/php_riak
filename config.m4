@@ -21,6 +21,8 @@ if test "$PHP_RIAK" != "no"; then
     riak/pool_info.c \
     riak/streaming.c \
     riak/req_inputs.c \
+    riak/input/input.c \
+    riak/input/delete_input.c \
     riak/output/output.c \
     riak/output/get_output.c \
     riak/output/put_output.c \

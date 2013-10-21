@@ -21,6 +21,7 @@
 #include "property/commit_hook_list.h"
 #include "property/module_function.h"
 #include "property/replication_mode/replication_mode.h"
+#include "input/delete_input.h"
 #include "exception/exception.h"
 #include "connection.h"
 #include "object.h"

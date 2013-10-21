@@ -24,6 +24,7 @@
 #include "riak/bucket.h"
 #include "riak/object.h"
 #include "riak/req_inputs.h"
+#include "riak/input/delete_input.h"
 #include "riak/output/output.h"
 #include "SAPI.h"
 #include <ext/standard/php_string.h>

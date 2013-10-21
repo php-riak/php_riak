@@ -155,3 +155,7 @@ riak/output/get_output.c
 riak/output/get_output.h
 riak/output/put_output.c
 riak/output/put_output.h
+riak/input/input.c
+riak/input/input.h
+riak/input/delete_input.c
+riak/input/delete_input.h
