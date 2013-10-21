@@ -46,6 +46,7 @@
 #include "riak/search/search.h"
 #include "riak/search/input/parameter_bag.h"
 #include "riak/search/output/output.h"
+#include "riak/search/output/document_output.h"
 #include "riak/property/module_function.h"
 #include "riak/property/commit_hook.h"
 #include "riak/property/commit_hook_list.h"
@@ -141,6 +142,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_search_init(TSRMLS_C);
     riak_search_input_parameterbag_init(TSRMLS_C);
     riak_search_output_output_init(TSRMLS_C);
+    riak_search_output_document_output_init(TSRMLS_C);
 
 #ifdef PHP_RIAK_SESSION
     php_session_register_module(&ps_mod_riak);
