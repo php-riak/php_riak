@@ -61,8 +61,6 @@ Bug fixes:
                 <file role="src" name="pool_info.h"/>
                 <file role="src" name="streaming.c"/>
                 <file role="src" name="streaming.h"/>
-                <file role="src" name="req_inputs.c"/>
-                <file role="src" name="req_inputs.h"/>
                 <dir name="exception">
                     <file role="src" name="exception.c"/>
                     <file role="src" name="exception.h"/>
@@ -72,6 +70,10 @@ Bug fixes:
                     <file role="src" name="input.h"/>
                     <file role="src" name="delete_input.c"/>
                     <file role="src" name="delete_input.h"/>
+                    <file role="src" name="get_input.c"/>
+                    <file role="src" name="get_input.h"/>
+                    <file role="src" name="put_input.c"/>
+                    <file role="src" name="put_input.h"/>
                 </dir>
                 <dir name="output">
                     <file role="src" name="output.c"/>
@@ -104,6 +106,14 @@ Bug fixes:
                     <file role="src" name="mr_phase.h"/>
                     <file role="src" name="mr_output.c"/>
                     <file role="src" name="mr_output.h"/>
+                    <dir name="functions">
+                        <file role="src" name="base_function.c"/>
+                        <file role="src" name="base_function.h"/>
+                        <file role="src" name="get_function.c"/>
+                        <file role="src" name="get_function.h"/>
+                        <file role="src" name="put_function.c"/>
+                        <file role="src" name="put_function.h"/>
+                    </dir>
                 </dir>
                 <dir name="search">
                     <file role="src" name="search.c"/>

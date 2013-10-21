@@ -1,6 +1,5 @@
 /*
-   Copyright 2013 Trifork A/S
-   Author: Kaspar Bach Pedersen
+   Copyright 2013: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,24 +14,14 @@
    limitations under the License.
 */
 
-#ifndef RIAK_MR_FUNCTION__H__
-#define RIAK_MR_FUNCTION__H__
+#ifndef RIAK_MAP_REDUCE__FUNCTIONS__ERLANG_FUNCTION__H__
+#define RIAK_MAP_REDUCE__FUNCTIONS__ERLANG_FUNCTION__H__
 
 #include "php_riak_internal.h"
 
-extern zend_class_entry *riak_mrfunction_ce;
-
-void riak_mrfunctions_init(TSRMLS_D);
-
-void create_named_mr_function(zend_class_entry *classentry, zval* result,
-                               zend_bool named, const char* source, int sourcelen TSRMLS_DC);
-
-PHP_METHOD(RiakMrJavascriptFunction, __construct);
-PHP_METHOD(RiakMrJavascriptFunction, toArray);
-PHP_METHOD(RiakMrJavascriptFunction, named);
-PHP_METHOD(RiakMrJavascriptFunction, anon);
+void riak_map_reduce_functions_erlang_function_init(TSRMLS_D);
 
 PHP_METHOD(RiakMrErlangFunction, __construct);
 PHP_METHOD(RiakMrErlangFunction, toArray);
 
-#endif
+#endif //RIAK_MAP_REDUCE__FUNCTIONS__ERLANG_FUNCTION__H__

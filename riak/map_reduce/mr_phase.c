@@ -15,7 +15,7 @@
    limitations under the License.
 */
 #include "mr_phase.h"
-#include "mr_functions.h"
+#include "functions/base_function.h"
 
 zend_class_entry *riak_mrphase_ce;
 zend_class_entry *riak_mr_mapphase_ce;

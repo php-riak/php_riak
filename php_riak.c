@@ -30,13 +30,16 @@
 #include "riak/exception/exception.h"
 #include "riak/map_reduce/mapreduce.h"
 #include "riak/map_reduce/mr_phase.h"
-#include "riak/map_reduce/mr_functions.h"
 #include "riak/map_reduce/mr_inputs.h"
 #include "riak/map_reduce/mr_output.h"
+#include "riak/map_reduce/functions/base_function.h"
+#include "riak/map_reduce/functions/erlang_function.h"
+#include "riak/map_reduce/functions/javascript_function.h"
 #include "riak/streaming.h"
-#include "riak/req_inputs.h"
 #include "riak/input/input.h"
 #include "riak/input/delete_input.h"
+#include "riak/input/get_input.h"
+#include "riak/input/put_input.h"
 #include "riak/output/output.h"
 #include "riak/output/get_output.h"
 #include "riak/output/put_output.h"
@@ -116,16 +119,20 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
 
     riak_mapreduce_init(TSRMLS_C);
     riak_mrphase_init(TSRMLS_C);
-    riak_mrfunctions_init(TSRMLS_C);
     riak_mrinputs_init(TSRMLS_C);
     riak_mroutput_init(TSRMLS_C);
+    riak_map_reduce_functions_base_function_init(TSRMLS_C);
+    riak_map_reduce_functions_erlang_function_init(TSRMLS_C);
+    riak_map_reduce_functions_javascript_function_init(TSRMLS_C);
 
     riak_input_input_init(TSRMLS_C);
     riak_input_delete_input_init(TSRMLS_C);
+    riak_input_get_input_init(TSRMLS_C);
+    riak_input_put_input_init(TSRMLS_C);
+
     riak_output_init(TSRMLS_C);
     riak_output_get_output_init(TSRMLS_C);
     riak_output_put_output_init(TSRMLS_C);
-    riak_req_inputs_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
     riak_poolinfo_init(TSRMLS_C);

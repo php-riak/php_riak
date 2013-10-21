@@ -22,10 +22,11 @@
 #include "property/module_function.h"
 #include "property/replication_mode/replication_mode.h"
 #include "input/delete_input.h"
+#include "input/get_input.h"
+#include "input/put_input.h"
 #include "exception/exception.h"
 #include "connection.h"
 #include "object.h"
-#include "req_inputs.h"
 #include "output/output.h"
 #include "streaming.h"
 #include <ext/spl/spl_iterators.h>

@@ -20,9 +20,10 @@ if test "$PHP_RIAK" != "no"; then
     riak/link.c \
     riak/pool_info.c \
     riak/streaming.c \
-    riak/req_inputs.c \
     riak/input/input.c \
     riak/input/delete_input.c \
+    riak/input/get_input.c \
+    riak/input/put_input.c \
     riak/output/output.c \
     riak/output/get_output.c \
     riak/output/put_output.c \
@@ -36,9 +37,11 @@ if test "$PHP_RIAK" != "no"; then
     riak/search/output/output.c \
     riak/map_reduce/mapreduce.c \
     riak/map_reduce/mr_phase.c \
-    riak/map_reduce/mr_functions.c \
     riak/map_reduce/mr_inputs.c \
     riak/map_reduce/mr_output.c \
+    riak/map_reduce/functions/base_function.c \
+    riak/map_reduce/functions/javascript_function.c \
+    riak/map_reduce/functions/erlang_function.c \
     LibRiack/src/riack_sock.c \
     LibRiack/src/riack.c \
     LibRiack/src/riack_kv.c \

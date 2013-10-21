@@ -102,8 +102,6 @@ riak/map_reduce/mapreduce.c
 riak/map_reduce/mr_phase.h
 riak/map_reduce/mapreduce.h
 tests/mrphase.phpt
-riak/map_reduce/mr_functions.h
-riak/map_reduce/mr_functions.c
 tests/mapreduce.phpt
 tests/mrfunctions.phpt
 riak/map_reduce/mr_inputs.h
@@ -120,8 +118,6 @@ riak/streaming.c
 config.w32
 tests/list_keys.phpt
 tests/stream_keys.phpt
-riak/req_inputs.c
-riak/req_inputs.h
 riak/search/search.c
 riak/search/search.h
 tests/search.phpt
@@ -159,3 +155,13 @@ riak/input/input.c
 riak/input/input.h
 riak/input/delete_input.c
 riak/input/delete_input.h
+riak/input/get_input.c
+riak/input/get_input.h
+riak/input/put_input.c
+riak/input/put_input.h
+riak/map_reduce/functions/base_function.c
+riak/map_reduce/functions/base_function.h
+riak/map_reduce/functions/erlang_function.c
+riak/map_reduce/functions/erlang_function.h
+riak/map_reduce/functions/javascript_function.c
+riak/map_reduce/functions/javascript_function.h

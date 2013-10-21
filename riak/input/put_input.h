@@ -1,5 +1,5 @@
 /*
-   Copyright 2013 Kaspar Bach Pedersen
+   Copyright 2013: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,31 +14,14 @@
    limitations under the License.
 */
 
-#ifndef RIAK_REQ_CONFIGS__H__
-#define RIAK_REQ_CONFIGS__H__
+#ifndef RIAK_INPUT__PUT_INPUT__H__
+#define RIAK_INPUT__PUT_INPUT__H__
 
 #include "php_riak_internal.h"
 
-extern zend_class_entry *riak_get_input_ce;
 extern zend_class_entry *riak_put_input_ce;
 
-void riak_req_inputs_init(TSRMLS_D);
-
-/* Riak\Input\GetInput */
-PHP_METHOD(Riak_Input_GetInput, setReturnHead);
-PHP_METHOD(Riak_Input_GetInput, getReturnHead);
-PHP_METHOD(Riak_Input_GetInput, getR);
-PHP_METHOD(Riak_Input_GetInput, setR);
-PHP_METHOD(Riak_Input_GetInput, getPR);
-PHP_METHOD(Riak_Input_GetInput, setPR);
-PHP_METHOD(Riak_Input_GetInput, getBasicQuorum);
-PHP_METHOD(Riak_Input_GetInput, setBasicQuorum);
-PHP_METHOD(Riak_Input_GetInput, getNotFoundOk);
-PHP_METHOD(Riak_Input_GetInput, setNotFoundOk);
-PHP_METHOD(Riak_Input_GetInput, getIfModifiedVClock);
-PHP_METHOD(Riak_Input_GetInput, setIfModifiedVClock);
-PHP_METHOD(Riak_Input_GetInput, getReturnDeletedVClock);
-PHP_METHOD(Riak_Input_GetInput, setReturnDeletedVClock);
+void riak_input_put_input_init(TSRMLS_D);
 
 /* Riak\Input\PutInput */
 PHP_METHOD(Riak_Input_PutInput, setReturnHead);
@@ -58,4 +41,5 @@ PHP_METHOD(Riak_Input_PutInput, setIfNoneMatch);
 PHP_METHOD(Riak_Input_PutInput, getIfNotModified);
 PHP_METHOD(Riak_Input_PutInput, setIfNotModified);
 
-#endif
+
+#endif //RIAK_INPUT__PUT_INPUT__H__
