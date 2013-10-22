@@ -177,3 +177,6 @@ riak/map_reduce/phase/reduce_phase.c
 riak/map_reduce/phase/reduce_phase.h
 riak/output/key_stream_output.c
 riak/output/key_stream_output.h
+riak/output/object_list.c
+riak/output/object_list.h
+tests/object_list.phpt

@@ -18,8 +18,8 @@
     <date>2013-10-13</date>
     <time>12:29:00</time>
     <version>
-        <release>0.6.1</release>
-        <api>0.6.0</api>
+        <release>0.6.2</release>
+        <api>0.6.2</api>
     </version>
     <stability>
         <release>beta</release>
@@ -27,9 +27,8 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
         <notes>
-Bug fixes:
-    - Issue43: Search\Output: hasMaxScore and hasNumFound fails
-    - Issue42: Riak\Bucket::getName() does not work
+Fixed potential bug in map reduce function
+Restructured extension sources so php FQN can be mapped directly to source.
         </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -82,6 +81,8 @@ Bug fixes:
                     <file role="src" name="put_output.h"/>
                     <file role="src" name="key_stream_output.c"/>
                     <file role="src" name="key_stream_output.h"/>
+                    <file role="src" name="object_list.c"/>
+                    <file role="src" name="object_list.h"/>
                 </dir>
                 <dir name="property">
                     <file role="src" name="module_function.c"/>

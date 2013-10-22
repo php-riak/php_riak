@@ -12,7 +12,7 @@ if (PHP_RIAK != "no") {
                 ADD_SOURCES(configure_module_dirname + "/riak/map_reduce/output", "output.c stream_output.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/map_reduce/phase", "phase.c map_phase.c reduce_phase.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/map_reduce/functions", "base_function.c erlang_function.c javascript_function.c", "riak");
-                ADD_SOURCES(configure_module_dirname + "/riak/output", "output.c get_output.c put_output.c key_stream_output.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riak/output", "output.c get_output.c put_output.c key_stream_output.c object_list.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/input", "input.c delete_input.c get_input.c put_input.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/exception", "exception.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/search", "search.c", "riak");
