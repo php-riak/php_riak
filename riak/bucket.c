@@ -28,7 +28,7 @@
 #include "connection.h"
 #include "object.h"
 #include "output/output.h"
-#include "streaming.h"
+#include "output/key_stream_output.h"
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
 

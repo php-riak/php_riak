@@ -1,6 +1,5 @@
 /*
-   Copyright 2013 Trifork A/S
-   Author: Kaspar Bach Pedersen
+   Copyright 2013: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,20 +14,20 @@
    limitations under the License.
 */
 
-#ifndef RIAK_MR_OUTPUT__H__
-#define RIAK_MR_OUTPUT__H__
+#ifndef RIAK_MAP_REDUCE__OUTPUT__OUTPUT__H__
+#define RIAK_MAP_REDUCE__OUTPUT__OUTPUT__H__
 
-#include <php.h>
-#include <riack.h>
+#include "php_riak_internal.h"
 
 extern zend_class_entry *riak_mroutput_ce;
 
-zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC);
+void riak_map_reduce_output_output_init(TSRMLS_D);
 
-void riak_mroutput_init(TSRMLS_D);
+zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC);
 
 PHP_METHOD(Riak_MapReduce_Output_Output, __construct);
 PHP_METHOD(Riak_MapReduce_Output_Output, getValue);
 PHP_METHOD(Riak_MapReduce_Output_Output, getPhaseNumber);
 
-#endif
+#endif //RIAK_MAP_REDUCE__OUTPUT__OUTPUT__H__
+

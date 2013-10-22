@@ -13,18 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
-#include "streaming.h"
+#include "key_stream_output.h"
 
 zend_class_entry *riak_key_streamer_ce;
-zend_class_entry *riak_mr_streamer_ce;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_keystreamer_key, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, key)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_mrstreamer_rec, 0, ZEND_RETURN_VALUE, 1)
-    ZEND_ARG_INFO(0, result)
 ZEND_END_ARG_INFO()
 
 static zend_function_entry riak_keystreamer_methods[] = {
@@ -32,18 +26,11 @@ static zend_function_entry riak_keystreamer_methods[] = {
     {NULL, NULL, NULL}
 };
 
-static zend_function_entry riak_mapreduce_out_stream_methods[] = {
-    ZEND_ABSTRACT_ME(Riak_MapReduce_Output_StreamOutput, receive, arginfo_mrstreamer_rec)
-    {NULL, NULL, NULL}
-};
-
-void riak_streaming_init(TSRMLS_D)/* {{{ */
+void riak_output_stream_output_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Output", "KeyStreamOutput", riak_keystreamer_methods);
     riak_key_streamer_ce = zend_register_internal_interface(&ce TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Output","StreamOutput", riak_mapreduce_out_stream_methods);
-    riak_mr_streamer_ce = zend_register_internal_interface(&ce TSRMLS_CC);
 }
 /* }}} */
+

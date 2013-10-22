@@ -19,7 +19,6 @@ if test "$PHP_RIAK" != "no"; then
     riak/pool.c \
     riak/link.c \
     riak/pool_info.c \
-    riak/streaming.c \
     riak/input/input.c \
     riak/input/delete_input.c \
     riak/input/get_input.c \
@@ -27,6 +26,7 @@ if test "$PHP_RIAK" != "no"; then
     riak/output/output.c \
     riak/output/get_output.c \
     riak/output/put_output.c \
+    riak/output/key_stream_output.c \
     riak/property/module_function.c \
     riak/property/commit_hook.c \
     riak/property/commit_hook_list.c \
@@ -36,8 +36,11 @@ if test "$PHP_RIAK" != "no"; then
     riak/search/output/document_output.c \
     riak/search/output/output.c \
     riak/map_reduce/mapreduce.c \
-    riak/map_reduce/mr_phase.c \
-    riak/map_reduce/mr_output.c \
+    riak/map_reduce/phase/phase.c \
+    riak/map_reduce/phase/map_phase.c \
+    riak/map_reduce/phase/reduce_phase.c \
+    riak/map_reduce/output/output.c \
+    riak/map_reduce/output/stream_output.c \
     riak/map_reduce/input/input.c \
     riak/map_reduce/input/bucket_input.c \
     riak/map_reduce/input/key_data_list_input.c \

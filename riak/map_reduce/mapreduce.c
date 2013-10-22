@@ -15,9 +15,9 @@
    limitations under the License.
 */
 #include "mapreduce.h"
-#include "mr_output.h"
-#include "mr_phase.h"
+#include "phase/phase.h"
 #include "input/input.h"
+#include "output/output.h"
 #include "riak/connection.h"
 #include "riak/exception/exception.h"
 #include "ht_utils.h"

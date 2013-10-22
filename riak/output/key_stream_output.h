@@ -14,16 +14,13 @@
    limitations under the License.
 */
 
-#ifndef RIAK_STREAMING__H__
-#define RIAK_STREAMING__H__
+#ifndef RIAK__OUTPUT__KEY_STREAMING_OUTPUT__H__
+#define RIAK__OUTPUT__KEY_STREAMING_OUTPUT__H__
 
-#include <php.h>
-#include <riack.h>
+#include "php_riak_internal.h"
 
 extern zend_class_entry *riak_key_streamer_ce;
-extern zend_class_entry *riak_mr_streamer_ce;
 
-
-void riak_streaming_init(TSRMLS_D);
+void riak_output_stream_output_init(TSRMLS_D);
 
 #endif

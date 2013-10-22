@@ -1,6 +1,5 @@
 /*
-   Copyright 2012 Trifork A/S
-   Author: Kaspar Pedersen
+   Copyright 2013: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,8 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#include "mr_output.h"
-#include "php_riak_internal.h"
+#include "output.h"
 #include "ext/json/php_json.h"
 
 zend_class_entry *riak_mroutput_ce;
@@ -35,17 +33,19 @@ static zend_function_entry riak_mroutput_methods[] = {
     {NULL, NULL, NULL}
 };
 
-void riak_mroutput_init(TSRMLS_D)/* {{{ */
+
+
+void riak_map_reduce_output_output_init(TSRMLS_D)/* {{{ */
 {
     zend_class_entry ce;
 
     INIT_NS_CLASS_ENTRY(ce, "Riak\\MapReduce\\Output", "Output", riak_mroutput_methods);
     riak_mroutput_ce = zend_register_internal_class(&ce TSRMLS_CC);
-
     zend_declare_property_null(riak_mroutput_ce, "value", sizeof("value")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_mroutput_ce, "phase", sizeof("phase")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 }
 /* }}} */
+
 
 zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC)/* {{{ */
 {
@@ -98,3 +98,4 @@ PHP_METHOD(Riak_MapReduce_Output_Output, getPhaseNumber)
     RIAK_GETTER_LONG(riak_mroutput_ce, "phase");
 }
 /* }}} */
+

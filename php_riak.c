@@ -29,8 +29,11 @@
 #include "riak_session.h"
 #include "riak/exception/exception.h"
 #include "riak/map_reduce/mapreduce.h"
-#include "riak/map_reduce/mr_phase.h"
-#include "riak/map_reduce/mr_output.h"
+#include "riak/map_reduce/phase/phase.h"
+#include "riak/map_reduce/phase/map_phase.h"
+#include "riak/map_reduce/phase/reduce_phase.h"
+#include "riak/map_reduce/output/output.h"
+#include "riak/map_reduce/output/stream_output.h"
 #include "riak/map_reduce/input/input.h"
 #include "riak/map_reduce/input/bucket_input.h"
 #include "riak/map_reduce/input/key_data_list_input.h"
@@ -38,7 +41,6 @@
 #include "riak/map_reduce/functions/base_function.h"
 #include "riak/map_reduce/functions/erlang_function.h"
 #include "riak/map_reduce/functions/javascript_function.h"
-#include "riak/streaming.h"
 #include "riak/input/input.h"
 #include "riak/input/delete_input.h"
 #include "riak/input/get_input.h"
@@ -46,6 +48,7 @@
 #include "riak/output/output.h"
 #include "riak/output/get_output.h"
 #include "riak/output/put_output.h"
+#include "riak/output/key_stream_output.h"
 #include "riak/search/search.h"
 #include "riak/search/input/parameter_bag.h"
 #include "riak/search/output/output.h"
@@ -122,14 +125,15 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_property_replication_mode_init(TSRMLS_C);
 
     riak_mapreduce_init(TSRMLS_C);
-    riak_mrphase_init(TSRMLS_C);
-    riak_mroutput_init(TSRMLS_C);
-
+    riak_map_reduce_phase_phase_init(TSRMLS_C);
+    riak_map_reduce_phase_map_phase_init(TSRMLS_C);
+    riak_map_reduce_phase_reduce_phase_init(TSRMLS_C);
     riak_map_reduce_input_input_init(TSRMLS_C);
     riak_map_reduce_input_bucket_input_init(TSRMLS_C);
     riak_map_reduce_input_key_data_list_input_init(TSRMLS_C);
     riak_map_reduce_input_key_list_input_init(TSRMLS_C);
-
+    riak_map_reduce_output_output_init(TSRMLS_C);
+    riak_map_reduce_output_stream_output_init(TSRMLS_C);
     riak_map_reduce_functions_base_function_init(TSRMLS_C);
     riak_map_reduce_functions_erlang_function_init(TSRMLS_C);
     riak_map_reduce_functions_javascript_function_init(TSRMLS_C);
@@ -142,10 +146,10 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_output_init(TSRMLS_C);
     riak_output_get_output_init(TSRMLS_C);
     riak_output_put_output_init(TSRMLS_C);
+    riak_output_stream_output_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
     riak_poolinfo_init(TSRMLS_C);
-    riak_streaming_init(TSRMLS_C);
 
     riak_search_init(TSRMLS_C);
     riak_search_input_parameterbag_init(TSRMLS_C);
