@@ -37,8 +37,11 @@ if test "$PHP_RIAK" != "no"; then
     riak/search/output/output.c \
     riak/map_reduce/mapreduce.c \
     riak/map_reduce/mr_phase.c \
-    riak/map_reduce/mr_inputs.c \
     riak/map_reduce/mr_output.c \
+    riak/map_reduce/input/input.c \
+    riak/map_reduce/input/bucket_input.c \
+    riak/map_reduce/input/key_data_list_input.c \
+    riak/map_reduce/input/key_list_input.c \
     riak/map_reduce/functions/base_function.c \
     riak/map_reduce/functions/javascript_function.c \
     riak/map_reduce/functions/erlang_function.c \

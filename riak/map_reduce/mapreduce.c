@@ -16,8 +16,8 @@
 */
 #include "mapreduce.h"
 #include "mr_output.h"
-#include "mr_inputs.h"
 #include "mr_phase.h"
+#include "input/input.h"
 #include "riak/connection.h"
 #include "riak/exception/exception.h"
 #include "ht_utils.h"

@@ -1,6 +1,5 @@
 /*
-   Copyright 2013 Trifork A/S
-   Author: Kaspar Bach Pedersen
+   Copyright 2013: Kaspar Bach Pedersen
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,28 +14,18 @@
    limitations under the License.
 */
 
-#ifndef RIAK_MR_INPUTS__H__
-#define RIAK_MR_INPUTS__H__
+
+#ifndef RIAK_MAP_REDUCE__INPUT__KEY_LIST_INPUT__H__
+#define RIAK_MAP_REDUCE__INPUT__KEY_LIST_INPUT__H__
 
 #include "php_riak_internal.h"
 
-extern zend_class_entry *riak_mrinput_ce;
-
-void riak_mrinputs_init(TSRMLS_D);
-
-PHP_METHOD(RiakMrInput, toArray);
-
-PHP_METHOD(Riak_MapReduce_Input_BucketInput, __construct);
-PHP_METHOD(Riak_MapReduce_Input_BucketInput, getValue);
-PHP_METHOD(Riak_MapReduce_Input_BucketInput, setIndexFilter);
+void riak_map_reduce_input_key_list_input_init(TSRMLS_D);
 
 PHP_METHOD(Riak_MapReduce_Input_KeyListInput, __construct);
 PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addArray);
 PHP_METHOD(Riak_MapReduce_Input_KeyListInput, addSingle);
 PHP_METHOD(Riak_MapReduce_Input_KeyListInput, getValue);
 
-PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, __construct);
-PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, getValue);
-PHP_METHOD(Riak_MapReduce_Input_KeyDataListInput, add);
+#endif //RIAK_MAP_REDUCE__INPUT__KEY_LIST_INPUT__H__
 
-#endif

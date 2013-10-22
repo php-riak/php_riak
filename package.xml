@@ -100,12 +100,20 @@ Bug fixes:
                     <file role="src" name="mapreduce.h"/>
                     <file role="src" name="mr_functions.c"/>
                     <file role="src" name="mr_functions.h"/>
-                    <file role="src" name="mr_inputs.c"/>
-                    <file role="src" name="mr_inputs.h"/>
                     <file role="src" name="mr_phase.c"/>
                     <file role="src" name="mr_phase.h"/>
                     <file role="src" name="mr_output.c"/>
                     <file role="src" name="mr_output.h"/>
+                    <dir name="input">
+                        <file role="src" name="input.c"/>
+                        <file role="src" name="input.h"/>
+                        <file role="src" name="bucket_input.c"/>
+                        <file role="src" name="bucket_input.h"/>
+                        <file role="src" name="key_data_list_input.c"/>
+                        <file role="src" name="key_data_list_input.h"/>
+                        <file role="src" name="key_list_input.c"/>
+                        <file role="src" name="key_list_input.h"/>
+                    </dir>
                     <dir name="functions">
                         <file role="src" name="base_function.c"/>
                         <file role="src" name="base_function.h"/>

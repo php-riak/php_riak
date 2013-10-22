@@ -30,8 +30,11 @@
 #include "riak/exception/exception.h"
 #include "riak/map_reduce/mapreduce.h"
 #include "riak/map_reduce/mr_phase.h"
-#include "riak/map_reduce/mr_inputs.h"
 #include "riak/map_reduce/mr_output.h"
+#include "riak/map_reduce/input/input.h"
+#include "riak/map_reduce/input/bucket_input.h"
+#include "riak/map_reduce/input/key_data_list_input.h"
+#include "riak/map_reduce/input/key_list_input.h"
 #include "riak/map_reduce/functions/base_function.h"
 #include "riak/map_reduce/functions/erlang_function.h"
 #include "riak/map_reduce/functions/javascript_function.h"
@@ -120,8 +123,13 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
 
     riak_mapreduce_init(TSRMLS_C);
     riak_mrphase_init(TSRMLS_C);
-    riak_mrinputs_init(TSRMLS_C);
     riak_mroutput_init(TSRMLS_C);
+
+    riak_map_reduce_input_input_init(TSRMLS_C);
+    riak_map_reduce_input_bucket_input_init(TSRMLS_C);
+    riak_map_reduce_input_key_data_list_input_init(TSRMLS_C);
+    riak_map_reduce_input_key_list_input_init(TSRMLS_C);
+
     riak_map_reduce_functions_base_function_init(TSRMLS_C);
     riak_map_reduce_functions_erlang_function_init(TSRMLS_C);
     riak_map_reduce_functions_javascript_function_init(TSRMLS_C);
