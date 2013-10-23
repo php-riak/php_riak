@@ -11,8 +11,8 @@ if test "$PHP_RIAK" != "no"; then
   PHP_NEW_EXTENSION(riak, php_riak.c \
     ht_utils.c \
     riak_session.c \
-    riak/connection.c \
     riak/bucket.c \
+    riak/connection.c \
     riak/object.c \
     riak/exception/exception.c \
     riak/bucket_properties.c \
@@ -61,6 +61,21 @@ if test "$PHP_RIAK" != "no"; then
     LibRiack/src/protocol/riak.pb-c.c \
     LibRiack/src/protocol/riak_kv.pb-c.c \
     LibRiack/src/google/protobuf-c/protobuf-c.c, $ext_shared)
+
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/exception], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/input], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/output], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/property], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/property/replication_mode], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/functions], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/input], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/output], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/phase], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/search], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/input], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/output], 1)
 
   PHP_ADD_BUILD_DIR([$ext_builddir/LibRiack/src], 1)
   PHP_ADD_INCLUDE([$ext_builddir/LibRiack/src])
