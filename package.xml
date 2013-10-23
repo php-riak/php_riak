@@ -127,10 +127,10 @@
                     <dir name="functions">
                         <file role="src" name="base_function.c"/>
                         <file role="src" name="base_function.h"/>
-                        <file role="src" name="get_function.c"/>
-                        <file role="src" name="get_function.h"/>
-                        <file role="src" name="put_function.c"/>
-                        <file role="src" name="put_function.h"/>
+                        <file role="src" name="erlang_function.c"/>
+                        <file role="src" name="erlang_function.h"/>
+                        <file role="src" name="javascript_function.c"/>
+                        <file role="src" name="javascript_function.h"/>
                     </dir>
                 </dir>
                 <dir name="search">
@@ -187,25 +187,34 @@
                 </dir>
             </dir>
             <dir name="tests">
+                <file name="bucket.phpt" role="test" />
                 <file name="bucket_props.phpt" role="test" />
-                <file name="key_not_found.phpt" role="test" />
-                <file name="mrfunctions.phpt" role="test" />
-                <file name="ping.phpt" role="test" />
-                <file name="session.phpt" role="test" />
+                <file name="bucket_props_ext.phpt" role="test" />
                 <file name="client_ctor.phpt" role="test" />
-                <file name="links.phpt" role="test" />
-                <file name="mrinputs.phpt" role="test" />
-                <file name="pool.phpt" role="test" />
-                <file name="session_respects_options.phpt" role="test" />
+                <file name="connect.inc" role="test" />
+                <file name="connection.phpt" role="test" />
                 <file name="get1.phpt" role="test" />
-                <file name="mapreduce.phpt" role="test" />
-                <file name="mrkeyfilters.phpt" role="test" />
-                <file name="put1.phpt" role="test" />
-                <file name="pool_info.phpt" role="test" />
                 <file name="indexquery.phpt" role="test" />
+                <file name="key_not_found.phpt" role="test" />
+                <file name="links.phpt" role="test" />
+                <file name="list_keys.phpt" role="test" />
+                <file name="mapreduce.phpt" role="test" />
                 <file name="metadata.phpt" role="test" />
+                <file name="mrfunctions.phpt" role="test" />
+                <file name="mrinputs.phpt" role="test" />
+                <file name="mrkeyfilters.phpt" role="test" />
                 <file name="mrphase.phpt" role="test" />
+                <file name="object_list.phpt" role="test" />
+                <file name="ping.phpt" role="test" />
+                <file name="pool.phpt" role="test" />
+                <file name="property_commit_hook.phpt" role="test" />
+                <file name="put1.phpt" role="test" />
                 <file name="reconnect.phpt" role="test" />
+                <file name="search.phpt" role="test" />
+                <file name="search_input.phpt" role="test" />
+                <file name="session.phpt" role="test" />
+                <file name="session_respects_options.phpt" role="test" />
+                <file name="stream_keys.phpt" role="test" />
             </dir>
         </dir>
     </contents>

@@ -49,7 +49,7 @@
 #include "riak/output/get_output.h"
 #include "riak/output/put_output.h"
 #include "riak/output/key_stream_output.h"
-#include "riak/output/object_list.h"
+#include "riak/object_list.h"
 #include "riak/search/search.h"
 #include "riak/search/input/parameter_bag.h"
 #include "riak/search/output/output.h"

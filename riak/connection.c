@@ -16,11 +16,10 @@
 */
 
 #include "connection.h"
-#include <zend_exceptions.h>
 #include "object.h"
 #include "bucket.h"
-#include "pool.h"
 #include "exception/exception.h"
+#include <zend_exceptions.h>
 
 zend_class_entry *riak_connection_ce;
 

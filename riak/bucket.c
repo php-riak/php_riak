@@ -28,6 +28,8 @@
 #include "connection.h"
 #include "object.h"
 #include "output/output.h"
+#include "output/put_output.h"
+#include "output/get_output.h"
 #include "output/key_stream_output.h"
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
