@@ -77,18 +77,41 @@ PHP_METHOD(Riak_Output_Object_List, __construct)
 Get the first object in this list or null if list is empty*/
 PHP_METHOD(Riak_Output_Object_List, first)
 {
-    zval *zobjects, *zresult, zcurrname;
-    MAKE_STD_ZVAL(zresult);
-    ZVAL_STRING(&zcurrname, "current", 0);
+    zval *zobjects, *ztmp, zoffset;
+    ZVAL_LONG(&zoffset, 0);
     zobjects = zend_read_property(riak_output_object_list_ce, getThis(), "objects", sizeof("objects")-1, 1 TSRMLS_CC);
-    // TODO NOT WORKING ATM!!
-    call_user_function(NULL, &zobjects, &zcurrname, zresult, 0, NULL TSRMLS_CC);
-    if (Z_TYPE_P(zresult) == IS_OBJECT) {
-        RETVAL_ZVAL(zresult, 1, 0);
+    zend_call_method_with_1_params(&zobjects, spl_ce_ArrayObject, NULL, "offsetexists", &ztmp, &zoffset);
+
+    if (Z_TYPE_P(ztmp) == IS_BOOL && Z_BVAL_P(ztmp)) {
+        // Read offset 0
+        zval_ptr_dtor(&ztmp);
+        zend_call_method_with_1_params(&zobjects, spl_ce_ArrayObject, NULL, "offsetget", &ztmp, &zoffset);
+        RETURN_ZVAL(ztmp, 0, 1);
     } else {
-        RETVAL_NULL();
+        zval_ptr_dtor(&ztmp);
+        zend_call_method_with_0_params(&zobjects, spl_ce_ArrayObject, NULL, "getiterator", &ztmp);
+        if (Z_TYPE_P(ztmp) == IS_OBJECT) {
+            // TODO The hard way using iterator
+            zval zvalidname, zcurrname, *zvalid;
+            ZVAL_STRING(&zvalidname, "valid", 0);
+            ZVAL_STRING(&zcurrname, "current", 0);
+            MAKE_STD_ZVAL(zvalid);
+            call_user_function(NULL, &ztmp, &zvalidname, zvalid, 0, NULL TSRMLS_CC);
+            if (Z_TYPE_P(zvalid) == IS_BOOL && Z_BVAL_P(zvalid)) {
+                zval *zresult;
+                MAKE_STD_ZVAL(zresult);
+                call_user_function(NULL, &ztmp, &zcurrname, zresult, 0, NULL TSRMLS_CC);
+                if (Z_TYPE_P(zresult) == IS_OBJECT) {
+                    // TODO
+                }
+            }
+            zval_ptr_dtor(&zvalid);
+            zval_ptr_dtor(&ztmp);
+        } else {
+            zval_ptr_dtor(&ztmp);
+        }
+        RETURN_NULL();
     }
-    zval_ptr_dtor(&zresult);
 }
 /* }}} */
 
@@ -100,9 +123,11 @@ PHP_METHOD(Riak_Output_Object_List, isEmpty)
     zobjects = zend_read_property(riak_output_object_list_ce, getThis(), "objects", sizeof("objects")-1, 1 TSRMLS_CC);
     zend_call_method_with_0_params(&zobjects, spl_ce_ArrayObject, NULL, "count", &zcount);
     if (Z_TYPE_P(zcount) == IS_LONG && Z_LVAL_P(zcount) > 0) {
-        RETURN_BOOL(0)
+        RETVAL_BOOL(0);
+    } else {
+        RETVAL_BOOL(1);
     }
-    RETURN_BOOL(1)
+    zval_ptr_dtor(&zcount);
 }
 /* }}} */
 

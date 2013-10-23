@@ -19,7 +19,7 @@ if ($objList->count() !== 2) {
 if (!$objList->offsetExists("2")) {
     echo "2 should exist in list".PHP_EOL;
 }
-if ($objList->first()->getKey() == $obj1->getKey()) {
+if ($objList->first()->getKey() !== $obj1->getKey()) {
     echo "Keys should equal".PHP_EOL;
 }
 echo "done!".PHP_EOL;
