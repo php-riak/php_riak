@@ -36,6 +36,19 @@ void riak_output_get_output_init(TSRMLS_D)/* {{{ */
 }
 /* }}} */
 
+zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC) /* {{{ */
+{
+    zval *zoutput;
+    MAKE_STD_ZVAL(zoutput);
+    object_init_ex(zoutput, riak_get_output_ce);
+    if (getobj->unchanged_present) {
+        zend_update_property_bool(riak_get_output_ce, zoutput, "unchanged", sizeof("unchanged")-1, getobj->unchanged TSRMLS_CC);
+    }
+    riak_set_output_properties(zoutput, zkey, &getobj->object TSRMLS_CC);
+    return zoutput;
+}
+/* }}} */
+
 
 /* {{{ proto bool|null Riak\Output\GetOutput->isUnchanged()
 Is unchanged */

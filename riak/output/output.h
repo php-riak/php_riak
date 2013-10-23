@@ -23,8 +23,7 @@ extern zend_class_entry *riak_output_ce;
 
 void riak_output_init(TSRMLS_D);
 
-zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC);
-zval *put_output_from_riack_object(struct RIACK_OBJECT* obj, zval* zkey TSRMLS_DC);
+void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* obj TSRMLS_DC);
 
 PHP_METHOD(Riak_Output_Output, getObjectList);
 PHP_METHOD(Riak_Output_Output, getVClock);

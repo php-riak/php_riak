@@ -3,8 +3,8 @@ Test Riak\Output\ObjectList works
 --FILE--
 <?php
 $obj1 = new \Riak\Object("1");
-$obj2 = new \Riak\Object("1");
-$objList = new \Riak\Output\ObjectList();
+$obj2 = new \Riak\Object("2");
+$objList = new \Riak\ObjectList();
 if (!$objList->isEmpty()) {
     echo "List is supposed to be empty!".PHP_EOL;
 }
@@ -22,7 +22,24 @@ if (!$objList->offsetExists("2")) {
 if ($objList->first()->getKey() !== $obj1->getKey()) {
     echo "Keys should equal".PHP_EOL;
 }
-echo "done!".PHP_EOL;
+
+$objList2 = new \Riak\ObjectList();
+$objList2["plappe"] = $obj2;
+if ($objList2->isEmpty()) {
+    echo "List2 is not supposed to be empty".PHP_EOL;
+}
+if ($objList2->first()->getKey() !== $obj2->getKey()) {
+    echo "List2 keys should equal".PHP_EOL;
+}
+
+//////
+// Try inserting a non riak object
+try {
+    $objList2["fail"] = 3;
+} catch (\Riak\Exception\BadArgumentsException $e) {
+    echo "done!".PHP_EOL;
+}
 ?>
 --EXPECT--
+Warning: Riak\ObjectList::offsetSet() expects parameter 2 to be Riak\Object, integer given in /Users/kaspar/Documents/workspace/php_riak/tests/object_list.php on line 35
 done!

@@ -19,6 +19,7 @@ if test "$PHP_RIAK" != "no"; then
     riak/pool.c \
     riak/link.c \
     riak/pool_info.c \
+    riak/object_list.c \
     riak/input/input.c \
     riak/input/delete_input.c \
     riak/input/get_input.c \
@@ -27,7 +28,6 @@ if test "$PHP_RIAK" != "no"; then
     riak/output/get_output.c \
     riak/output/put_output.c \
     riak/output/key_stream_output.c \
-    riak/output/object_list.c \
     riak/property/module_function.c \
     riak/property/commit_hook.c \
     riak/property/commit_hook_list.c \

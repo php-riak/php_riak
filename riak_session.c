@@ -23,6 +23,7 @@
 #include "riak/connection.h"
 #include "riak/bucket.h"
 #include "riak/object.h"
+#include "riak/object_list.h"
 #include "riak/input/delete_input.h"
 #include "riak/input/get_input.h"
 #include "riak/input/put_input.h"
@@ -201,27 +202,26 @@ PS_READ_FUNC(riak) /* {{{ */
     RIAK_CALL_METHOD2(RiakBucket, get, zoutput, data->zbucket, zkey, data->zgetprops);
 
     if (!EG(exception) && Z_TYPE_P(zoutput) == IS_OBJECT) {
-        zval *zobjarr;
+        zval *zobjlist;
 
-        MAKE_STD_ZVAL(zobjarr);
-        RIAK_CALL_METHOD(Riak_Output_Output, getObjectList, zobjarr, zoutput);
-
-        if (Z_TYPE_P(zobjarr) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(zobjarr)) > 0) {
-            zval **found = NULL;
-
-            zend_hash_index_find(Z_ARRVAL_P(zobjarr), 0, (void**)&found);
-
-            zdata = zend_read_property(riak_object_ce, *found, "content", sizeof("content")-1, 1 TSRMLS_CC);
-
-            if (zdata->type == IS_STRING && Z_STRLEN_P(zdata) > 0) {
-                *vallen = Z_STRLEN_P(zdata);
-                *val = emalloc(Z_STRLEN_P(zdata));
-
-                memcpy(*val, Z_STRVAL_P(zdata), Z_STRLEN_P(zdata));
+        MAKE_STD_ZVAL(zobjlist);
+        RIAK_CALL_METHOD(Riak_Output_Output, getObjectList, zobjlist, zoutput);
+        // TODO Add warning if we have siblings
+        if (Z_TYPE_P(zobjlist) == IS_OBJECT) {
+            zval *zobject;
+            MAKE_STD_ZVAL(zobject);
+            RIAK_CALL_METHOD(Riak_Object_List, first, zobject, zobjlist);
+            if (Z_TYPE_P(zobject) == IS_OBJECT) {
+                zdata = zend_read_property(riak_object_ce, zobject, "content", sizeof("content")-1, 1 TSRMLS_CC);
+                if (zdata->type == IS_STRING && Z_STRLEN_P(zdata) > 0) {
+                    *vallen = Z_STRLEN_P(zdata);
+                    *val = emalloc(Z_STRLEN_P(zdata));
+                    memcpy(*val, Z_STRVAL_P(zdata), Z_STRLEN_P(zdata));
+                }
             }
+            zval_ptr_dtor(&zobject);
         }
-
-        zval_ptr_dtor(&zobjarr);
+        zval_ptr_dtor(&zobjlist);
     } else if (EG(exception)) {
         zend_clear_exception(TSRMLS_C);
     }

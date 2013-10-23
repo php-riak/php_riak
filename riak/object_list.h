@@ -23,15 +23,15 @@ extern zend_class_entry *riak_output_object_list_ce;
 
 void riak_output_object_list_init(TSRMLS_D);
 
-PHP_METHOD(Riak_Output_Object_List, __construct);
-PHP_METHOD(Riak_Output_Object_List, first);
-PHP_METHOD(Riak_Output_Object_List, isEmpty);
-PHP_METHOD(Riak_Output_Object_List, offsetExists);
-PHP_METHOD(Riak_Output_Object_List, offsetGet);
-PHP_METHOD(Riak_Output_Object_List, offsetSet);
-PHP_METHOD(Riak_Output_Object_List, offsetUnset);
-PHP_METHOD(Riak_Output_Object_List, count);
-PHP_METHOD(Riak_Output_Object_List, getIterator);
+PHP_METHOD(Riak_Object_List, __construct);
+PHP_METHOD(Riak_Object_List, first);
+PHP_METHOD(Riak_Object_List, isEmpty);
+PHP_METHOD(Riak_Object_List, offsetExists);
+PHP_METHOD(Riak_Object_List, offsetGet);
+PHP_METHOD(Riak_Object_List, offsetSet);
+PHP_METHOD(Riak_Object_List, offsetUnset);
+PHP_METHOD(Riak_Object_List, count);
+PHP_METHOD(Riak_Object_List, getIterator);
 
 
 #endif //RIAK_OUTPUT__OBJECT_LIST__H__

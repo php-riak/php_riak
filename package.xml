@@ -15,8 +15,8 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-10-13</date>
-    <time>12:29:00</time>
+    <date>2013-10-23</date>
+    <time>18:30:00</time>
     <version>
         <release>0.6.2</release>
         <api>0.6.2</api>
@@ -27,8 +27,9 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
         <notes>
-Fixed potential bug in map reduce function
-Restructured extension sources so php FQN can be mapped directly to source.
+- Fixed potential bug in map reduce function
+- Restructured extension sources so php FQN can be mapped directly to source.
+- Changed get output from array to collection, which implements ArrayAccess so it maintains compatability
         </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -54,6 +55,8 @@ Restructured extension sources so php FQN can be mapped directly to source.
                 <file role="src" name="link.h"/>
                 <file role="src" name="object.c"/>
                 <file role="src" name="object.h"/>
+                <file role="src" name="object_list.c"/>
+                <file role="src" name="object_list.h"/>
                 <file role="src" name="pool.c"/>
                 <file role="src" name="pool.h"/>
                 <file role="src" name="pool_info.c"/>
@@ -81,8 +84,6 @@ Restructured extension sources so php FQN can be mapped directly to source.
                     <file role="src" name="put_output.h"/>
                     <file role="src" name="key_stream_output.c"/>
                     <file role="src" name="key_stream_output.h"/>
-                    <file role="src" name="object_list.c"/>
-                    <file role="src" name="object_list.h"/>
                 </dir>
                 <dir name="property">
                     <file role="src" name="module_function.c"/>
@@ -222,6 +223,23 @@ Restructured extension sources so php FQN can be mapped directly to source.
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+    <release>
+        <version>
+            <release>0.6.2</release>
+            <api>0.6.2</api>
+        </version>
+        <stability>
+            <release>beta</release>
+            <api>beta</api>
+        </stability>
+        <date>2013-10-23</date>
+        <license>Apache2</license>
+        <notes>
+- Fixed potential bug in map reduce function
+- Restructured extension sources so php FQN can be mapped directly to source.
+- Changed get output from array to collection, which implements ArrayAccess so it maintains compatability
+</notes>
+    </release>
     <release>
         <version>
             <release>0.6.1</release>

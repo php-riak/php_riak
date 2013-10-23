@@ -16,6 +16,7 @@
 
 #include "output.h"
 #include "riak/object.h"
+#include "riak/object_list.h"
 #include "get_output.h"
 #include "put_output.h"
 
@@ -60,11 +61,12 @@ void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* 
                                      Z_STRVAL_P(zkey), Z_STRLEN_P(zkey) TSRMLS_CC);
     }
     MAKE_STD_ZVAL(zobjectlist);
-    array_init(zobjectlist);
+    object_init_ex(zobjectlist, riak_output_object_list_ce);
+    RIAK_CALL_METHOD(Riak_Object_List, __construct, zobjectlist, zobjectlist);
     content_cnt = obj->content_count;
     for (i=0; i<content_cnt; ++i) {
         // Create a new Riak\Object for each content
-        zval *zobject;
+        zval *zobject, zoffset;
         MAKE_STD_ZVAL(zobject);
         object_init_ex(zobject, riak_object_ce);
         if (Z_TYPE_P(zkey) != IS_NULL) {
@@ -73,33 +75,13 @@ void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* 
             RIAK_CALL_METHOD(RiakObject, __construct, zobject, zobject);
         }
         set_object_from_riak_content(zobject, &obj->content[i] TSRMLS_CC);
-        add_next_index_zval(zobjectlist, zobject);
+        //add_next_index_zval(zobjectlist, zobject);
+        ZVAL_LONG(&zoffset, i);
+        RIAK_CALL_METHOD2(Riak_Object_List, offsetSet, NULL, zobjectlist, &zoffset, zobject);
+        zval_ptr_dtor(&zobject);
     }
     zend_update_property(riak_output_ce, zoutput, "objectList", sizeof("objectList")-1, zobjectlist TSRMLS_CC);
     zval_ptr_dtor(&zobjectlist);
-}
-/* }}} */
-
-zval *put_output_from_riack_object(struct RIACK_OBJECT* obj, zval* zkey TSRMLS_DC) /* {{{ */
-{
-    zval *zoutput;
-    MAKE_STD_ZVAL(zoutput);
-    object_init_ex(zoutput, riak_put_output_ce);
-    riak_set_output_properties(zoutput, zkey, obj TSRMLS_CC);
-    return zoutput;
-}
-/* }}} */
-
-zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC) /* {{{ */
-{
-    zval *zoutput;
-    MAKE_STD_ZVAL(zoutput);
-    object_init_ex(zoutput, riak_get_output_ce);
-    if (getobj->unchanged_present) {
-        zend_update_property_bool(riak_get_output_ce, zoutput, "unchanged", sizeof("unchanged")-1, getobj->unchanged TSRMLS_CC);
-    }
-    riak_set_output_properties(zoutput, zkey, &getobj->object TSRMLS_CC);
-    return zoutput;
 }
 /* }}} */
 
@@ -107,11 +89,11 @@ zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zk
 * Implementation: Riak\Output\Output
 *************************************************************/
 
-/* {{{ proto Riak\Object[] Riak\Output\Output->getObjectList()
+/* {{{ proto Riak\Output\ObjectList Riak\Output\Output->getObjectList()
 Get list of returned objects */
 PHP_METHOD(Riak_Output_Output, getObjectList)
 {
-    RIAK_GETTER_ARRAY(riak_output_ce, "objectList")
+    RIAK_GETTER_OBJECT(riak_output_ce, "objectList")
 }
 /* }}} */
 
@@ -137,13 +119,16 @@ Does this output have multiple objects */
 PHP_METHOD(Riak_Output_Output, hasSiblings)
 {
     zval* zlist = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
-    if (Z_TYPE_P(zlist) == IS_ARRAY) {
-        int elems = zend_hash_num_elements(Z_ARRVAL_P(zlist));
-        if (elems > 1) {
-            RETURN_BOOL(1);
+    RETVAL_BOOL(0);
+    if (Z_TYPE_P(zlist) == IS_OBJECT) {
+        zval *zcount;
+        MAKE_STD_ZVAL(zcount);
+        RIAK_CALL_METHOD(Riak_Object_List, count, zcount, zlist);
+        if (Z_TYPE_P(zcount) == IS_LONG && Z_LVAL_P(zcount) > 1) {
+            RETVAL_BOOL(1);
         }
+        zval_ptr_dtor(&zcount);
     }
-    RETURN_BOOL(0);
 }
 /* }}} */
 
@@ -152,13 +137,17 @@ Does this output have atleast one object */
 PHP_METHOD(Riak_Output_Output, hasObject)
 {
     zval* zlist = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
-    if (Z_TYPE_P(zlist) == IS_ARRAY) {
-        int elems = zend_hash_num_elements(Z_ARRVAL_P(zlist));
-        if (elems > 0) {
-            RETURN_BOOL(1);
+    RETVAL_BOOL(0);
+    if (Z_TYPE_P(zlist) == IS_OBJECT) {
+        zval *zisempty;
+        RETVAL_BOOL(1);
+        MAKE_STD_ZVAL(zisempty);
+        RIAK_CALL_METHOD(Riak_Object_List, isEmpty, zisempty, zlist);
+        if (Z_TYPE_P(zisempty) == IS_BOOL && Z_BVAL_P(zisempty)) {
+            RETVAL_BOOL(0);
         }
+        zval_ptr_dtor(&zisempty);
     }
-    RETURN_BOOL(0);
 }
 /* }}} */
 
@@ -166,16 +155,12 @@ PHP_METHOD(Riak_Output_Output, hasObject)
 Get first object in objectlist */
 PHP_METHOD(Riak_Output_Output, getFirstObject)
 {
-    // TODO change when list is object
     zval* zlist = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
-    if (Z_TYPE_P(zlist) == IS_ARRAY) {
-        int elems = zend_hash_num_elements(Z_ARRVAL_P(zlist));
-        if (elems > 0) {
-            zval **zfirst;
-            if (zend_hash_index_find(Z_ARRVAL_P(zlist), 0, (void**)&zfirst) == SUCCESS) {
-                RETURN_ZVAL(*zfirst, 1, 0);
-            }
-        }
+    if (Z_TYPE_P(zlist) == IS_OBJECT) {
+        zval* zresult;
+        MAKE_STD_ZVAL(zresult);
+        RIAK_CALL_METHOD(Riak_Object_List, first, zresult, zlist);
+        RETURN_ZVAL(zresult, 0, 1);
     }
     RETURN_NULL();
 }

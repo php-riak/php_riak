@@ -31,3 +31,15 @@ void riak_output_put_output_init(TSRMLS_D)/* {{{ */
     riak_put_output_ce = zend_register_internal_class_ex(&ce, riak_output_ce, NULL TSRMLS_CC);
 }
 /* }}} */
+
+
+zval *put_output_from_riack_object(struct RIACK_OBJECT* obj, zval* zkey TSRMLS_DC) /* {{{ */
+{
+    zval *zoutput;
+    MAKE_STD_ZVAL(zoutput);
+    object_init_ex(zoutput, riak_put_output_ce);
+    riak_set_output_properties(zoutput, zkey, obj TSRMLS_CC);
+    return zoutput;
+}
+/* }}} */
+

@@ -22,6 +22,7 @@
 extern zend_class_entry *riak_get_output_ce;
 
 void riak_output_get_output_init(TSRMLS_D);
+zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC);
 
 PHP_METHOD(Riak_Output_GetOutput, isUnchanged);
 
