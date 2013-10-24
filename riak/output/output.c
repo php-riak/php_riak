@@ -62,23 +62,26 @@ void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* 
     }
     MAKE_STD_ZVAL(zobjectlist);
     object_init_ex(zobjectlist, riak_output_object_list_ce);
-    RIAK_CALL_METHOD(Riak_Object_List, __construct, zobjectlist, zobjectlist);
+    RIAK_CALL_METHOD(Riak_Object_List, __construct, NULL, zobjectlist);
     content_cnt = obj->content_count;
     for (i=0; i<content_cnt; ++i) {
         // Create a new Riak\Object for each content
-        zval *zobject, zoffset;
+        zval *zobject, *zoffset;
         MAKE_STD_ZVAL(zobject);
         object_init_ex(zobject, riak_object_ce);
         if (Z_TYPE_P(zkey) != IS_NULL) {
-            RIAK_CALL_METHOD1(RiakObject, __construct, zobject, zobject, zkey);
+            RIAK_CALL_METHOD1(RiakObject, __construct, NULL, zobject, zkey);
         } else {
-            RIAK_CALL_METHOD(RiakObject, __construct, zobject, zobject);
+            RIAK_CALL_METHOD(RiakObject, __construct, NULL, zobject);
         }
         set_object_from_riak_content(zobject, &obj->content[i] TSRMLS_CC);
+
         //add_next_index_zval(zobjectlist, zobject);
-        ZVAL_LONG(&zoffset, i);
-        RIAK_CALL_METHOD2(Riak_Object_List, offsetSet, NULL, zobjectlist, &zoffset, zobject);
+        MAKE_STD_ZVAL(zoffset);
+        ZVAL_LONG(zoffset, i);
+        RIAK_CALL_METHOD2(Riak_Object_List, offsetSet, NULL, zobjectlist, zoffset, zobject);
         zval_ptr_dtor(&zobject);
+        zval_ptr_dtor(&zoffset);
     }
     zend_update_property(riak_output_ce, zoutput, "objectList", sizeof("objectList")-1, zobjectlist TSRMLS_CC);
     zval_ptr_dtor(&zobjectlist);

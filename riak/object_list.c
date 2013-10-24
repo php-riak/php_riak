@@ -37,9 +37,9 @@ ZEND_END_ARG_INFO()
 
 
 static zend_function_entry riak_output_object_list_methods[] = {
+    PHP_ME(Riak_Object_List, __construct, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     PHP_ME(Riak_Object_List, first, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Object_List, isEmpty, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC)
-    PHP_ME(Riak_Object_List, __construct, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     PHP_ME(Riak_Object_List, offsetExists, arginfo_riak_output_object_list_offset_exists, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Object_List, offsetGet, arginfo_riak_output_object_list_offset_exists, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Object_List, offsetSet, arginfo_riak_output_object_list_offset_set, ZEND_ACC_PUBLIC)
@@ -77,18 +77,20 @@ PHP_METHOD(Riak_Object_List, __construct)
 Get the first object in this list or null if list is empty*/
 PHP_METHOD(Riak_Object_List, first)
 {
-    zval *zobjects, *ztmp, zoffset;
-    ZVAL_LONG(&zoffset, 0);
+    zval *zobjects, *ztmp, *zoffset;
     zobjects = zend_read_property(riak_output_object_list_ce, getThis(), "objects", sizeof("objects")-1, 1 TSRMLS_CC);
-    zend_call_method_with_1_params(&zobjects, spl_ce_ArrayObject, NULL, "offsetexists", &ztmp, &zoffset);
 
+    MAKE_STD_ZVAL(zoffset);
+    ZVAL_LONG(zoffset, 0);
+    MAKE_STD_ZVAL(ztmp);
+    RIAK_CALL_METHOD1(Riak_Object_List, offsetExists, ztmp, getThis(), zoffset);
     RETVAL_NULL();
-
     if (Z_TYPE_P(ztmp) == IS_BOOL && Z_BVAL_P(ztmp)) {
         // Read offset 0
         zval_ptr_dtor(&ztmp);
-        zend_call_method_with_1_params(&zobjects, spl_ce_ArrayObject, NULL, "offsetget", &ztmp, &zoffset);
-        RETURN_ZVAL(ztmp, 0, 1);
+        ztmp = NULL;
+        zend_call_method_with_1_params(&zobjects, spl_ce_ArrayObject, NULL, "offsetget", &ztmp, zoffset);
+        RETVAL_ZVAL(ztmp, 0, 1);
     } else {
         zval_ptr_dtor(&ztmp);
         zend_call_method_with_0_params(&zobjects, spl_ce_ArrayObject, NULL, "getiterator", &ztmp);
@@ -110,6 +112,7 @@ PHP_METHOD(Riak_Object_List, first)
         }
         zval_ptr_dtor(&ztmp);
     }
+    zval_ptr_dtor(&zoffset);
 }
 /* }}} */
 
@@ -171,6 +174,7 @@ PHP_METHOD(Riak_Object_List, offsetSet)
     zobjects = zend_read_property(riak_output_object_list_ce, getThis(), "objects", sizeof("objects")-1, 1 TSRMLS_CC);
     zend_call_method_with_2_params(&zobjects, spl_ce_ArrayObject, NULL, "offsetset", NULL, zoffset, zvalue);
 }
+
 /* }}} */
 
 /* {{{ proto void Riak\ObjectList->offsetUnset($offset)

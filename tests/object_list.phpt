@@ -40,6 +40,6 @@ try {
     echo "done!".PHP_EOL;
 }
 ?>
---EXPECT--
-Warning: Riak\ObjectList::offsetSet() expects parameter 2 to be Riak\Object, integer given in /Users/kaspar/Documents/workspace/php_riak/tests/object_list.php on line 35
+--EXPECTF--
+Warning: Riak\ObjectList::offsetSet() expects parameter 2 to be Riak\Object, integer given in %s
 done!
