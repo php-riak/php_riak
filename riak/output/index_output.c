@@ -27,6 +27,6 @@ void riak_output_index_output_init(TSRMLS_D)
 {
     zend_class_entry ce;
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Output", "IndexOutput", riak_output_index_output_methods);
-    riak_output_index_output_methods = zend_register_internal_class_ex(&ce, riak_output_ce, NULL TSRMLS_CC);
+    riak_index_output_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
 }

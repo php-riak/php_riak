@@ -162,7 +162,7 @@ PHP_METHOD(Riak_Object_List, offsetGet)
 }
 /* }}} */
 
-/* {{{ proto void Riak\ObjectList->offsetGet($offset, Object $value)
+/* {{{ proto void Riak\ObjectList->offsetGet($offset)
 Set an object at given offset */
 PHP_METHOD(Riak_Object_List, offsetSet)
 {

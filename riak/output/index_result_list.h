@@ -23,4 +23,13 @@ extern zend_class_entry *riak_index_result_list_ce;
 
 void riak_output_index_result_list_init(TSRMLS_D);
 
+PHP_METHOD(Riak_Index_Result_List, __construct);
+PHP_METHOD(Riak_Index_Result_List, offsetExists);
+PHP_METHOD(Riak_Index_Result_List, offsetGet);
+PHP_METHOD(Riak_Index_Result_List, offsetSet);
+PHP_METHOD(Riak_Index_Result_List, offsetUnset);
+PHP_METHOD(Riak_Index_Result_List, count);
+PHP_METHOD(Riak_Index_Result_List, getIterator);
+
+
 #endif //RIAK_OUTPUT__INDEX_RESULT_LIST__H__
