@@ -74,6 +74,8 @@
                     <file role="src" name="get_input.h"/>
                     <file role="src" name="put_input.c"/>
                     <file role="src" name="put_input.h"/>
+                    <file role="src" name="index_input.c"/>
+                    <file role="src" name="index_input.h"/>
                 </dir>
                 <dir name="output">
                     <file role="src" name="output.c"/>
@@ -82,6 +84,12 @@
                     <file role="src" name="get_output.h"/>
                     <file role="src" name="put_output.c"/>
                     <file role="src" name="put_output.h"/>
+                    <file role="src" name="index_result.c"/>
+                    <file role="src" name="index_result.h"/>
+                    <file role="src" name="index_result_list.c"/>
+                    <file role="src" name="index_result_list.h"/>
+                    <file role="src" name="index_output.c"/>
+                    <file role="src" name="index_output.h"/>
                     <file role="src" name="key_stream_output.c"/>
                     <file role="src" name="key_stream_output.h"/>
                 </dir>

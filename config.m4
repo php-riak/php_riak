@@ -24,9 +24,13 @@ if test "$PHP_RIAK" != "no"; then
     riak/input/delete_input.c \
     riak/input/get_input.c \
     riak/input/put_input.c \
+    riak/input/index_input.c \
     riak/output/output.c \
     riak/output/get_output.c \
     riak/output/put_output.c \
+    riak/output/index_result.c \
+    riak/output/index_result_list.c \
+    riak/output/index_output.c \
     riak/output/key_stream_output.c \
     riak/property/module_function.c \
     riak/property/commit_hook.c \

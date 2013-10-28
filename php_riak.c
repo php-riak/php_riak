@@ -42,6 +42,7 @@
 #include "riak/map_reduce/functions/erlang_function.h"
 #include "riak/map_reduce/functions/javascript_function.h"
 #include "riak/input/input.h"
+#include "riak/input/index_input.h"
 #include "riak/input/delete_input.h"
 #include "riak/input/get_input.h"
 #include "riak/input/put_input.h"
@@ -49,6 +50,9 @@
 #include "riak/output/get_output.h"
 #include "riak/output/put_output.h"
 #include "riak/output/key_stream_output.h"
+#include "riak/output/index_result.h"
+#include "riak/output/index_result_list.h"
+#include "riak/output/index_output.h"
 #include "riak/object_list.h"
 #include "riak/search/search.h"
 #include "riak/search/input/parameter_bag.h"
@@ -143,12 +147,16 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_input_delete_input_init(TSRMLS_C);
     riak_input_get_input_init(TSRMLS_C);
     riak_input_put_input_init(TSRMLS_C);
+    riak_input_index_input_init(TSRMLS_C);
 
     riak_output_init(TSRMLS_C);
     riak_output_get_output_init(TSRMLS_C);
     riak_output_put_output_init(TSRMLS_C);
     riak_output_stream_output_init(TSRMLS_C);
     riak_output_object_list_init(TSRMLS_C);
+    riak_output_index_result_init(TSRMLS_C);
+    riak_output_index_result_list_init(TSRMLS_C);
+    riak_output_index_output_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
     riak_poolinfo_init(TSRMLS_C);

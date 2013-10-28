@@ -180,3 +180,11 @@ riak/output/key_stream_output.h
 riak/object_list.c
 riak/object_list.h
 tests/object_list.phpt
+riak/input/index_input.c
+riak/input/index_input.h
+riak/output/index_result.c
+riak/output/index_result.h
+riak/output/index_result_list.c
+riak/output/index_result_list.h
+riak/output/index_output.c
+riak/output/index_output.h
