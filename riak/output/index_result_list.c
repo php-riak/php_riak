@@ -58,6 +58,8 @@ void riak_output_index_result_list_init(TSRMLS_D)
     zend_class_entry ce;
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Output", "IndexResultList", riak_output_index_result_list_methods);
     riak_index_result_list_ce = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_class_implements(riak_index_result_list_ce TSRMLS_CC, 3, spl_ce_ArrayAccess, spl_ce_Aggregate, spl_ce_Countable);
+
     zend_declare_property_null(riak_index_result_list_ce, "resultList", sizeof("resultList")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 

@@ -30,6 +30,7 @@
 #include "output/output.h"
 #include "output/put_output.h"
 #include "output/get_output.h"
+#include "input/index_input.h"
 #include "output/key_stream_output.h"
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
@@ -231,7 +232,7 @@ PHP_METHOD(RiakBucket, getKeyList)
 
 
 /* {{{ proto array Riak\Bucket->index(string $index, string $from [, string $to])
-Apply given properties to this bucket */
+Perform a secondary index lookup */
 PHP_METHOD(RiakBucket, index)
 {
     RIACK_STRING rsbucket, rsindex, rsfrom, rsto;
@@ -268,6 +269,20 @@ PHP_METHOD(RiakBucket, index)
     }
     riack_free_string_list(connection->client, &resultlist);
     RETURN_ZVAL(zresult, 0, 1);
+}
+/* }}} */
+
+/* {{{ proto array Riak\Bucket->indexQuery(IndexQuery $query[, IndexInput $input])
+Apply given properties to this bucket */
+PHP_METHOD(RiakBucket, indexQuery)
+{
+//    zval *zquery, *zinput;
+//    zinput = zquery = 0;
+//    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|O", &zquery, ) == FAILURE) {
+//        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
+//        return;
+//    }
+    // TODO
 }
 /* }}} */
 

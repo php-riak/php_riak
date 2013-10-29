@@ -23,4 +23,8 @@ extern zend_class_entry *riak_index_output_ce;
 
 void riak_output_index_output_init(TSRMLS_D);
 
+PHP_METHOD(Riak_Index_Output, __construct);
+PHP_METHOD(Riak_Index_Output, getResultList);
+PHP_METHOD(Riak_Index_Output, getContinuation);
+
 #endif //RIAK_OUTPUT__INDEX_OUTPUT__H__

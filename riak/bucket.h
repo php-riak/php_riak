@@ -33,6 +33,7 @@ PHP_METHOD(RiakBucket, put);
 PHP_METHOD(RiakBucket, get);
 PHP_METHOD(RiakBucket, delete);
 PHP_METHOD(RiakBucket, index);
+PHP_METHOD(RiakBucket, indexQuery);
 
 PHP_METHOD(RiakBucket, getKeyStream);
 PHP_METHOD(RiakBucket, getKeyList);

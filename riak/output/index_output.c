@@ -15,10 +15,23 @@
 */
 #include "index_output.h"
 #include "output.h"
+#include "index_result_list.h"
+#include "../exception/exception.h"
 
 zend_class_entry *riak_index_output_ce;
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_output_index_output_noargs, 0, ZEND_RETURN_VALUE, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_output_index_output_ctor, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, indexOutput)
+    ZEND_ARG_INFO(0, continuation)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_output_index_output_methods[] = {
+    PHP_ME(Riak_Index_Output, __construct, arginfo_riak_output_index_output_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+    PHP_ME(Riak_Index_Output, getContinuation, arginfo_riak_output_index_output_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Index_Output, getResultList, arginfo_riak_output_index_output_noargs, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -29,4 +42,35 @@ void riak_output_index_output_init(TSRMLS_D)
     INIT_NS_CLASS_ENTRY(ce, "Riak\\Output", "IndexOutput", riak_output_index_output_methods);
     riak_index_output_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
+    zend_declare_property_null(riak_index_output_ce, "result", sizeof("result")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+    zend_declare_property_null(riak_index_output_ce, "continuation", sizeof("continuation")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+}
+
+PHP_METHOD(Riak_Index_Output, __construct)
+{
+    char *continuation;
+    int continuation_len;
+    zval *zresultlist;
+    continuation = 0;
+    continuation_len = 0;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|s", &zresultlist, riak_index_result_list_ce,
+                              &continuation, &continuation_len) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
+        return;
+    }
+    if (continuation && continuation_len > 0) {
+        zend_update_property_stringl(riak_index_output_ce, getThis(), "continuation",
+                                     sizeof("continuation")-1, continuation, continuation_len TSRMLS_CC);
+    }
+    zend_update_property(riak_index_output_ce, getThis(), "result", sizeof("result")-1, zresultlist TSRMLS_CC);
+}
+
+PHP_METHOD(Riak_Index_Output, getResultList)
+{
+    RIAK_GETTER_OBJECT(riak_index_output_ce, "result")
+}
+
+PHP_METHOD(Riak_Index_Output, getContinuation)
+{
+    RIAK_GETTER_STRING(riak_index_output_ce, "continuation");
 }
