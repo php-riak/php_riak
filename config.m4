@@ -25,6 +25,7 @@ if test "$PHP_RIAK" != "no"; then
     riak/input/get_input.c \
     riak/input/put_input.c \
     riak/input/index_input.c \
+    riak/query/index_query.c \
     riak/output/output.c \
     riak/output/get_output.c \
     riak/output/put_output.c \
@@ -78,6 +79,7 @@ if test "$PHP_RIAK" != "no"; then
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/output], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/phase], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/search], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/query], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/input], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/output], 1)
 

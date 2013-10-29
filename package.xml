@@ -65,6 +65,10 @@
                     <file role="src" name="exception.c"/>
                     <file role="src" name="exception.h"/>
                 </dir>
+                <dir name="query">
+                    <file role="src" name="index_query.c"/>
+                    <file role="src" name="index_query.h"/>
+                </dir>
                 <dir name="input">
                     <file role="src" name="input.c"/>
                     <file role="src" name="input.h"/>

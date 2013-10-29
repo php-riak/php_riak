@@ -189,3 +189,6 @@ riak/output/index_result_list.h
 riak/output/index_output.c
 riak/output/index_output.h
 tests/index_output.phpt
+riak/query/index_query.c
+riak/query/index_query.h
+tests/index_query.phpt
