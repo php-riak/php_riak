@@ -31,6 +31,7 @@
 #include "output/put_output.h"
 #include "output/get_output.h"
 #include "input/index_input.h"
+#include "query/index_query.h"
 #include "output/key_stream_output.h"
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
@@ -272,17 +273,54 @@ PHP_METHOD(RiakBucket, index)
 }
 /* }}} */
 
+void riack_req_set_from_indexquery(zval* zindexq, struct RIACK_2I_QUERY_REQ *req TSRMLS_DC)
+{
+    zval *zname, *zisrange;
+    bool isranged;
+    MAKE_STD_ZVAL(zname);
+    RIAK_CALL_METHOD(Riak_Query_IndexQuery, getName, zname, zindexq);
+    // TODO COPY
+    req->index.len = Z_STRLEN_P(zname);
+    req->index.value = Z_STRVAL_P(zname);
+
+    MAKE_STD_ZVAL(zisrange);
+    RIAK_CALL_METHOD(Riak_Query_IndexQuery, isRangeQuery, zisrange, zindexq);
+    isranged = Z_BVAL_P(zisrange);
+    zval_ptr_dtor(&zisrange);
+/*
+    RIACK_STRING search_exact;
+    RIACK_STRING search_min;
+    RIACK_STRING search_max;
+    uint32_t max_results;
+    RIACK_STRING continuation_token;
+*/
+}
+
 /* {{{ proto array Riak\Bucket->indexQuery(IndexQuery $query[, IndexInput $input])
 Apply given properties to this bucket */
 PHP_METHOD(RiakBucket, indexQuery)
 {
-//    zval *zquery, *zinput;
-//    zinput = zquery = 0;
-//    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|O", &zquery, ) == FAILURE) {
-//        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-//        return;
-//    }
-    // TODO
+    riak_connection *connection;
+    struct RIACK_2I_QUERY_REQ req;
+    RIACK_STRING_LIST result_keys;
+    RIACK_STRING continuation;
+    zval *zquery, *zinput;
+    int riackstatus;
+    zinput = zquery = 0;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|O", &zquery, riak_index_query_ce, &zinput, riak_index_input_ce) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
+        return;
+    }
+    // TODO Validate query have exact or ranged values
+
+    connection = get_riak_connection(getThis() TSRMLS_CC);
+
+    memset(&req, 0, sizeof(req));
+    memset(&continuation, 0, sizeof(continuation));
+    req.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
+    riack_req_set_from_indexquery(zquery, &req TSRMLS_CC);
+
+    riackstatus = riack_2i_query_ext(connection->client, &req, &result_keys, &continuation);
 }
 /* }}} */
 
