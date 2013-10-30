@@ -192,3 +192,4 @@ tests/index_output.phpt
 riak/query/index_query.c
 riak/query/index_query.h
 tests/index_query.phpt
+tests/index_query_ext.phpt

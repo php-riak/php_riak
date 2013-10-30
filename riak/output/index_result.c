@@ -59,6 +59,6 @@ PHP_METHOD(Riak_Output_IndexResult, __construct)
 Get key */
 PHP_METHOD(Riak_Output_IndexResult, getKey)
 {
-    RIAK_GETTER_OBJECT(riak_index_result_ce, "key")
+    RIAK_GETTER_STRING(riak_index_result_ce, "key")
 }
 /* }}} */

@@ -30,6 +30,7 @@
 #include "output/output.h"
 #include "output/put_output.h"
 #include "output/get_output.h"
+#include "output/index_output.h"
 #include "input/index_input.h"
 #include "query/index_query.h"
 #include "output/key_stream_output.h"
@@ -87,6 +88,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_indexq, 0, ZEND_RETURN_VALUE, 2)
     ZEND_ARG_INFO(0, to)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_indexq_ext, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, query)
+    ZEND_ARG_INFO(0, input)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_streamkeys, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, keystreamer)
 ZEND_END_ARG_INFO()
@@ -100,6 +106,7 @@ static zend_function_entry riak_bucket_methods[] = {
     PHP_ME(RiakBucket, get, arginfo_bucket_get, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, delete, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, index, arginfo_bucket_indexq, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, indexQuery, arginfo_bucket_indexq_ext, ZEND_ACC_PUBLIC)
 
     PHP_ME(RiakBucket, getPropertyList, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, setPropertyList, arginfo_bucket_applyprops, ZEND_ACC_PUBLIC)
@@ -273,28 +280,6 @@ PHP_METHOD(RiakBucket, index)
 }
 /* }}} */
 
-void riack_req_set_from_indexquery(zval* zindexq, struct RIACK_2I_QUERY_REQ *req TSRMLS_DC)
-{
-    zval *zname, *zisrange;
-    bool isranged;
-    MAKE_STD_ZVAL(zname);
-    RIAK_CALL_METHOD(Riak_Query_IndexQuery, getName, zname, zindexq);
-    // TODO COPY
-    req->index.len = Z_STRLEN_P(zname);
-    req->index.value = Z_STRVAL_P(zname);
-
-    MAKE_STD_ZVAL(zisrange);
-    RIAK_CALL_METHOD(Riak_Query_IndexQuery, isRangeQuery, zisrange, zindexq);
-    isranged = Z_BVAL_P(zisrange);
-    zval_ptr_dtor(&zisrange);
-/*
-    RIACK_STRING search_exact;
-    RIACK_STRING search_min;
-    RIACK_STRING search_max;
-    uint32_t max_results;
-    RIACK_STRING continuation_token;
-*/
-}
 
 /* {{{ proto array Riak\Bucket->indexQuery(IndexQuery $query[, IndexInput $input])
 Apply given properties to this bucket */
@@ -304,7 +289,7 @@ PHP_METHOD(RiakBucket, indexQuery)
     struct RIACK_2I_QUERY_REQ req;
     RIACK_STRING_LIST result_keys;
     RIACK_STRING continuation;
-    zval *zquery, *zinput;
+    zval *zquery, *zinput, *zname, *zisrange, *zmaxresults, *zresult;
     int riackstatus;
     zinput = zquery = 0;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|O", &zquery, riak_index_query_ce, &zinput, riak_index_input_ce) == FAILURE) {
@@ -312,15 +297,53 @@ PHP_METHOD(RiakBucket, indexQuery)
         return;
     }
     // TODO Validate query have exact or ranged values
-
     connection = get_riak_connection(getThis() TSRMLS_CC);
 
     memset(&req, 0, sizeof(req));
     memset(&continuation, 0, sizeof(continuation));
+    memset(&result_keys, 0, sizeof(RIACK_STRING_LIST));
     req.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
-    riack_req_set_from_indexquery(zquery, &req TSRMLS_CC);
 
-    riackstatus = riack_2i_query_ext(connection->client, &req, &result_keys, &continuation);
+    MAKE_STD_ZVAL(zname);
+    RIAK_CALL_METHOD(Riak_Query_IndexQuery, getName, zname, zquery);
+    req.index.len = Z_STRLEN_P(zname);
+    req.index.value = Z_STRVAL_P(zname);
+
+    if (zinput) {
+        MAKE_STD_ZVAL(zmaxresults);
+        RIAK_CALL_METHOD(Riak_Input_IndexInput, getMaxResults, zmaxresults, zquery);
+        if (Z_TYPE_P(zmaxresults) == IS_LONG) {
+            req.max_results = Z_LVAL_P(zmaxresults);
+        }
+        zval_ptr_dtor(&zmaxresults);
+        // TODO continuation_token
+    }
+    MAKE_STD_ZVAL(zisrange);
+    RIAK_CALL_METHOD(Riak_Query_IndexQuery, isRangeQuery, zisrange, zquery);
+    if (Z_BVAL_P(zisrange)) {
+        zval *zmin, *zmax;
+        // TODO Call getter instead, this is cheat
+        zmin = zend_read_property(riak_index_query_ce, zquery, "minValue", sizeof("minValue")-1, 1 TSRMLS_CC);
+        zmax = zend_read_property(riak_index_query_ce, zquery, "maxValue", sizeof("maxValue")-1, 1 TSRMLS_CC);
+        req.search_min.len = Z_STRLEN_P(zmin);
+        req.search_min.value = Z_STRVAL_P(zmin);
+        req.search_max.len = Z_STRLEN_P(zmax);
+        req.search_max.value = Z_STRVAL_P(zmax);
+        riackstatus = riack_2i_query_ext(connection->client, &req, &result_keys, &continuation);
+    } else {
+        zval *zexact;
+        zexact = zend_read_property(riak_index_query_ce, zquery, "exactValue", sizeof("exactValue")-1, 1 TSRMLS_CC);
+        req.search_exact.len = Z_STRLEN_P(zexact);
+        req.search_exact.value = Z_STRVAL_P(zexact);
+        riackstatus = riack_2i_query_ext(connection->client, &req, &result_keys, &continuation);
+    }
+    zval_ptr_dtor(&zname);
+    zval_ptr_dtor(&zisrange);
+
+    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
+    zresult = get_index_output_from_riack_string_list(&result_keys TSRMLS_CC);
+
+    RETURN_ZVAL(zresult, 0, 1);
 }
 /* }}} */
 

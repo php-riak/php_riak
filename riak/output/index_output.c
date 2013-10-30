@@ -16,6 +16,7 @@
 #include "index_output.h"
 #include "output.h"
 #include "index_result_list.h"
+#include "index_result.h"
 #include "../exception/exception.h"
 
 zend_class_entry *riak_index_output_ce;
@@ -44,6 +45,36 @@ void riak_output_index_output_init(TSRMLS_D)
 
     zend_declare_property_null(riak_index_output_ce, "result", sizeof("result")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
     zend_declare_property_null(riak_index_output_ce, "continuation", sizeof("continuation")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
+}
+
+zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSRMLS_DC)
+{
+    zval *zresult;
+    size_t i;
+    MAKE_STD_ZVAL(zresult);
+    object_init_ex(zresult, riak_index_result_list_ce);
+    RIAK_CALL_METHOD(Riak_Index_Result_List, __construct, NULL, zresult);
+    for (i=0; i<result_keys->string_count; ++i) {
+        zval *zcurrent, *zkey, *zoffset, *zdummy;
+        MAKE_STD_ZVAL(zoffset);
+        ZVAL_LONG(zoffset, i);
+
+        MAKE_STD_ZVAL(zkey);
+        ZVAL_STRINGL(zkey, result_keys->strings[i].value, result_keys->strings[i].len, 1);
+
+        MAKE_STD_ZVAL(zcurrent);
+        object_init_ex(zcurrent, riak_index_result_ce);
+        RIAK_CALL_METHOD1(Riak_Output_IndexResult, __construct, NULL, zcurrent, zkey);
+
+        MAKE_STD_ZVAL(zdummy);
+        RIAK_CALL_METHOD2(Riak_Index_Result_List, offsetSet, zdummy, zresult, zoffset, zcurrent);
+
+        zval_ptr_dtor(&zdummy);
+        zval_ptr_dtor(&zoffset);
+        zval_ptr_dtor(&zkey);
+        zval_ptr_dtor(&zcurrent);
+    }
+    return zresult;
 }
 
 PHP_METHOD(Riak_Index_Output, __construct)
