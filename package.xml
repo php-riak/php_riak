@@ -15,11 +15,11 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-10-23</date>
-    <time>18:30:00</time>
+    <date>2013-10-31</date>
+    <time>19:30:00</time>
     <version>
-        <release>0.6.2</release>
-        <api>0.6.2</api>
+        <release>0.7.0</release>
+        <api>0.7.0</api>
     </version>
     <stability>
         <release>beta</release>
@@ -27,9 +27,7 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
         <notes>
-- Fixed potential bug in map reduce function
-- Restructured extension sources so php FQN can be mapped directly to source.
-- Changed get output from array to collection, which implements ArrayAccess so it maintains compatability
+- Riak 1.4+ feature: secondary index paging implemented
         </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -244,6 +242,21 @@
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+    <release>
+        <version>
+            <release>0.7.0</release>
+            <api>0.7.0</api>
+        </version>
+        <stability>
+            <release>beta</release>
+            <api>beta</api>
+        </stability>
+        <date>2013-10-31</date>
+        <license>Apache2</license>
+        <notes>
+- Riak 1.4+ feature: secondary index paging implemented
+</notes>
+    </release>
     <release>
         <version>
             <release>0.6.2</release>
