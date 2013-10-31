@@ -20,6 +20,13 @@ $result = $bucket->indexQuery($q);
 if ($result[0]->getKey() !== "obj1") {
     var_dump($result[0]);
 }
+
+$q->setRangeValue(1, 8);
+$input = new \Riak\Input\IndexInput();
+$input->setMaxResults(4);
+$result = $bucket->indexQuery($q, $input);
+// var_dump($result);
+
 echo "done!".PHP_EOL;
 ?>
 --EXPECT--

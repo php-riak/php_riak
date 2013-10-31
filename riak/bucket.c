@@ -311,7 +311,7 @@ PHP_METHOD(RiakBucket, indexQuery)
 
     if (zinput) {
         MAKE_STD_ZVAL(zmaxresults);
-        RIAK_CALL_METHOD(Riak_Input_IndexInput, getMaxResults, zmaxresults, zquery);
+        RIAK_CALL_METHOD(Riak_Input_IndexInput, getMaxResults, zmaxresults, zinput);
         if (Z_TYPE_P(zmaxresults) == IS_LONG) {
             req.max_results = Z_LVAL_P(zmaxresults);
         }
