@@ -55,7 +55,7 @@ zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSR
     object_init_ex(zresult, riak_index_result_list_ce);
     RIAK_CALL_METHOD(Riak_Index_Result_List, __construct, NULL, zresult);
     for (i=0; i<result_keys->string_count; ++i) {
-        zval *zcurrent, *zkey, *zoffset, *zdummy;
+        zval *zcurrent, *zkey, *zoffset;
         MAKE_STD_ZVAL(zoffset);
         ZVAL_LONG(zoffset, i);
 
@@ -66,10 +66,7 @@ zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSR
         object_init_ex(zcurrent, riak_index_result_ce);
         RIAK_CALL_METHOD1(Riak_Output_IndexResult, __construct, NULL, zcurrent, zkey);
 
-        MAKE_STD_ZVAL(zdummy);
-        RIAK_CALL_METHOD2(Riak_Index_Result_List, offsetSet, zdummy, zresult, zoffset, zcurrent);
-
-        zval_ptr_dtor(&zdummy);
+        RIAK_CALL_METHOD2(Riak_Index_Result_List, offsetSet, NULL, zresult, zoffset, zcurrent);
         zval_ptr_dtor(&zoffset);
         zval_ptr_dtor(&zkey);
         zval_ptr_dtor(&zcurrent);
