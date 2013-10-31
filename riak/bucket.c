@@ -289,7 +289,7 @@ PHP_METHOD(RiakBucket, indexQuery)
     struct RIACK_2I_QUERY_REQ req;
     RIACK_STRING_LIST result_keys;
     RIACK_STRING continuation;
-    zval *zquery, *zinput, *zname, *zisrange, *zmaxresults, *zresult;
+    zval *zquery, *zinput, *zname, *zisrange, *zcontinuation, *zresult;
     int riackstatus;
     zinput = zquery = 0;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|O", &zquery, riak_index_query_ce, &zinput, riak_index_input_ce) == FAILURE) {
@@ -309,14 +309,22 @@ PHP_METHOD(RiakBucket, indexQuery)
     req.index.len = Z_STRLEN_P(zname);
     req.index.value = Z_STRVAL_P(zname);
 
+    zcontinuation = NULL;
     if (zinput) {
+        zval *zmaxresults;
         MAKE_STD_ZVAL(zmaxresults);
         RIAK_CALL_METHOD(Riak_Input_IndexInput, getMaxResults, zmaxresults, zinput);
         if (Z_TYPE_P(zmaxresults) == IS_LONG) {
             req.max_results = Z_LVAL_P(zmaxresults);
         }
         zval_ptr_dtor(&zmaxresults);
-        // TODO continuation_token
+
+        MAKE_STD_ZVAL(zcontinuation);
+        RIAK_CALL_METHOD(Riak_Input_IndexInput, getContinuation, zcontinuation, zinput);
+        if (Z_TYPE_P(zcontinuation) == IS_STRING) {
+            req.continuation_token.len = Z_STRLEN_P(zcontinuation);
+            req.continuation_token.value = Z_STRVAL_P(zcontinuation);
+        }
     }
     MAKE_STD_ZVAL(zisrange);
     RIAK_CALL_METHOD(Riak_Query_IndexQuery, isRangeQuery, zisrange, zquery);
@@ -339,9 +347,15 @@ PHP_METHOD(RiakBucket, indexQuery)
     }
     zval_ptr_dtor(&zname);
     zval_ptr_dtor(&zisrange);
+    if (zcontinuation) {
+        zval_ptr_dtor(&zcontinuation);
+    }
 
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
-    zresult = get_index_output_from_riack_string_list(&result_keys TSRMLS_CC);
+    zresult = riak_index_output_from_string_list_and_continuation(&result_keys, &continuation TSRMLS_CC);
+    if (RSTR_HAS_CONTENT(continuation)) {
+        RSTR_SAFE_FREE(connection->client, continuation);
+    }
 
     RETURN_ZVAL(zresult, 0, 1);
 }

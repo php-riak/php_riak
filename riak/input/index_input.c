@@ -61,7 +61,7 @@ PHP_METHOD(Riak_Input_IndexInput, getContinuation)
 
 PHP_METHOD(Riak_Input_IndexInput, setMaxResults)
 {
-    RIAK_SETTER_STRING(riak_index_input_ce, "maxResults");
+    RIAK_SETTER_LONG(riak_index_input_ce, "maxResults");
     RIAK_RETURN_THIS
 }
 

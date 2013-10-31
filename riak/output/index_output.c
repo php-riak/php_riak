@@ -74,6 +74,25 @@ zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSR
     return zresult;
 }
 
+zval *riak_index_output_from_string_list_and_continuation(RIACK_STRING_LIST *result_keys, RIACK_STRING *continuation TSRMLS_DC) {
+    zval* zlist, *zresult;
+    MAKE_STD_ZVAL(zresult);
+    object_init_ex(zresult, riak_index_output_ce);
+
+    zlist = get_index_output_from_riack_string_list(result_keys TSRMLS_CC);
+    if (continuation && RSTR_HAS_CONTENT((*continuation))) {
+        zval *zcontinuation;
+        MAKE_STD_ZVAL(zcontinuation);
+        ZVAL_STRINGL(zcontinuation, continuation->value, continuation->len, 1);
+        RIAK_CALL_METHOD2(Riak_Index_Output, __construct, NULL, zresult, zlist, zcontinuation);
+        zval_ptr_dtor(&zcontinuation);
+    } else {
+        RIAK_CALL_METHOD1(Riak_Index_Output, __construct, NULL, zresult, zlist);
+    }
+    zval_ptr_dtor(&zlist);
+    return zresult;
+}
+
 PHP_METHOD(Riak_Index_Output, __construct)
 {
     char *continuation;
