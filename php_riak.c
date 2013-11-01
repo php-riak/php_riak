@@ -41,6 +41,9 @@
 #include "riak/map_reduce/functions/base_function.h"
 #include "riak/map_reduce/functions/erlang_function.h"
 #include "riak/map_reduce/functions/javascript_function.h"
+#include "riak/crdt/counter.h"
+#include "riak/crdt/input/get_input.h"
+#include "riak/crdt/input/update_input.h"
 #include "riak/input/input.h"
 #include "riak/input/index_input.h"
 #include "riak/input/delete_input.h"
@@ -167,6 +170,10 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_search_input_parameterbag_init(TSRMLS_C);
     riak_search_output_output_init(TSRMLS_C);
     riak_search_output_document_output_init(TSRMLS_C);
+
+    riak_crdt_counter_init(TSRMLS_C);
+    riak_crdt_input_get_input_init(TSRMLS_C);
+    riak_crdt_input_update_input_init(TSRMLS_C);
 
 #ifdef PHP_RIAK_SESSION
     php_session_register_module(&ps_mod_riak);

@@ -20,5 +20,14 @@
 
 #include "php_riak_internal.h"
 
+extern zend_class_entry *riak_crdt_counter_ce;
+
+void riak_crdt_counter_init(TSRMLS_D);
+
+PHP_METHOD(Riak_Crdt_Counter, __construct);
+
+PHP_METHOD(Riak_Crdt_Counter, increment);
+PHP_METHOD(Riak_Crdt_Counter, incrementAndGet);
+PHP_METHOD(Riak_Crdt_Counter, get);
 
 #endif // RIAK__CRDT__COUNTER__H__

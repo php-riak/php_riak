@@ -20,5 +20,15 @@
 
 #include "php_riak_internal.h"
 
+extern zend_class_entry *riak_crdt_input_update_ce;
+
+void riak_crdt_input_update_input_init(TSRMLS_D);
+
+PHP_METHOD(Riak_Crdt_Input_UpdateInput, getW);
+PHP_METHOD(Riak_Crdt_Input_UpdateInput, setW);
+PHP_METHOD(Riak_Crdt_Input_UpdateInput, getDW);
+PHP_METHOD(Riak_Crdt_Input_UpdateInput, setDW);
+PHP_METHOD(Riak_Crdt_Input_UpdateInput, getPW);
+PHP_METHOD(Riak_Crdt_Input_UpdateInput, setPW);
 
 #endif // RIAK__CRDT__INPUT__UPDATE_INPUT__H__

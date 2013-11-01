@@ -20,5 +20,17 @@
 
 #include "php_riak_internal.h"
 
+extern zend_class_entry *riak_crdt_input_get_ce;
+
+void riak_crdt_input_get_input_init(TSRMLS_D);
+
+PHP_METHOD(Riak_Crdt_Input_GetInput, getR);
+PHP_METHOD(Riak_Crdt_Input_GetInput, setR);
+PHP_METHOD(Riak_Crdt_Input_GetInput, getPR);
+PHP_METHOD(Riak_Crdt_Input_GetInput, setPR);
+PHP_METHOD(Riak_Crdt_Input_GetInput, getBasicQuorum);
+PHP_METHOD(Riak_Crdt_Input_GetInput, setBasicQuorum);
+PHP_METHOD(Riak_Crdt_Input_GetInput, getNotFoundOk);
+PHP_METHOD(Riak_Crdt_Input_GetInput, setNotFoundOk);
 
 #endif // RIAK__CRDT__INPUT__GET_INPUT__H__
