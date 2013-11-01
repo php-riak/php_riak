@@ -59,6 +59,16 @@
                 <file role="src" name="pool.h"/>
                 <file role="src" name="pool_info.c"/>
                 <file role="src" name="pool_info.h"/>
+                <dir name="crdt">
+                    <file role="src" name="counter.c"/>
+                    <file role="src" name="counter.h"/>
+                    <dir name="input">
+                        <file role="src" name="get_input.c"/>
+                        <file role="src" name="get_input.h"/>
+                        <file role="src" name="update_input.c"/>
+                        <file role="src" name="update_input.h"/>
+                    </dir>
+                </dir>
                 <dir name="exception">
                     <file role="src" name="exception.c"/>
                     <file role="src" name="exception.h"/>

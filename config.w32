@@ -15,6 +15,8 @@ if (PHP_RIAK != "no") {
                 ADD_SOURCES(configure_module_dirname + "/riak/output", "output.c get_output.c put_output.c key_stream_output.c index_result.c index_result_list.c index_output.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/input", "input.c delete_input.c get_input.c put_input.c index_input.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/exception", "exception.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riak/crdt", "counter.c", "riak");
+                ADD_SOURCES(configure_module_dirname + "/riak/crdt/input", "update_input.c get_input.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/search", "search.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/query", "index_query.c", "riak");
                 ADD_SOURCES(configure_module_dirname + "/riak/search/input", "parameter_bag.c", "riak");

@@ -20,6 +20,9 @@ if test "$PHP_RIAK" != "no"; then
     riak/link.c \
     riak/pool_info.c \
     riak/object_list.c \
+    riak/crdt/counter.c \
+    riak/crdt/input/get_input.c \
+    riak/crdt/input/update_input.c \
     riak/input/input.c \
     riak/input/delete_input.c \
     riak/input/get_input.c \
@@ -68,6 +71,8 @@ if test "$PHP_RIAK" != "no"; then
     LibRiack/src/google/protobuf-c/protobuf-c.c, $ext_shared)
 
     PHP_ADD_BUILD_DIR([$ext_builddir/riak], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/crdt], 1)
+    PHP_ADD_BUILD_DIR([$ext_builddir/riak/crdt/input], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/exception], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/input], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/output], 1)

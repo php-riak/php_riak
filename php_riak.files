@@ -193,3 +193,9 @@ riak/query/index_query.c
 riak/query/index_query.h
 tests/index_query.phpt
 tests/index_query_ext.phpt
+riak/crdt/counter.c
+riak/crdt/counter.h
+riak/crdt/input/update_input.c
+riak/crdt/input/update_input.h
+riak/crdt/input/get_input.c
+riak/crdt/input/get_input.h
