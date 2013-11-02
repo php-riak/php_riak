@@ -199,3 +199,4 @@ riak/crdt/input/update_input.c
 riak/crdt/input/update_input.h
 riak/crdt/input/get_input.c
 riak/crdt/input/get_input.h
+tests/crdt_counter.phpt

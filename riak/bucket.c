@@ -25,7 +25,6 @@
 #include "input/get_input.h"
 #include "input/put_input.h"
 #include "exception/exception.h"
-#include "connection.h"
 #include "object.h"
 #include "output/output.h"
 #include "output/put_output.h"
@@ -34,6 +33,7 @@
 #include "input/index_input.h"
 #include "query/index_query.h"
 #include "output/key_stream_output.h"
+#include "crdt/counter.h"
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
 
@@ -97,6 +97,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_streamkeys, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, keystreamer)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_counter, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_bucket_noargs, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
@@ -107,6 +111,7 @@ static zend_function_entry riak_bucket_methods[] = {
     PHP_ME(RiakBucket, delete, arginfo_bucket_delete, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, index, arginfo_bucket_indexq, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, indexQuery, arginfo_bucket_indexq_ext, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucket, counter, arginfo_bucket_counter, ZEND_ACC_PUBLIC)
 
     PHP_ME(RiakBucket, getPropertyList, arginfo_bucket_fetchprops, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucket, setPropertyList, arginfo_bucket_applyprops, ZEND_ACC_PUBLIC)
@@ -238,6 +243,29 @@ PHP_METHOD(RiakBucket, getKeyList)
 }
 /* }}} */
 
+
+/* {{{ proto Riak\Crdt\Counter Riak\Bucket->counter(string $key)
+Creates a new counter on this bucket */
+PHP_METHOD(RiakBucket, counter)
+{
+    zval *zcounter, *zkey;
+    char *key;
+    int keylen;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &keylen) == FAILURE) {
+        zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
+        return;
+    }
+    MAKE_STD_ZVAL(zkey);
+    ZVAL_STRINGL(zkey, key, keylen, 1);
+
+    MAKE_STD_ZVAL(zcounter);
+    object_init_ex(zcounter, riak_crdt_counter_ce);
+    RIAK_CALL_METHOD2(Riak_Crdt_Counter, __construct, NULL, zcounter, getThis(), zkey);
+
+    zval_ptr_dtor(&zkey);
+
+    RETURN_ZVAL(zcounter, 0, 1);
+}
 
 /* {{{ proto array Riak\Bucket->index(string $index, string $from [, string $to])
 Perform a secondary index lookup */

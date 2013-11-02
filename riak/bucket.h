@@ -19,6 +19,7 @@
 #define RIAK_BUCKET__H__
 
 #include "php_riak_internal.h"
+#include "connection.h"
 
 extern zend_class_entry *riak_bucket_ce;
 
@@ -34,12 +35,14 @@ PHP_METHOD(RiakBucket, get);
 PHP_METHOD(RiakBucket, delete);
 PHP_METHOD(RiakBucket, index);
 PHP_METHOD(RiakBucket, indexQuery);
+PHP_METHOD(RiakBucket, counter);
 
 PHP_METHOD(RiakBucket, getKeyStream);
 PHP_METHOD(RiakBucket, getKeyList);
 PHP_METHOD(RiakBucket, getName);
 PHP_METHOD(RiakBucket, getConnection);
 
+riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC);
 RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC);
 void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC);
