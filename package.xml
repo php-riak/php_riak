@@ -59,6 +59,8 @@
                 <file role="src" name="pool.h"/>
                 <file role="src" name="pool_info.c"/>
                 <file role="src" name="pool_info.h"/>
+                <file role="src" name="server_info.c"/>
+                <file role="src" name="server_info.h"/>
                 <dir name="crdt">
                     <file role="src" name="counter.c"/>
                     <file role="src" name="counter.h"/>

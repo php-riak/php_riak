@@ -200,3 +200,7 @@ riak/crdt/input/update_input.h
 riak/crdt/input/get_input.c
 riak/crdt/input/get_input.h
 tests/crdt_counter.phpt
+riak/server_info.h
+riak/server_info.c
+php_riak.includes
+tests/server_info.phpt

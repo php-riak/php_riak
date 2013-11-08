@@ -19,6 +19,7 @@ if test "$PHP_RIAK" != "no"; then
     riak/pool.c \
     riak/link.c \
     riak/pool_info.c \
+    riak/server_info.c \
     riak/object_list.c \
     riak/crdt/counter.c \
     riak/crdt/input/get_input.c \

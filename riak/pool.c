@@ -78,6 +78,7 @@ zend_bool lock_pool(TSRMLS_D) /* {{{ */
     return 0;
   }
 #endif
+  return 1;
 }
 /* }}} */
 
