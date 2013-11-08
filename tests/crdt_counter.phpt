@@ -45,5 +45,6 @@ $read2 = $counter2->get($getInput);
 if ($start2 - 2 != $read2) {
     echo "Inc2 b failed".PHP_EOL;
 }
+echo "done!".PHP_EOL;
 --EXPECT--
 done!
