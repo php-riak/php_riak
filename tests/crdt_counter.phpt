@@ -25,7 +25,6 @@ $updateInput->setPW(1);
 
 $start1 = $counter1->get();
 $start2 = $counter2->get($getInput);
-
 $read1 = $counter1->incrementAndGet(1);
 if ($start1+1 != $read1) {
     echo "Inc1 a failed".PHP_EOL;
@@ -37,17 +36,14 @@ if ($start1+2 != $read1) {
 
 $counter2->increment(-1);
 $read2 = $counter2->get($getInput);
-if ($start1 - 1 != $read2) {
-    echo "expected: ".($start1 - 1)." but got ".$read2.PHP_EOL;
+if ($start2 - 1 != $read2) {
     echo "Inc2 a failed".PHP_EOL;
 }
 
 $counter2->increment(-1, $updateInput);
 $read2 = $counter2->get($getInput);
-if ($start1 - 2 != $read2) {
-    echo "expected: ".($start1 - 2)." but got ".$read2.PHP_EOL;
+if ($start2 - 2 != $read2) {
     echo "Inc2 b failed".PHP_EOL;
 }
-echo "done!".PHP_EOL;
 --EXPECT--
 done!
