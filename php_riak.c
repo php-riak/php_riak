@@ -66,6 +66,7 @@
 #include "riak/property/commit_hook.h"
 #include "riak/property/commit_hook_list.h"
 #include "riak/property/replication_mode/replication_mode.h"
+#include "riak/server_info.h"
 
 #ifdef PHP_RIAK_SESSION
   extern ps_module ps_mod_riak;
@@ -175,6 +176,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_crdt_input_get_input_init(TSRMLS_C);
     riak_crdt_input_update_input_init(TSRMLS_C);
 
+    riak_server_info_init(TSRMLS_C);
 #ifdef PHP_RIAK_SESSION
     php_session_register_module(&ps_mod_riak);
 #endif

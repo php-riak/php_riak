@@ -53,5 +53,6 @@ PHP_METHOD(RiakConnection, ping);
 PHP_METHOD(RiakConnection, getHost);
 PHP_METHOD(RiakConnection, getPort);
 PHP_METHOD(RiakConnection, getBucket);
+PHP_METHOD(RiakConnection, getServerInfo);
 
 #endif

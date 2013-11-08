@@ -84,7 +84,7 @@ PHP_METHOD(Riak_Server_Info, getNode)/* {{{ */
     riak_connection *connection;
     zval *znode, *zserver;
     int riackresult;
-    riackresult = riak_get_server_info_as_zvals(&connection, &znode, &zserver, getThis());
+    riackresult = riak_get_server_info_as_zvals(&connection, &znode, &zserver, getThis() TSRMLS_CC);
     if (zserver) {
         zval_ptr_dtor(&zserver);
     }
@@ -101,7 +101,7 @@ PHP_METHOD(Riak_Server_Info, getServerVersion)/* {{{ */
     riak_connection *connection;
     zval *znode, *zserver;
     int riackresult;
-    riackresult = riak_get_server_info_as_zvals(&connection, &znode, &zserver, getThis());
+    riackresult = riak_get_server_info_as_zvals(&connection, &znode, &zserver, getThis() TSRMLS_CC);
     if (znode) {
         zval_ptr_dtor(&znode);
     }

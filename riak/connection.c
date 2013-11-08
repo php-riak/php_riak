@@ -19,6 +19,7 @@
 #include "object.h"
 #include "bucket.h"
 #include "exception/exception.h"
+#include "server_info.h"
 #include <zend_exceptions.h>
 
 zend_class_entry *riak_connection_ce;
@@ -41,6 +42,7 @@ static zend_function_entry riak_connection_methods[] = {
     PHP_ME(RiakConnection, getHost, arginfo_riak_connection_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakConnection, getPort, arginfo_riak_connection_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakConnection, getBucket, arginfo_riak_connection_get_bucket, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakConnection, getServerInfo, arginfo_riak_connection_noargs, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
@@ -154,7 +156,19 @@ PHP_METHOD(RiakConnection, __construct)
 }
 /* }}} */
 
-/* {{{ proto void RiakConnection->ping()
+/* {{{ proto void Riak\Connection->getServerInfo()
+Get a ServerInfo object */
+PHP_METHOD(RiakConnection, getServerInfo)
+{
+    zval* sinfo;
+    MAKE_STD_ZVAL(sinfo);
+    object_init_ex(sinfo, riak_server_info_ce);
+    RIAK_CALL_METHOD1(Riak_Server_Info, __construct, NULL, sinfo, getThis());
+    RETURN_ZVAL(sinfo, 0, 1);
+}
+/* }}} */
+
+/* {{{ proto void Riak\Connection->ping()
 Ping riak to see if it is alive, an exception is thrown if no response is received */
 PHP_METHOD(RiakConnection, ping)
 {
@@ -170,7 +184,7 @@ PHP_METHOD(RiakConnection, ping)
 }
 /* }}} */
 
-/* {{{ proto string RiakConnection->getHost()
+/* {{{ proto string Riak\Connection->getHost()
 Get this connections hostname */
 PHP_METHOD(RiakConnection, getHost)
 {
@@ -178,7 +192,7 @@ PHP_METHOD(RiakConnection, getHost)
 }
 /* }}} */
 
-/* {{{ proto int RiakConnection->getPort()
+/* {{{ proto int Riak\Connection->getPort()
 Get this connections port number */
 PHP_METHOD(RiakConnection, getPort)
 {
@@ -186,7 +200,7 @@ PHP_METHOD(RiakConnection, getPort)
 }
 /* }}} */
 
-/* {{{ proto Riak\Bucket RiakConnection->getBucket(string $bucketName)
+/* {{{ proto Riak\Bucket Riak\Connection->getBucket(string $bucketName)
 Get a Riak\Bucket */
 PHP_METHOD(RiakConnection, getBucket)
 {

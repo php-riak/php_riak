@@ -38,12 +38,14 @@ if ($start1+2 != $read1) {
 $counter2->increment(-1);
 $read2 = $counter2->get($getInput);
 if ($start1 - 1 != $read2) {
+    echo "expected: ".($start1 - 1)." but got ".$read2.PHP_EOL;
     echo "Inc2 a failed".PHP_EOL;
 }
 
 $counter2->increment(-1, $updateInput);
 $read2 = $counter2->get($getInput);
 if ($start1 - 2 != $read2) {
+    echo "expected: ".($start1 - 2)." but got ".$read2.PHP_EOL;
     echo "Inc2 b failed".PHP_EOL;
 }
 echo "done!".PHP_EOL;
