@@ -219,7 +219,7 @@ PHP_METHOD(RiakBucket, getKeyStream)
 #endif
     cb_params.zstreamer = zstreamer;
     riackstatus = riack_stream_keys(stream_connection->client, rsbucket, riak_stream_key_cb, &cb_params);
-    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(stream_connection, riackstatus);
+    CHECK_RIACK_STATUS_THROW_ON_ERROR(stream_connection, riackstatus);
     release_connection(stream_connection TSRMLS_CC);
 }
 /* }}} */

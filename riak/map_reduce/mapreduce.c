@@ -169,6 +169,7 @@ PHP_METHOD(RiakMapreduce, run)
             // LibRiack can only handle one operation at the time pr connection
             stream_connection = take_connection(connection->client->host, strlen(connection->client->host), connection->client->port TSRMLS_CC);
             if (!stream_connection) {
+                zval_ptr_dtor(&zjson);
                 CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(stream_connection, RIACK_ERROR_COMMUNICATION);
             }
 
