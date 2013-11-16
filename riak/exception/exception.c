@@ -23,7 +23,6 @@ zend_class_entry *riak_badarguments_exception_ce;
 zend_class_entry *riak_connection_exception_ce;
 zend_class_entry *riak_communication_exception_ce;
 zend_class_entry *riak_response_exception_ce;
-zend_class_entry *riak_not_found_exception_ce;
 
 void riak_exceptions_init(TSRMLS_D) 
 {
@@ -47,10 +46,6 @@ void riak_exceptions_init(TSRMLS_D)
 
     INIT_NS_CLASS_ENTRY(ceRespExc, "Riak\\Exception", "UnexpectedResponseException", NULL);
 	riak_response_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
-		riak_exception_ce, NULL TSRMLS_CC);
-
-    INIT_NS_CLASS_ENTRY(ceNotFound, "Riak\\Exception","NotFoundException", NULL);
-	riak_not_found_exception_ce = zend_register_internal_class_ex(&ceNotFound, 
-		riak_exception_ce, NULL TSRMLS_CC);
+        riak_exception_ce, NULL TSRMLS_CC);
 
 }

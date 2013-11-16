@@ -919,22 +919,9 @@ PHP_METHOD(RiakBucket, get)
         RFREE(connection->client, props.if_modified.clock);
     }
     if (riackResult == RIACK_SUCCESS) {
-        contentCount = getResult.object.content_count;
-        if (contentCount > 0) {
-            zval *zout = get_output_from_riack_get_object(&getResult, zKey TSRMLS_CC);
-            RETVAL_ZVAL(zout, 0, 1);
-		} else {
-            // Hack warning!!
-            // Work around for session module, when session.auto_start is enabled read is called before a stackframe has been setup
-            // in that case we cannot throw exception without halting execution, return null instead.
-            if (!EG(current_execute_data)) {
-                // No stack dont throw
-                RETVAL_NULL();
-            } else {
-                /* Throw not found exception */
-                zend_throw_exception(riak_not_found_exception_ce, "Not Found", 2000 TSRMLS_CC);
-            }
-        }
+        zval *zout = get_output_from_riack_get_object(&getResult, zKey TSRMLS_CC);
+        RETVAL_ZVAL(zout, 0, 1);
+
 		riack_free_get_object(connection->client, &getResult);
     } else {
         connection->needs_reconnect = 1;

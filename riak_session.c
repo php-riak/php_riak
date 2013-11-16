@@ -206,7 +206,6 @@ PS_READ_FUNC(riak) /* {{{ */
 
         MAKE_STD_ZVAL(zobjlist);
         RIAK_CALL_METHOD(Riak_Output_Output, getObjectList, zobjlist, zoutput);
-        // TODO Add warning if we have siblings
         if (Z_TYPE_P(zobjlist) == IS_OBJECT) {
             zval *zobject;
             MAKE_STD_ZVAL(zobject);
