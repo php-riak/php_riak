@@ -144,7 +144,7 @@ Runs the mapreduce query and returns the results as an array of Riak_MapReduce_O
 PHP_METHOD(RiakMapreduce, run)
 {
     zval* zjson, *zclient, *zresult, *zstreamer;
-    riak_connection *connection;
+    riak_connection *connection, *stream_connection;
     struct RIACK_MAPRED_RESPONSE_LIST *mapresult;
     struct RIACK_MAPRED_RESPONSE_LIST *mapresult_iter;
     struct riak_mr_stream_params stream_params;
@@ -165,12 +165,20 @@ PHP_METHOD(RiakMapreduce, run)
         ensure_connected(connection TSRMLS_CC);
 
         if (zstreamer) {
+            // Create a new connection only for this stream
+            // LibRiack can only handle one operation at the time pr connection
+            stream_connection = take_connection(connection->client->host, strlen(connection->client->host), connection->client->port TSRMLS_CC);
+            if (!stream_connection) {
+                CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(stream_connection, RIACK_ERROR_COMMUNICATION);
+            }
+
             stream_params.zstreamer = zstreamer;
             #ifdef ZTS
                 stream_params.tsrm_ls = TSRMLS_C;
             #endif
-            riackResult = riack_map_reduce_stream(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &riak_mr_result_cb, &stream_params);
-            CHECK_RIACK_STATUS_THROW_ON_ERROR(connection, riackResult);
+            riackResult = riack_map_reduce_stream(stream_connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &riak_mr_result_cb, &stream_params);
+            CHECK_RIACK_STATUS_THROW_ON_ERROR(stream_connection, riackResult);
+            release_connection(stream_connection TSRMLS_CC);
         } else {
             riackResult = riack_map_reduce(connection->client, Z_STRLEN_P(zjson), (uint8_t*)Z_STRVAL_P(zjson), APPLICATION_JSON, &mapresult);
             if (riackResult == RIACK_SUCCESS) {

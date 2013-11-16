@@ -199,21 +199,28 @@ PHP_METHOD(RiakBucket, getKeyStream)
 {
     struct riak_stream_key_cb_param cb_params;
     RIACK_STRING rsbucket;
-    riak_connection *connection;
+    riak_connection *connection, *stream_connection;
     zval* zstreamer;
     int riackstatus;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zstreamer, riak_key_streamer_ce) == FAILURE) {
         zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
     }
+    // Create a new connection only for this stream
+    // LibRiack can only handle one operation at the time pr connection
     connection = get_riak_connection(getThis() TSRMLS_CC);
+    stream_connection = take_connection(connection->client->host, strlen(connection->client->host), connection->client->port TSRMLS_CC);
+    if (!stream_connection) {
+        CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(stream_connection, RIACK_ERROR_COMMUNICATION);
+    }
     rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 #ifdef ZTS
     cb_params.tsrm_ls = TSRMLS_C;
 #endif
     cb_params.zstreamer = zstreamer;
-    riackstatus = riack_stream_keys(connection->client, rsbucket, riak_stream_key_cb, &cb_params);
-    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
+    riackstatus = riack_stream_keys(stream_connection->client, rsbucket, riak_stream_key_cb, &cb_params);
+    CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(stream_connection, riackstatus);
+    release_connection(stream_connection TSRMLS_CC);
 }
 /* }}} */
 
