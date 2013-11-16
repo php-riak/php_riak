@@ -64,15 +64,17 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_put, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, object)
-    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, putInput)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_get, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, getInput)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_delete, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, object)
+    ZEND_ARG_INFO(0, delInput)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_fetchprops, 0, ZEND_RETURN_VALUE, 0)
