@@ -15,21 +15,20 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-11-16</date>
+    <date>2013-11-17</date>
     <time>20:00:00</time>
     <version>
-        <release>0.9.1</release>
-        <api>0.9.1</api>
+        <release>1.0.0</release>
+        <api>1.0.0</api>
     </version>
     <stability>
-        <release>beta</release>
-        <api>beta</api>
+        <release>stable</release>
+        <api>stable</api>
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
-        <notes>
-Added some missing ZEND_ARG_INFO's in bucket.c
-Possibly breaking change: Removed NotFoundException, you always want an GetOutput with vclock even though the object is not found.
-        </notes>
+<notes>
+Fixed issue 52: A temporary connection is now taken from pool when doing streaming operations
+</notes>
     <contents>
         <dir baseinstalldir="/" name="/">
             <file role="doc" name="LICENSE"/>
@@ -257,6 +256,21 @@ Possibly breaking change: Removed NotFoundException, you always want an GetOutpu
     <changelog>
     <release>
         <version>
+            <release>1.0.0</release>
+            <api>1.0.0</api>
+        </version>
+        <stability>
+            <release>stable</release>
+            <api>stable</api>
+        </stability>
+        <date>2013-11-17</date>
+        <license>Apache2</license>
+<notes>
+Fixed issue 52: A temporary connection is now taken from pool when doing streaming operations
+</notes>
+    </release>
+    <release>
+        <version>
             <release>0.9.1</release>
             <api>0.9.1</api>
         </version>
@@ -264,7 +278,7 @@ Possibly breaking change: Removed NotFoundException, you always want an GetOutpu
             <release>beta</release>
             <api>beta</api>
         </stability>
-        <date>2013-10-16</date>
+        <date>2013-11-16</date>
         <license>Apache2</license>
         <notes>
 Added some missing ZEND_ARG_INFO's in bucket.c
@@ -296,7 +310,7 @@ Possibly breaking change: Removed NotFoundException, you always want an GetOutpu
             <release>beta</release>
             <api>beta</api>
         </stability>
-        <date>2013-10-02</date>
+        <date>2013-11-02</date>
         <license>Apache2</license>
         <notes>
 - Riak 1.4+ feature: CRDT counters implemented
