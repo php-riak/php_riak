@@ -69,11 +69,18 @@ void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* 
         zval *zobject, *zoffset;
         MAKE_STD_ZVAL(zobject);
         object_init_ex(zobject, riak_object_ce);
+
         if (Z_TYPE_P(zkey) != IS_NULL) {
             RIAK_CALL_METHOD1(RiakObject, __construct, NULL, zobject, zkey);
         } else {
             RIAK_CALL_METHOD(RiakObject, __construct, NULL, zobject);
         }
+
+        if (obj->vclock.len > 0) {
+            zend_update_property_stringl(riak_object_ce, zobject, "vClock", sizeof("vClock")-1,
+                                     (char*)obj->vclock.clock, obj->vclock.len TSRMLS_CC);
+        }
+
         set_object_from_riak_content(zobject, &obj->content[i] TSRMLS_CC);
 
         //add_next_index_zval(zobjectlist, zobject);
