@@ -803,8 +803,9 @@ PHP_METHOD(RiakBucket, delete)
 
     if (Z_TYPE(ztmp) == IS_STRING) {
         RMALLOCCOPY(connection->client, props.vclock.clock, props.vclock.len, Z_STRVAL(ztmp), Z_STRLEN(ztmp));
-        zval_dtor(&ztmp);
     }
+
+    zval_dtor(&ztmp);
 
 	riackResult = riack_delete(connection->client, bucketName, key, &props);
     if (props.vclock.clock) {
@@ -860,8 +861,9 @@ PHP_METHOD(RiakBucket, put)
 
     if (Z_TYPE(ztmp) == IS_STRING) {
         RMALLOCCOPY(connection->client, obj.vclock.clock, obj.vclock.len, Z_STRVAL(ztmp), Z_STRLEN(ztmp));
-        zval_dtor(&ztmp);
     }
+
+    zval_dtor(&ztmp);
 
     /* Set bucket name */
     obj.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
