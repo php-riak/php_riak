@@ -83,7 +83,8 @@ static zend_function_entry riak_object_methods[] = {
     PHP_ME(RiakObject, getIndexMap, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakObject, getMetadataMap, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakObject, getLinkList, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
-	{NULL, NULL, NULL}
+    PHP_ME(RiakObject, getVClock, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
+    {NULL, NULL, NULL}
 };
 
 void riak_object_init(TSRMLS_D)/* {{{ */
@@ -93,6 +94,7 @@ void riak_object_init(TSRMLS_D)/* {{{ */
 	riak_object_ce = zend_register_internal_class(&ce TSRMLS_CC);
     zend_declare_property_null(riak_object_ce, "key", sizeof("key")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_object_ce, "vtag", sizeof("vtag")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_object_ce, "vClock", sizeof("vClock")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_object_ce, "contentEncoding", sizeof("contentEncoding")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_object_ce, "charset", sizeof("charset")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_string(riak_object_ce, "contentType", sizeof("contentType")-1, "text/plain", ZEND_ACC_PRIVATE TSRMLS_CC);
@@ -324,6 +326,12 @@ PHP_METHOD(RiakObject, getLinkList)
 }
 /* }}} */
 
+/* {{{ proto string|null Riak\Object->getVClock() */
+PHP_METHOD(RiakObject, getVClock)
+{
+    RIAK_GETTER_STRING(riak_object_ce, "vClock");
+}
+/* }}} */
 
 /*************************************************************
 * Implementation: Riak\Object Helpers
