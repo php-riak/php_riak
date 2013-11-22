@@ -23,29 +23,39 @@ zend_class_entry *riak_badarguments_exception_ce;
 zend_class_entry *riak_connection_exception_ce;
 zend_class_entry *riak_communication_exception_ce;
 zend_class_entry *riak_response_exception_ce;
+zend_class_entry *riak_nonunique_exception_ce;
+zend_class_entry *riak_unresolvedconflict_exception_ce;
 
 void riak_exceptions_init(TSRMLS_D) 
 {
-	zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc, ceNotFound;
+    zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc, ceNotFound;
 
     INIT_NS_CLASS_ENTRY(ceRiak, "Riak\\Exception", "RiakException", NULL);
-	riak_exception_ce = zend_register_internal_class_ex(&ceRiak, 
-		(zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+    riak_exception_ce = zend_register_internal_class_ex(&ceRiak, 
+        (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ceBadArgs, "Riak\\Exception", "BadArgumentsException", NULL);
-	riak_badarguments_exception_ce = zend_register_internal_class_ex(&ceBadArgs, 
-		riak_exception_ce, NULL TSRMLS_CC);
+    riak_badarguments_exception_ce = zend_register_internal_class_ex(&ceBadArgs,
+        riak_exception_ce, NULL TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ceConnExc, "Riak\\Exception", "ConnectionException", NULL);
-	riak_connection_exception_ce = zend_register_internal_class_ex(&ceConnExc, 
-		riak_exception_ce, NULL TSRMLS_CC);
+    riak_connection_exception_ce = zend_register_internal_class_ex(&ceConnExc, 
+        riak_exception_ce, NULL TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ceCommExc, "Riak\\Exception","CommunicationException", NULL);
-	riak_communication_exception_ce = zend_register_internal_class_ex(&ceCommExc, 
-		riak_exception_ce, NULL TSRMLS_CC);
+    riak_communication_exception_ce = zend_register_internal_class_ex(&ceCommExc, 
+        riak_exception_ce, NULL TSRMLS_CC);
 
     INIT_NS_CLASS_ENTRY(ceRespExc, "Riak\\Exception", "UnexpectedResponseException", NULL);
-	riak_response_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
+    riak_response_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
+        riak_exception_ce, NULL TSRMLS_CC);
+
+    INIT_NS_CLASS_ENTRY(ceRespExc, "Riak\\Exception", "NonUniqueException", NULL);
+    riak_nonunique_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
+        riak_exception_ce, NULL TSRMLS_CC);
+
+    INIT_NS_CLASS_ENTRY(ceRespExc, "Riak\\Exception", "UnresolvedConflictException", NULL);
+    riak_unresolvedconflict_exception_ce = zend_register_internal_class_ex(&ceRespExc, 
         riak_exception_ce, NULL TSRMLS_CC);
 
 }

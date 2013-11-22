@@ -184,7 +184,7 @@ PHP_METHOD(Riak_Input_PutInput, setVClock)
 Get return body value */
 PHP_METHOD(Riak_Input_PutInput, getReturnBody)
 {
-    RIAK_GETTER_STRING(riak_put_input_ce, "returnBody");
+    RIAK_GETTER_BOOL(riak_put_input_ce, "returnBody");
 }
 /* }}} */
 
@@ -192,7 +192,7 @@ PHP_METHOD(Riak_Input_PutInput, getReturnBody)
 Set return body value */
 PHP_METHOD(Riak_Input_PutInput, setReturnBody)
 {
-    RIAK_SETTER_STRING(riak_put_input_ce, "returnBody");
+    RIAK_SETTER_BOOL(riak_put_input_ce, "returnBody");
     RIAK_RETURN_THIS
 }
 /* }}} */

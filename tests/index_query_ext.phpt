@@ -1,5 +1,5 @@
 --TEST--
-Test extended index query´ying
+Test extended index querying
 --FILE--
 <?php
 use \Riak\Query\IndexQuery;

@@ -39,6 +39,7 @@ ZEND_END_ARG_INFO()
 static zend_function_entry riak_output_object_list_methods[] = {
     PHP_ME(Riak_Object_List, __construct, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     PHP_ME(Riak_Object_List, first, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(Riak_Object_List, last, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Object_List, isEmpty, arginfo_riak_output_object_list_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Object_List, offsetExists, arginfo_riak_output_object_list_offset_exists, ZEND_ACC_PUBLIC)
     PHP_ME(Riak_Object_List, offsetGet, arginfo_riak_output_object_list_offset_exists, ZEND_ACC_PUBLIC)
@@ -113,6 +114,30 @@ PHP_METHOD(Riak_Object_List, first)
         zval_ptr_dtor(&ztmp);
     }
     zval_ptr_dtor(&zoffset);
+}
+/* }}} */
+
+
+/* {{{ proto Object|null Riak\ObjectList->last()
+Get the last object in this list or null if list is empty*/
+PHP_METHOD(Riak_Object_List, last)
+{
+    zval *zList, *zArray, **zObject;
+
+    zList = zend_read_property(riak_output_object_list_ce, getThis(), "objects", sizeof("objects")-1, 1 TSRMLS_CC);
+
+    zend_call_method_with_0_params(&zList, NULL, NULL, "getArrayCopy", &zArray);
+    zend_hash_internal_pointer_end(Z_ARRVAL_P(zArray));
+
+    if (zend_hash_get_current_data(Z_ARRVAL_P(zArray), (void **) &zObject) == FAILURE) {
+
+        zval_ptr_dtor(&zArray);
+        RETVAL_NULL();
+
+        return;
+    }
+
+    RETVAL_ZVAL(*zObject, 1, 1);
 }
 /* }}} */
 

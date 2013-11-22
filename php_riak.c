@@ -48,11 +48,15 @@
 #include "riak/input/index_input.h"
 #include "riak/input/delete_input.h"
 #include "riak/input/get_input.h"
+#include "riak/input/get_resolver_input.h"
 #include "riak/input/put_input.h"
 #include "riak/query/index_query.h"
 #include "riak/output/output.h"
 #include "riak/output/get_output.h"
 #include "riak/output/put_output.h"
+#include "riak/output/conflict_resolver.h"
+#include "riak/output/first_sibling_resolver.h"
+#include "riak/output/last_sibling_resolver.h"
 #include "riak/output/key_stream_output.h"
 #include "riak/output/index_result.h"
 #include "riak/output/index_result_list.h"
@@ -151,6 +155,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_input_input_init(TSRMLS_C);
     riak_input_delete_input_init(TSRMLS_C);
     riak_input_get_input_init(TSRMLS_C);
+    riak_input_get_resolver_input_init(TSRMLS_C);
     riak_input_put_input_init(TSRMLS_C);
     riak_input_index_input_init(TSRMLS_C);
     riak_query_index_query_init(TSRMLS_C);
@@ -163,6 +168,9 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_output_index_result_init(TSRMLS_C);
     riak_output_index_result_list_init(TSRMLS_C);
     riak_output_index_output_init(TSRMLS_C);
+    riak_output_conflict_resolver_init(TSRMLS_C);
+    riak_output_first_sibling_resolver_init(TSRMLS_C);
+    riak_output_last_sibling_resolver_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
     riak_poolinfo_init(TSRMLS_C);
