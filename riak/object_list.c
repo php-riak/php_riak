@@ -132,7 +132,7 @@ PHP_METHOD(Riak_Object_List, last)
     if (zend_hash_get_current_data(Z_ARRVAL_P(zArray), (void **) &zObject) == FAILURE) {
         RETVAL_NULL();
     } else {
-        RETVAL_ZVAL(*zObject, 1, 1);
+        RETVAL_ZVAL(*zObject, 1, 0);
     }
     zval_ptr_dtor(&zArray);
 }
