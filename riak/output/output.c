@@ -191,7 +191,6 @@ PHP_METHOD(Riak_Output_Output, getObject)
     zval *zCount, *zResolver, *zObjectList, *zObject;
     zObjectList = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zObjectList) != IS_OBJECT) {
-        zval_ptr_dtor(&zObjectList);
         RETURN_NULL();
     }
 
