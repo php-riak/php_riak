@@ -18,3 +18,4 @@ before_script:
 script:
   - PHP=`which php`
   - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q -m --show-diff
+  - find . -name *.mem | xargs cat

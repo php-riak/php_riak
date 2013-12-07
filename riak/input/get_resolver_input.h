@@ -14,25 +14,17 @@
    limitations under the License.
 */
 
-#ifndef RIAK_OUTPUT__OBJECT_LIST__H__
-#define RIAK_OUTPUT__OBJECT_LIST__H__
+#ifndef RIAK_INPUT__GET_RESOLVER_INPUT__H__
+#define RIAK_INPUT__GET_RESOLVER_INPUT__H__
 
 #include "php_riak_internal.h"
 
-extern zend_class_entry *riak_output_object_list_ce;
+extern zend_class_entry *riak_get_resolver_input_ce;
 
-void riak_output_object_list_init(TSRMLS_D);
+void riak_input_get_resolver_input_init(TSRMLS_D);
 
-PHP_METHOD(Riak_Object_List, __construct);
-PHP_METHOD(Riak_Object_List, first);
-PHP_METHOD(Riak_Object_List, last);
-PHP_METHOD(Riak_Object_List, isEmpty);
-PHP_METHOD(Riak_Object_List, offsetExists);
-PHP_METHOD(Riak_Object_List, offsetGet);
-PHP_METHOD(Riak_Object_List, offsetSet);
-PHP_METHOD(Riak_Object_List, offsetUnset);
-PHP_METHOD(Riak_Object_List, count);
-PHP_METHOD(Riak_Object_List, getIterator);
+/* Riak\Input\GetResolverInput */
+PHP_METHOD(Riak_Input_GetResolverInput, __construct);
+PHP_METHOD(Riak_Input_GetResolverInput, getConflictResolver);
 
-
-#endif //RIAK_OUTPUT__OBJECT_LIST__H__
+#endif //RIAK_INPUT__GET_RESOLVER_INPUT__H__

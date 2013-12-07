@@ -13,14 +13,29 @@ if (!is_null($objList->first())) {
 }
 $objList[] = $obj1;
 $objList["2"] = $obj2;
+
 if ($objList->count() !== 2) {
     echo "Count should be 2".PHP_EOL;
 }
+
 if (!$objList->offsetExists("2")) {
     echo "2 should exist in list".PHP_EOL;
 }
+
 if ($objList->first()->getKey() !== $obj1->getKey()) {
-    echo "Keys should equal".PHP_EOL;
+    echo "Keys key should be equal".PHP_EOL;
+}
+
+if ($objList->last()->getKey() !== $obj2->getKey()) {
+    echo "Last key should be equal".PHP_EOL;
+}
+
+if ($objList->first() !== $obj1) {
+    echo "First object fail".PHP_EOL;
+}
+
+if ($objList->last() !== $obj2) {
+    echo "Last object fail".PHP_EOL;
 }
 
 $objList2 = new \Riak\ObjectList();

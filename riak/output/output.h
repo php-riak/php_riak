@@ -30,6 +30,7 @@ PHP_METHOD(Riak_Output_Output, getVClock);
 PHP_METHOD(Riak_Output_Output, getKey);
 PHP_METHOD(Riak_Output_Output, hasSiblings);
 PHP_METHOD(Riak_Output_Output, hasObject);
+PHP_METHOD(Riak_Output_Output, getObject);
 PHP_METHOD(Riak_Output_Output, getFirstObject);
 
 #endif
