@@ -188,45 +188,34 @@ PHP_METHOD(Riak_Output_Output, getFirstObject)
 Retrieves a unique riak object */
 PHP_METHOD(Riak_Output_Output, getObject)
 {
-    zval* zObjectList = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
-
+    zval *zCount, *zResolver, *zObjectList, *zObject;
+    zObjectList = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zObjectList) != IS_OBJECT) {
-        RETURN_NULL();
         zval_ptr_dtor(&zObjectList);
-
-        return;
+        RETURN_NULL();
     }
 
-    zval *zCount, *zResolver;
-
     zend_call_method_with_0_params(&zObjectList, NULL, NULL, "count", &zCount);
-
     if (Z_LVAL_P(zCount) == 0) {
         zval_ptr_dtor(&zCount);
         RETURN_NULL();
-        return;
     }
 
     if (Z_LVAL_P(zCount) == 1) {
         zval *zFirst;
-
         zend_call_method_with_0_params(&zObjectList, NULL, NULL, "first", &zFirst);
         zval_ptr_dtor(&zCount);
         RETURN_ZVAL(zFirst, 0, 1);
-        return;
     }
 
     if (Z_LVAL_P(zCount) > 1) {
         zResolver = zend_read_property(riak_output_ce, getThis(), "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC);
-
         if (Z_TYPE_P(zResolver) != IS_OBJECT) {
             zval_ptr_dtor(&zCount);
             zend_throw_exception(riak_nonunique_exception_ce, "GetOutput contains unresolved siblings", 500 TSRMLS_CC);
             return;
         }
     }
-
-    zval *zObject;
 
     zval_ptr_dtor(&zCount);
     zend_call_method_with_1_params(&zResolver, NULL, NULL, "resolve", &zObject, zObjectList);
@@ -239,13 +228,12 @@ PHP_METHOD(Riak_Output_Output, getObject)
         zval *zObjectKey;
 
         zend_call_method_with_0_params(&zObject, NULL, NULL, "getKey", &zObjectKey);
-
         if (Z_TYPE_P(zObjectKey) != IS_STRING) {
+            zval_ptr_dtor(&zObject);
             zval_ptr_dtor(&zObjectKey);
             zend_throw_exception(riak_unresolvedconflict_exception_ce, "The resolved Riak\\Object does not contain a valid key.", 500 TSRMLS_CC);
             return;
         }
-
         zval_ptr_dtor(&zObjectKey);
     }
 
@@ -256,7 +244,6 @@ PHP_METHOD(Riak_Output_Output, getObject)
     MAKE_STD_ZVAL(zPutInput);
     MAKE_STD_ZVAL(zBool);
     ZVAL_TRUE(zBool);
-
     object_init_ex(zPutInput, riak_put_input_ce);
 
     zend_call_method_with_1_params(&zPutInput, NULL, NULL, "setVClock", NULL, zVClock);
@@ -269,11 +256,12 @@ PHP_METHOD(Riak_Output_Output, getObject)
     if (Z_TYPE_P(zOutput) == IS_NULL) {
         zval_ptr_dtor(&zOutput);
         zend_throw_exception(riak_unresolvedconflict_exception_ce, "Unable to put the conflict resolution", 500 TSRMLS_CC);
+        return;
     }
 
     zend_call_method_with_0_params(&zOutput, NULL, NULL, "getVClock", &zVClock);
     zend_update_property(Z_OBJCE_P(zObject), zObject, "vClock", sizeof("vClock")-1, zVClock TSRMLS_CC);
-
+    zval_ptr_dtor(&zVClock);
     zval_ptr_dtor(&zOutput);
 
     RETURN_ZVAL(zObject, 0, 1);

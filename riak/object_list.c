@@ -130,14 +130,11 @@ PHP_METHOD(Riak_Object_List, last)
     zend_hash_internal_pointer_end(Z_ARRVAL_P(zArray));
 
     if (zend_hash_get_current_data(Z_ARRVAL_P(zArray), (void **) &zObject) == FAILURE) {
-
-        zval_ptr_dtor(&zArray);
         RETVAL_NULL();
-
-        return;
+    } else {
+        RETVAL_ZVAL(*zObject, 1, 1);
     }
-
-    RETVAL_ZVAL(*zObject, 1, 1);
+    zval_ptr_dtor(&zArray);
 }
 /* }}} */
 

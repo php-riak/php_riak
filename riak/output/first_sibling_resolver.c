@@ -53,7 +53,6 @@ PHP_METHOD(Riak_Output_FirstSiblingResolver, resolve)
     if (zObject && Z_TYPE_P(zObject) == IS_OBJECT) {
         RETURN_ZVAL(zObject, 0, 1)
     }
-
     zval_ptr_dtor(&zObject);
     RETURN_NULL();
 }
