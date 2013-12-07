@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/TriKaspar/php_riak.png)](https://travis-ci.org/TriKaspar/php_riak)
+[![Build Status](https://travis-ci.org/php-riak/php_riak.png?branch=master)](https://travis-ci.org/php-riak/php_riak)
 
 Generated documentation can be found at http://phpriak.bachpedersen.dk/docs  
 More documentation and examples can be found at http://phpriak.bachpedersen.dk/  
 
-Stubs for editor autocompletion at https://github.com/TriKaspar/php_riak_stub  
+Stubs for editor autocompletion at https://github.com/php-riak/php_riak_stub  
 
 # Riak PHP extension
 PHP extension for interfacing with Riak.  
