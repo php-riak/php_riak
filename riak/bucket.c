@@ -771,7 +771,7 @@ PHP_METHOD(RiakBucket, delete)
 {
     struct RIACK_DEL_PROPERTIES props;
     riak_connection *connection;
-    zval *zparam, *zinput;
+    zval *zparam, *zinput, zKey;
     RIACK_STRING bucketName, key;
     int riackResult;
 
@@ -813,14 +813,13 @@ PHP_METHOD(RiakBucket, delete)
         zval_dtor(&zget);
     }
 
+    ZVAL_NULL(&zKey);
     if (Z_TYPE_P(zparam) == IS_OBJECT) {
-        zval zKey;
         RIAK_CALL_METHOD(RiakObject, getKey, &zKey, zparam);
         if (Z_TYPE(zKey) == IS_STRING && Z_STRVAL(zKey) > 0) {
             key.len   = Z_STRLEN(zKey);
             key.value = Z_STRVAL(zKey);
         }
-        zval_dtor(&zKey);
 
         // If vclock is not set retrieve from object
         if (!props.vclock.clock) {
@@ -841,7 +840,7 @@ PHP_METHOD(RiakBucket, delete)
     }
     riackResult = riack_delete(connection->client, bucketName, key, &props);
     RFREE(connection->client, props.vclock.clock);
-
+    zval_dtor(&zKey);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 }
 /* }}} */
