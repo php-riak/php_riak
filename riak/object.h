@@ -50,5 +50,6 @@ PHP_METHOD(RiakObject, getLinkList);
 PHP_METHOD(RiakObject, getMetadataMap);
 PHP_METHOD(RiakObject, getVTag);
 PHP_METHOD(RiakObject, getVClock);
+PHP_METHOD(RiakObject, setVClock);
 
 #endif

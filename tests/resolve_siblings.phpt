@@ -38,7 +38,9 @@ $bucket->put($merged, $putInput);
 
 echo "Has Siblings  : " . var_export($bucket->get($key)->hasSiblings(), true) . PHP_EOL;
 
-$bucket->delete($key);
+$getOutput = $bucket->get($key);
+$deleteInput = new \Riak\Input\DeleteInput();
+$bucket->delete($key, $deleteInput->setVClock($getOutput->getVClock()));
 ?>
 --EXPECT--
 Has Siblings  : true

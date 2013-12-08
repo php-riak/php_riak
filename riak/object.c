@@ -63,6 +63,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_set_content_encoding, 0, ZEND_RETURN_
     ZEND_ARG_INFO(0, content_encoding)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_riak_object_set_vclock, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, vclock)
+ZEND_END_ARG_INFO()
+
 static zend_function_entry riak_object_methods[] = {
     PHP_ME(RiakObject, __construct, arginfo_riak_object_ctor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
     PHP_ME(RiakObject, getKey, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
@@ -84,6 +88,7 @@ static zend_function_entry riak_object_methods[] = {
     PHP_ME(RiakObject, getMetadataMap, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakObject, getLinkList, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakObject, getVClock, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, setVClock, arginfo_riak_object_set_vclock, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL}
 };
 
@@ -330,6 +335,14 @@ PHP_METHOD(RiakObject, getLinkList)
 PHP_METHOD(RiakObject, getVClock)
 {
     RIAK_GETTER_STRING(riak_object_ce, "vClock");
+}
+/* }}} */
+
+/* {{{ proto void Riak\Object->setVClock(string $vclock) */
+PHP_METHOD(RiakObject, setVClock)
+{
+    RIAK_SETTER_STRING(riak_object_ce, "vClock");
+    RIAK_RETURN_THIS
 }
 /* }}} */
 
