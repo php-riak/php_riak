@@ -89,6 +89,9 @@ static zend_function_entry riak_object_methods[] = {
     PHP_ME(RiakObject, getLinkList, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakObject, getVClock, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakObject, setVClock, arginfo_riak_object_set_vclock, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, getLastModifiedUSecs, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakObject, getLastModified, arginfo_riak_object_noargs, ZEND_ACC_PUBLIC)
+
     {NULL, NULL, NULL}
 };
 
@@ -151,6 +154,22 @@ PHP_METHOD(RiakObject, __construct)
     array_init(zarrlinks);
     zend_update_property(riak_object_ce, getThis(), "links", sizeof("links")-1, zarrlinks TSRMLS_CC);
     zval_ptr_dtor(&zarrlinks);
+}
+/* }}} */
+
+/* {{{ proto int Riak\Object->getLastModified()
+ */
+PHP_METHOD(RiakObject, getLastModified)
+{
+    RIAK_GETTER_LONG(riak_object_ce, "lastModified");
+}
+/* }}} */
+
+/* {{{ proto int Riak\Object->getLastModified()
+ */
+PHP_METHOD(RiakObject, getLastModifiedUSecs)
+{
+    RIAK_GETTER_LONG(riak_object_ce, "lastModifiedUSecs");
 }
 /* }}} */
 
