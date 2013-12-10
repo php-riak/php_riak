@@ -121,6 +121,7 @@ PHP_INI_BEGIN()
   STD_PHP_INI_ENTRY("riak.socket.keep_alive",      "1",    PHP_INI_ALL, OnUpdateBool, keep_alive,             zend_riak_globals, riak_globals)
   STD_PHP_INI_ENTRY("riak.socket.recv_timeout",    "10000",PHP_INI_ALL, OnUpdateLong, recv_timeout,           zend_riak_globals, riak_globals)
   STD_PHP_INI_ENTRY("riak.socket.send_timeout",    "10000",PHP_INI_ALL, OnUpdateLong, send_timeout,           zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.default.retries",        "3",    PHP_INI_ALL, OnUpdateLong, default_retries,        zend_riak_globals, riak_globals)
 PHP_INI_END()
 
 PHP_MINIT_FUNCTION(riak) /* {{{ */
@@ -210,6 +211,7 @@ PHP_GINIT_FUNCTION(riak) /* {{{ */
     riak_globals->keep_alive = 1;
     riak_globals->recv_timeout = 10000;
     riak_globals->send_timeout = 10000;
+    riak_globals->default_retries = 3;
 #ifdef ZTS
     riak_globals->pool_mutex = tsrm_mutex_alloc();
 #endif

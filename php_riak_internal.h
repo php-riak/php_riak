@@ -30,6 +30,11 @@
 * Macros
 *************************************************/
 
+#define RIACK_RETRY_OP(RIACK_RESULT_VAR, OPERATION) { long retry_cnt; \
+        retry_cnt = RIAK_GLOBAL(default_retries); \
+        do { RIACK_RESULT_VAR = OPERATION; retry_cnt--; } \
+        while (RIACK_RESULT_VAR != RIACK_SUCCESS && retry_cnt >= 0); }
+
 #define RIAK_PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
 #define RIAK_POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
 #define RIAK_PUSH_EO_PARAM()
@@ -157,6 +162,7 @@ ZEND_BEGIN_MODULE_GLOBALS(riak)
   long open_connections_persistent;
 
   long reconnects;
+  long default_retries;
 #ifdef ZTS
   MUTEX_T pool_mutex;
 #endif

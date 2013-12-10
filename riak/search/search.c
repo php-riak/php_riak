@@ -92,7 +92,7 @@ PHP_METHOD(Riak_Search, search)
     rsindex.value = index;
     rsindex.len = index_len;
     riak_search_set_optional_params(connection->client, zparams, &search_params TSRMLS_CC);
-    riackstatus = riack_search(connection->client, rsquery, rsindex, &search_params, &search_result);
+    RIACK_RETRY_OP(riackstatus, riack_search(connection->client, rsquery, rsindex, &search_params, &search_result));
     riak_search_free_optional_params(connection->client, &search_params TSRMLS_CC);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
     zresult = riak_search_output_from_riack_search_result(&search_result TSRMLS_CC);
