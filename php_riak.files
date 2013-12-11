@@ -207,11 +207,9 @@ tests/server_info.phpt
 riak/input/get_resolver_input.h
 riak/input/get_resolver_input.c
 riak/output/conflict_resolver.h
-riak/output/first_sibling_resolver.h
-riak/output/last_sibling_resolver.h
+riak/output/youngest_sibling_resolver.h
 riak/output/conflict_resolver.c
-riak/output/first_sibling_resolver.c
-riak/output/last_sibling_resolver.c
+riak/output/youngest_sibling_resolver.c
 tests/update_object.phpt
 tests/stream_keys.phpt
 tests/session.phpt

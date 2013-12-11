@@ -55,8 +55,7 @@
 #include "riak/output/get_output.h"
 #include "riak/output/put_output.h"
 #include "riak/output/conflict_resolver.h"
-#include "riak/output/first_sibling_resolver.h"
-#include "riak/output/last_sibling_resolver.h"
+#include "riak/output/youngest_sibling_resolver.h"
 #include "riak/output/key_stream_output.h"
 #include "riak/output/index_result.h"
 #include "riak/output/index_result_list.h"
@@ -121,7 +120,7 @@ PHP_INI_BEGIN()
   STD_PHP_INI_ENTRY("riak.socket.keep_alive",      "1",    PHP_INI_ALL, OnUpdateBool, keep_alive,             zend_riak_globals, riak_globals)
   STD_PHP_INI_ENTRY("riak.socket.recv_timeout",    "10000",PHP_INI_ALL, OnUpdateLong, recv_timeout,           zend_riak_globals, riak_globals)
   STD_PHP_INI_ENTRY("riak.socket.send_timeout",    "10000",PHP_INI_ALL, OnUpdateLong, send_timeout,           zend_riak_globals, riak_globals)
-  STD_PHP_INI_ENTRY("riak.default.retries",        "3",    PHP_INI_ALL, OnUpdateLong, default_retries,        zend_riak_globals, riak_globals)
+  STD_PHP_INI_ENTRY("riak.default.retries",        "1",    PHP_INI_ALL, OnUpdateLong, default_retries,        zend_riak_globals, riak_globals)
 PHP_INI_END()
 
 PHP_MINIT_FUNCTION(riak) /* {{{ */
@@ -170,8 +169,7 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
     riak_output_index_result_list_init(TSRMLS_C);
     riak_output_index_output_init(TSRMLS_C);
     riak_output_conflict_resolver_init(TSRMLS_C);
-    riak_output_first_sibling_resolver_init(TSRMLS_C);
-    riak_output_last_sibling_resolver_init(TSRMLS_C);
+    riak_output_youngest_sibling_resolver_init(TSRMLS_C);
 
     riak_exceptions_init(TSRMLS_C);
     riak_poolinfo_init(TSRMLS_C);
@@ -211,7 +209,7 @@ PHP_GINIT_FUNCTION(riak) /* {{{ */
     riak_globals->keep_alive = 1;
     riak_globals->recv_timeout = 10000;
     riak_globals->send_timeout = 10000;
-    riak_globals->default_retries = 3;
+    riak_globals->default_retries = 1;
 #ifdef ZTS
     riak_globals->pool_mutex = tsrm_mutex_alloc();
 #endif

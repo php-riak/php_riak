@@ -107,10 +107,8 @@ Issue 55: Implemented missing getter for last modified on object.
                     <file role="src" name="put_output.h"/>
                     <file role="src" name="conflict_resolver.c"/>
                     <file role="src" name="conflict_resolver.h"/>
-                    <file role="src" name="first_sibling_resolver.c"/>
-                    <file role="src" name="first_sibling_resolver.h"/>
-                    <file role="src" name="last_sibling_resolver.c"/>
-                    <file role="src" name="last_sibling_resolver.h"/>
+                    <file role="src" name="youngest_sibling_resolver.c"/>
+                    <file role="src" name="youngest_sibling_resolver.h"/>
                     <file role="src" name="index_result.c"/>
                     <file role="src" name="index_result.h"/>
                     <file role="src" name="index_result_list.c"/>

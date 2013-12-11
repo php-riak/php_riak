@@ -19,10 +19,10 @@
 
 #include "php_riak_internal.h"
 
-PHP_METHOD(Riak_Output_FirstSiblingResolver, resolve);
+PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve);
 
-extern zend_class_entry *riak_output_first_sibling_resolver;
+extern zend_class_entry *riak_output_youngest_sibling_resolver_ce;
 
-void riak_output_first_sibling_resolver_init(TSRMLS_D);
+void riak_output_youngest_sibling_resolver_init(TSRMLS_D);
 
 #endif //RIAK_OUTPUT__FIRST_SIBLING_RESOLVER__H__

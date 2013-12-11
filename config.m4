@@ -35,8 +35,7 @@ if test "$PHP_RIAK" != "no"; then
     riak/output/get_output.c \
     riak/output/put_output.c \
     riak/output/conflict_resolver.c \
-    riak/output/first_sibling_resolver.c \
-    riak/output/last_sibling_resolver.c \
+    riak/output/youngest_sibling_resolver.c \
     riak/output/index_result.c \
     riak/output/index_result_list.c \
     riak/output/index_output.c \
