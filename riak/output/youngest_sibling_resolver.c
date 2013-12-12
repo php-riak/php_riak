@@ -43,28 +43,43 @@ void riak_output_youngest_sibling_resolver_init(TSRMLS_D)/* {{{ */
 PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
 {
     zval *zObjects, *ziter, *zwinner;
+    long winner_ts, winner_ts_us;
+    zend_bool valid;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &zObjects) == FAILURE) {
         return;
     }
     zwinner = NULL;
+    winner_ts = winner_ts_us = 0;
     zend_call_method_with_0_params(&zObjects, NULL, NULL, "getiterator", &ziter);
     if (Z_TYPE_P(ziter) == IS_OBJECT) {
-        zval zvalidname, zcurrname, *zvalid;
+        zval zvalidname, zcurrname, zlastmodname, zlastmodusname, znextname, *zvalid;
         ZVAL_STRING(&zvalidname, "valid", 0);
         ZVAL_STRING(&zcurrname, "current", 0);
-        MAKE_STD_ZVAL(zvalid);
-        call_user_function(NULL, &ziter, &zvalidname, zvalid, 0, NULL TSRMLS_CC);
-        if (Z_TYPE_P(zvalid) == IS_BOOL && Z_BVAL_P(zvalid)) {
-            zval *zresult;
-            MAKE_STD_ZVAL(zresult);
-            call_user_function(NULL, &ziter, &zcurrname, zresult, 0, NULL TSRMLS_CC);
-            if (Z_TYPE_P(zresult) == IS_OBJECT) {
-                // Check for is deleted and get modified stamps
+        ZVAL_STRING(&znextname, "next", 0);
+        ZVAL_STRING(&zlastmodname, "getLastModified", 0);
+        ZVAL_STRING(&zlastmodusname, "getLastModifiedUSecs", 0);
+        valid = 1;
+
+        while (valid) {
+            MAKE_STD_ZVAL(zvalid);
+            call_user_function(NULL, &ziter, &zvalidname, zvalid, 0, NULL TSRMLS_CC);
+            if (Z_TYPE_P(zvalid) == IS_BOOL && Z_BVAL_P(zvalid)) {
+                zval *zobject;
+                MAKE_STD_ZVAL(zobject);
+                call_user_function(NULL, &ziter, &zcurrname, zobject, 0, NULL TSRMLS_CC);
+                if (Z_TYPE_P(zobject) == IS_OBJECT) {
+                    zval zlastmod, zlastmod_us;
+                    // TODO Check for is deleted
+                    call_user_function(NULL, &zobject, &zlastmodname, &zlastmod, 0, NULL TSRMLS_CC);
+                    call_user_function(NULL, &zobject, &zlastmodname, &zlastmod_us, 0, NULL TSRMLS_CC);
+                }
+                call_user_function(NULL, &zobject, &znextname, NULL, 0, NULL TSRMLS_CC);
+            } else {
+                valid = 0;
             }
-            // TODO move iterator to next pointer
         }
     }
-    zval_ptr_dtor(&zcount);
+    //zval_ptr_dtor(&zcount);
     if (zwinner != NULL) {
         RETURN_ZVAL(zwinner, 0, 1);
     } else {
