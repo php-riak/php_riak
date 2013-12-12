@@ -52,12 +52,13 @@ PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
     winner_ts = winner_ts_us = 0;
     zend_call_method_with_0_params(&zObjects, NULL, NULL, "getiterator", &ziter);
     if (Z_TYPE_P(ziter) == IS_OBJECT) {
-        zval zvalidname, zcurrname, zlastmodname, zlastmodusname, znextname, *zvalid;
+        zval zvalidname, zcurrname, zlastmodname, zlastmodusname, znextname, zdeletedname, *zvalid;
         ZVAL_STRING(&zvalidname, "valid", 0);
         ZVAL_STRING(&zcurrname, "current", 0);
         ZVAL_STRING(&znextname, "next", 0);
         ZVAL_STRING(&zlastmodname, "getLastModified", 0);
         ZVAL_STRING(&zlastmodusname, "getLastModifiedUSecs", 0);
+        ZVAL_STRING(&zdeletedname, "isDeleted", 0);
         valid = 1;
 
         while (valid) {
@@ -68,22 +69,47 @@ PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
                 MAKE_STD_ZVAL(zobject);
                 call_user_function(NULL, &ziter, &zcurrname, zobject, 0, NULL TSRMLS_CC);
                 if (Z_TYPE_P(zobject) == IS_OBJECT) {
-                    zval zlastmod, zlastmod_us;
-                    // TODO Check for is deleted
-                    call_user_function(NULL, &zobject, &zlastmodname, &zlastmod, 0, NULL TSRMLS_CC);
-                    call_user_function(NULL, &zobject, &zlastmodname, &zlastmod_us, 0, NULL TSRMLS_CC);
+                    zval zlastmod, zlastmod_us, zdeleted;
+                    long lastmod, lastmod_us;
+                    lastmod = lastmod_us = 0;
+                    call_user_function(NULL, &zobject, &zdeletedname, &zdeleted, 0, NULL TSRMLS_CC);
+
+                    // Ignore deleted objects
+                    if (Z_TYPE(zdeleted) != IS_BOOL || Z_BVAL(zdeletedname) == 0) {
+                        call_user_function(NULL, &zobject, &zlastmodname, &zlastmod, 0, NULL TSRMLS_CC);
+                        call_user_function(NULL, &zobject, &zlastmodname, &zlastmod_us, 0, NULL TSRMLS_CC);
+                        if (Z_TYPE(zlastmod) == IS_LONG) {
+                            lastmod = Z_LVAL(zlastmod);
+                        }
+                        if (Z_TYPE(zlastmod_us) == IS_LONG) {
+                            lastmod_us = Z_LVAL(zlastmod_us);
+                        }
+                        if ((lastmod >= winner_ts) ||
+                                ((lastmod == winner_ts) && (lastmod_us > winner_ts_us))) {
+                            winner_ts = lastmod;
+                            winner_ts_us = lastmod_us;
+                            if (zwinner != NULL) {
+                                // dtor old winner
+                                zval_ptr_dtor(&zwinner);
+                            }
+                            zwinner = zobject;
+                            // Addref to new winner so it wont get dtored
+                            zval_addref_p(zwinner);
+                        }
+                    }
                 }
-                call_user_function(NULL, &zobject, &znextname, NULL, 0, NULL TSRMLS_CC);
+                zval_ptr_dtor(&zobject);
+                call_user_function(NULL, &ziter, &znextname, NULL, 0, NULL TSRMLS_CC);
             } else {
                 valid = 0;
             }
         }
     }
-    //zval_ptr_dtor(&zcount);
     if (zwinner != NULL) {
         RETURN_ZVAL(zwinner, 0, 1);
     } else {
         RETURN_NULL();
     }
 }
+
 /* }}} */

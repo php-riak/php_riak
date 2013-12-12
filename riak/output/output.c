@@ -91,7 +91,6 @@ void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* 
 
         set_object_from_riak_content(zobject, &obj->content[i] TSRMLS_CC);
 
-        //add_next_index_zval(zobjectlist, zobject);
         MAKE_STD_ZVAL(zoffset);
         ZVAL_LONG(zoffset, i);
         RIAK_CALL_METHOD2(Riak_Object_List, offsetSet, NULL, zobjectlist, zoffset, zobject);
