@@ -65,7 +65,7 @@ PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
             MAKE_STD_ZVAL(zvalid);
             call_user_function(NULL, &ziter, &zvalidname, zvalid, 0, NULL TSRMLS_CC);
             if (Z_TYPE_P(zvalid) == IS_BOOL && Z_BVAL_P(zvalid)) {
-                zval *zobject;
+                zval *zobject, zdummy;
                 MAKE_STD_ZVAL(zobject);
                 call_user_function(NULL, &ziter, &zcurrname, zobject, 0, NULL TSRMLS_CC);
                 if (Z_TYPE_P(zobject) == IS_OBJECT) {
@@ -75,7 +75,7 @@ PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
                     call_user_function(NULL, &zobject, &zdeletedname, &zdeleted, 0, NULL TSRMLS_CC);
 
                     // Ignore deleted objects
-                    if (Z_TYPE(zdeleted) != IS_BOOL || Z_BVAL(zdeletedname) == 0) {
+                    if (Z_TYPE(zdeleted) != IS_BOOL || Z_BVAL(zdeleted) == 0) {
                         call_user_function(NULL, &zobject, &zlastmodname, &zlastmod, 0, NULL TSRMLS_CC);
                         call_user_function(NULL, &zobject, &zlastmodname, &zlastmod_us, 0, NULL TSRMLS_CC);
                         if (Z_TYPE(zlastmod) == IS_LONG) {
@@ -84,7 +84,10 @@ PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
                         if (Z_TYPE(zlastmod_us) == IS_LONG) {
                             lastmod_us = Z_LVAL(zlastmod_us);
                         }
-                        if ((lastmod >= winner_ts) ||
+                        // Always set the winner if it is not set at this point
+                        // otherwise just set it if the current object is newer.
+                        if ((zwinner == NULL) ||
+                                (lastmod > winner_ts) ||
                                 ((lastmod == winner_ts) && (lastmod_us > winner_ts_us))) {
                             winner_ts = lastmod;
                             winner_ts_us = lastmod_us;
@@ -99,7 +102,7 @@ PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
                     }
                 }
                 zval_ptr_dtor(&zobject);
-                call_user_function(NULL, &ziter, &znextname, NULL, 0, NULL TSRMLS_CC);
+                call_user_function(NULL, &ziter, &znextname, &zdummy, 0, NULL TSRMLS_CC);
             } else {
                 valid = 0;
             }
