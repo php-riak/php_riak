@@ -226,6 +226,12 @@ Issue 55: Implemented missing getter for last modified on object.
                 <file name="client_ctor.phpt" role="test" />
                 <file name="connect.inc" role="test" />
                 <file name="connection.phpt" role="test" />
+                <file name="builtin_conflict_resolver_db_objs.phpt" role="test" />
+                <file name="builtin_conflict_resolvers.phpt" role="test" />
+                <file name="conflict_resolver_bucket.phpt" role="test" />
+                <file name="conflict_resolver_exception.phpt" role="test" />
+                <file name="conflict_resolver_key.phpt" role="test" />
+                <file name="conflict_resolver_precedence.phpt" role="test" />
                 <file name="get1.phpt" role="test" />
                 <file name="indexquery.phpt" role="test" />
                 <file name="key_not_found.phpt" role="test" />
