@@ -189,7 +189,7 @@ PS_CLOSE_FUNC(riak) /* {{{ */
 
 PS_READ_FUNC(riak) /* {{{ */
 {
-    zval *zoutput, *zkey, *zdata, *zex;
+    zval *zoutput, *zkey, *zdata;
     riak_session_data *data = PS_GET_MOD_DATA();
     *vallen = 0;
 

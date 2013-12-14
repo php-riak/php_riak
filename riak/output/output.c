@@ -187,7 +187,8 @@ PHP_METHOD(Riak_Output_Output, getFirstObject)
 Retrieves a unique riak object */
 PHP_METHOD(Riak_Output_Output, getObject)
 {
-    zval *zCount, *zResolver, *zObjectList, *zObject;
+    zval *zCount, *zResolver, *zObjectList, *zObject, *zBucket, *zVClock, *zPutInput, *zOutput, *zBool;
+
     zObjectList = zend_read_property(riak_output_ce, getThis(), "objectList", sizeof("objectList")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zObjectList) != IS_OBJECT) {
         RETURN_NULL();
@@ -235,9 +236,8 @@ PHP_METHOD(Riak_Output_Output, getObject)
         zval_ptr_dtor(&zObjectKey);
     }
 
-    zval *zBucket = zend_read_property(riak_output_ce, getThis(), "bucket", sizeof("bucket")-1, 1 TSRMLS_CC);
-    zval *zVClock = zend_read_property(riak_output_ce, getThis(), "vClock", sizeof("vClock")-1, 1 TSRMLS_CC);
-    zval *zPutInput, *zOutput, *zBool;
+    zBucket = zend_read_property(riak_output_ce, getThis(), "bucket", sizeof("bucket")-1, 1 TSRMLS_CC);
+    zVClock = zend_read_property(riak_output_ce, getThis(), "vClock", sizeof("vClock")-1, 1 TSRMLS_CC);
 
     MAKE_STD_ZVAL(zPutInput);
     MAKE_STD_ZVAL(zBool);

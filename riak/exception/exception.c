@@ -28,7 +28,7 @@ zend_class_entry *riak_unresolvedconflict_exception_ce;
 
 void riak_exceptions_init(TSRMLS_D) 
 {
-    zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc, ceNotFound;
+    zend_class_entry ceBadArgs, ceRiak, ceConnExc, ceCommExc, ceRespExc;
 
     INIT_NS_CLASS_ENTRY(ceRiak, "Riak\\Exception", "RiakException", NULL);
     riak_exception_ce = zend_register_internal_class_ex(&ceRiak, 

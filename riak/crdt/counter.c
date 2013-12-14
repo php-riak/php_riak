@@ -70,7 +70,7 @@ PHP_METHOD(Riak_Crdt_Counter, __construct)
 {
     char *key;
     int keylen;
-    zval *zconnection, *zbucket;
+    zval *zbucket;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "Os", &zbucket, riak_bucket_ce, &key, &keylen) == FAILURE) {
         zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
         return;
