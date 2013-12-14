@@ -106,8 +106,10 @@ PHP_METHOD(Riak_Output_YoungestSiblingResolver, resolve)
             } else {
                 valid = 0;
             }
+            zval_ptr_dtor(&zvalid);
         }
     }
+    zval_ptr_dtor(&ziter);
     if (zwinner != NULL) {
         RETURN_ZVAL(zwinner, 0, 1);
     } else {
