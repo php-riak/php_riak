@@ -23,7 +23,7 @@
 #endif
 
 #define PHP_RIAK_EXTNAME "riak"
-#define PHP_RIAK_VERSION "1.0.0"
+#define PHP_RIAK_VERSION "1.1.0"
 
 PHP_MINIT_FUNCTION(riak);
 PHP_MSHUTDOWN_FUNCTION(riak);
