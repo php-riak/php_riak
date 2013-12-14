@@ -68,11 +68,12 @@ $bucket->put($object2);
 
 $output = $bucket->get($key, $options);
 $object = $output->getObject();
+// New put the winner back
+$bucket->put($object);
 
 echo "Siblings          : " . count($output->getObjectList()) . PHP_EOL;
 echo "Read Winner       : " . $bucket->get($key)->getFirstObject()->getContent() . PHP_EOL;
 echo "Has Siblings      : " . var_export($bucket->get($key)->hasSiblings(), true) . PHP_EOL;
-echo "Winner vClock     : " . var_export($object->getVClock() === $bucket->get($key)->getVClock(), true) . PHP_EOL;
 
 $bucket->delete($key);
 
@@ -82,4 +83,3 @@ MyKeyResolver
 Siblings          : 2
 Read Winner       : 3
 Has Siblings      : false
-Winner vClock     : true

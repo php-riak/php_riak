@@ -59,6 +59,8 @@ $bucket->setConflictResolver($resolver);
 
 $output = $bucket->get($key);
 $object = $output->getObject();
+// New put the winner back
+$bucket->put($object);
 
 echo "Has object        : " . var_export($output->hasObject(), true) . PHP_EOL;
 echo "Siblings          : " . count($output->getObjectList()) . PHP_EOL;
@@ -66,7 +68,6 @@ echo "Get/Set Resolver  : " . var_export($resolver === $bucket->getConflictResol
 echo "Winner value      : " . $object->getContent() . PHP_EOL;
 echo "Has Siblings      : " . var_export($bucket->get($key)->hasSiblings(), true) . PHP_EOL;
 echo "Read Winner       : " . $bucket->get($key)->getFirstObject()->getContent() . PHP_EOL;
-echo "Winner vClock     : " . var_export($object->getVClock() === $bucket->get($key)->getVClock(), true) . PHP_EOL;
 
 $bucket->delete($key);
 
@@ -84,4 +85,3 @@ Get/Set Resolver  : true
 Winner value      : 3
 Has Siblings      : false
 Read Winner       : 3
-Winner vClock     : true

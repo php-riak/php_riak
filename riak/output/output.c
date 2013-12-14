@@ -225,7 +225,6 @@ PHP_METHOD(Riak_Output_Output, getObject)
         return;
     } else {
         zval *zObjectKey;
-
         zend_call_method_with_0_params(&zObject, NULL, NULL, "getKey", &zObjectKey);
         if (Z_TYPE_P(zObjectKey) != IS_STRING) {
             zval_ptr_dtor(&zObject);
@@ -235,33 +234,6 @@ PHP_METHOD(Riak_Output_Output, getObject)
         }
         zval_ptr_dtor(&zObjectKey);
     }
-
-    zBucket = zend_read_property(riak_output_ce, getThis(), "bucket", sizeof("bucket")-1, 1 TSRMLS_CC);
-    zVClock = zend_read_property(riak_output_ce, getThis(), "vClock", sizeof("vClock")-1, 1 TSRMLS_CC);
-
-    MAKE_STD_ZVAL(zPutInput);
-    MAKE_STD_ZVAL(zBool);
-    ZVAL_TRUE(zBool);
-    object_init_ex(zPutInput, riak_put_input_ce);
-
-    zend_call_method_with_1_params(&zPutInput, NULL, NULL, "setVClock", NULL, zVClock);
-    zend_call_method_with_1_params(&zPutInput, NULL, NULL, "setReturnHead", NULL, zBool);
-    zend_call_method_with_2_params(&zBucket, NULL, NULL, "put", &zOutput, zObject, zPutInput); // put the winner
-
-    zval_ptr_dtor(&zBool);
-    zval_ptr_dtor(&zPutInput);
-
-    if (Z_TYPE_P(zOutput) == IS_NULL) {
-        zval_ptr_dtor(&zOutput);
-        zend_throw_exception(riak_unresolvedconflict_exception_ce, "Unable to put the conflict resolution", 500 TSRMLS_CC);
-        return;
-    }
-
-    zend_call_method_with_0_params(&zOutput, NULL, NULL, "getVClock", &zVClock);
-    zend_update_property(Z_OBJCE_P(zObject), zObject, "vClock", sizeof("vClock")-1, zVClock TSRMLS_CC);
-    zval_ptr_dtor(&zVClock);
-    zval_ptr_dtor(&zOutput);
-
     RETURN_ZVAL(zObject, 0, 1);
 }
 /* }}} */
