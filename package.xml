@@ -16,10 +16,10 @@
         <active>yes</active>
     </lead>
     <date>2013-12-14</date>
-    <time>11:00:00</time>
+    <time>12:00:00</time>
     <version>
-        <release>1.1.0</release>
-        <api>1.1.0</api>
+        <release>1.1.1</release>
+        <api>1.1.1</api>
     </version>
     <stability>
         <release>beta</release>
@@ -27,12 +27,7 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
 <notes>
-New features:
-Issue 50: vClock now gets read from object if not present in input, making vclock easier to work with.
-Issue 54: Conflict resolver can now be set on a bucket or passed along to the get function, which can make conflict resolving a lot easier.
-Issue 10: Automatic retry implemented and set to 1 retry by default
-Fixes:
-Issue 55: Implemented missing getter for last modified on object.
+Fixed windows build.
 </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -271,6 +266,21 @@ Issue 55: Implemented missing getter for last modified on object.
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+    <release>
+        <version>
+            <release>1.1.1</release>
+            <api>1.1.1</api>
+        </version>
+        <stability>
+            <release>beta</release>
+            <api>beta</api>
+        </stability>
+        <date>2013-12-14</date>
+        <license>Apache2</license>
+<notes>
+Fix windows build
+</notes>
+    </release>
     <release>
         <version>
             <release>1.1.0</release>
