@@ -46,6 +46,8 @@ You can override the following settings in your php.ini (settings shown below ar
         riak.socket.recv_timeout=10000
         ; Socket send timeout [ms]
         riak.socket.send_timeout=10000
+        ; Number of retries if riak returns an error  
+        riak.default.retries=1
 
 ## Usage
 
