@@ -15,11 +15,11 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-12-14</date>
-    <time>12:00:00</time>
+    <date>2013-12-18</date>
+    <time>09:00:00</time>
     <version>
-        <release>1.1.1</release>
-        <api>1.1.1</api>
+        <release>1.1.2</release>
+        <api>1.1.2</api>
     </version>
     <stability>
         <release>beta</release>
@@ -27,7 +27,7 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
 <notes>
-Fixed windows build.
+Fixed issue 65: Conflict resolvers no longer do an automatic put when conflicts are resolved.
 </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -266,6 +266,21 @@ Fixed windows build.
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+    <release>
+        <version>
+            <release>1.1.2</release>
+            <api>1.1.2</api>
+        </version>
+        <stability>
+            <release>beta</release>
+            <api>beta</api>
+        </stability>
+        <date>2013-12-18</date>
+        <license>Apache2</license>
+<notes>
+Fixed issue 65: Conflict resolvers no longer do an automatic put when conflicts are resolved.
+</notes>
+    </release>
     <release>
         <version>
             <release>1.1.1</release>
