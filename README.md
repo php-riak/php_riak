@@ -216,6 +216,106 @@ echo var_export($getOutput->hasSiblings(), true).PHP_EOL;
 echo var_export($getOutput->getObject()->getContent(), true).PHP_EOL;
 ```
 
+####Secondary Indexes
+Secondary indexes can be added to \Riak\Object by calling addIndex.  
+Querying secondary indexes is also very easy, simply call the index function on an \Riak\Bucket object, se the example below:  
+ ```PHP
+// Create 10 objects with indexes
+for ($i=0; $i<10; $i++) {
+   $obj = new \Riak\Object("obj$i");
+   $obj->setContent('dummy data');
+   // Set a integer index num_int and a binary index text_bin
+   // remember secondary index should always end on _int or _bin
+   $obj->addIndex('num_int', $i);
+   $obj->addIndex('text_bin', "text$i");
+   // Store object
+   $bucket->put($obj);
+}
+ 
+// Query for all objects where num_int = 1
+$result = $bucket->index("num_int", 1);
+// Result is an array of keys, in this case obj1 should be the only entry
+echo "First query returned key: ".$result[0].PHP_EOL;
+ 
+// Now make a ranged query on the text_bin index
+$result = $bucket->index("text_bin", "text4", "text6");
+// This query will match objects which index is text4, text5 and text6
+echo "Second query returned: ";
+print_r($result);
+```
+ 
+####Search
+Riak have builtin full text search which can be very usefull, I will only demonstrate 
+how php_riak client can query Riak search not how it works in general, to get the 
+full picture jump to the http://docs.basho.com/riak/latest/dev/using/search/  
+
+The example below demonstrates how to do a simple search.  
+```PHP
+// Make sure search is enabled in both riak app.config and on the bucket
+
+// Create some test data
+$testDataArr[] = '{"name": "apple","price": 2.50, "tags": ["fruit"]}';
+$testDataArr[] = '{"name": "potato","price": 1.50, "tags": ["veg", "something"]}';
+$testDataArr[] = '{"name": "pineapple","price": 15, "tags": ["fruit"]}';
+$testDataArr[] = '{"name": "cheese", "price": 45, "tags": ["cow", "dairy"]}';
+$i = 0;
+foreach ($testDataArr as $testData) {
+   $i++;
+   $obj = new \Riak\Object("id$i");
+   $obj->setContentType("application/json");
+   $obj->setContent($testData);
+   $bucket->put($obj);
+}
+ 
+// Perform the search
+$search = new \Riak\Search\Search($connection);
+$searchInput = new \Riak\Search\Input\ParameterBag();
+// Search on the name field
+$searchInput->setDefaultField('name');
+// Now search in our search_ex_bucket after documents with the name apple
+$searchResult = $search->search('search_ex_bucket', 'apple', $searchInput);
+// Did we find something?
+ 
+// Number of found documents:
+echo 'Search found '.$searchResult->getNumFound().' with the name apple'.PHP_EOL;
+$foundDocuments = $searchResult->getDocuments();
+foreach ($foundDocuments as $document) {
+   var_dump($document);
+}
+```  
+
+####Counters
+In Riak 1.4 basho added support CRDT counters http://docs.basho.com/riak/latest/dev/references/http/counters/  
+Counters are very simple to use, and they are very useful for a lot of use cases.  
+The example below shows how to get and modify counters:  
+```PHP
+// Make sure allowMult is set to true on the bucket, as this is required for CRDT's to work.
+
+// Counter can be constructed in two ways
+// With new:
+$counter1 = new \Riak\CRDT\Counter($bucket, "counter1");
+// Or with Riak\Bucket's counter function
+$counter2 = $bucket->counter("counter2");
+ 
+// All counters start at 0
+// All changes to the counter value is done using increment like this
+$counter1->increment(10);
+// Use negative values to decrement
+$counter2->increment(-10);
+ 
+// Increment can also return the updated value
+echo "Counter1 value: ".$counter1->incrementAndGet(10).PHP_EOL;
+ 
+// The Riak\Bucket->counter function can save some typing
+// the counter function will always return a counter object or throw exception
+$c2val = $bucket->counter("counter2")->get();
+echo "Counter2 value: ".$c2val.PHP_EOL;
+```  
+
+####MapReduce  
+php_riak is able to do advanced map reduce queries including streaming results etc.  
+I have not had the time to do an example yet, 
+however take a look in this php_riak unittest: https://github.com/php-riak/php_riak/blob/master/tests/mapreduce.phpt and the classes here https://github.com/php-riak/php_riak_stub/tree/master/Riak/MapReduce  
 
 ## Test requirements
 To make all tests succeed you need a running riak server with eleveldb backend and riak search enabled in app.config.
