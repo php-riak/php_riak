@@ -18,8 +18,8 @@
     <date>2013-12-20</date>
     <time>06:50:00</time>
     <version>
-        <release>1.1.2</release>
-        <api>1.1.2</api>
+        <release>1.1.3</release>
+        <api>1.1.3</api>
     </version>
     <stability>
         <release>stable</release>
@@ -274,8 +274,8 @@ Issue 55: Implemented missing getter for last modified on object.
     <changelog>
     <release>
         <version>
-            <release>1.1.2</release>
-            <api>1.1.2</api>
+            <release>1.1.3</release>
+            <api>1.1.3</api>
         </version>
         <stability>
             <release>stable</release>
