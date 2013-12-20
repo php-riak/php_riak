@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/php-riak/php_riak.png?branch=master)](https://travis-ci.org/php-riak/php_riak)
 
-Discussion forum: http://ost.io/@php-riak/php_riak
+Discussion forum: http://ost.io/@php-riak/php_riak  
 Stubs for editor autocompletion at https://github.com/php-riak/php_riak_stub  
 
 # Riak PHP extension
