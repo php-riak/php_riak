@@ -1,9 +1,6 @@
 [![Build Status](https://travis-ci.org/php-riak/php_riak.png?branch=master)](https://travis-ci.org/php-riak/php_riak)
 
-Generated documentation can be found at http://phpriak.bachpedersen.dk/docs  
-More documentation and examples can be found at http://phpriak.bachpedersen.dk/  
 Discussion forum: http://ost.io/@php-riak/php_riak
-
 Stubs for editor autocompletion at https://github.com/php-riak/php_riak_stub  
 
 # Riak PHP extension
@@ -325,3 +322,7 @@ You also need to have seach enabled on the ´testsearch´ bucket, this can be do
 ```
 bin/search-cmd install testsearch
 ```
+
+##Documentation
+Generated documentation can be found at http://phpriak.bachpedersen.dk/docs  
+More documentation and examples can be found at http://phpriak.bachpedersen.dk/  
