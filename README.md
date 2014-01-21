@@ -12,11 +12,12 @@ PHP extension for interfacing with Riak.
 - Riak PHP session store replacement, that can be enabled directly in php.ini no code needed.
 
 ## Building
-In a terminal make sure you are in project root, then run the following commands.
-Giving the riak-c path is mandatory at the moment.
+Download and compile riak-c-client from here https://github.com/basho/riak-c-client.  
+In a terminal make sure you are in project root, then run the following commands.  
+Giving the riak-c path is mandatory at the moment.  
 
 	phpize
-        ./configure --with-riak-c-dir=/some/path/riak-c-client/src
+	./configure --with-riak-c-dir=/some/path/riak-c-client/src
 	sudo make install
 
 Module is now installed but it needs to be added to the appropriate php.ini as well, this can be done by adding the following line to your php.ini  

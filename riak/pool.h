@@ -48,13 +48,13 @@ zend_bool ensure_connected(riak_context *context TSRMLS_DC);
 zend_bool ensure_connected_init(riak_context *context, char* host, int host_len, int port TSRMLS_DC);
 void mark_for_reconnect(riak_context *context);
 
-void release_connection(riak_context *context TSRMLS_DC);
-riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC);
+void release_context(riak_context *context TSRMLS_DC);
+riak_context *take_connection(char* host, int host_len, int port TSRMLS_DC);
 
 void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 
 /* Internal */
-void release_connection_from_pool(riak_connection_pool* pool, riak_connection *connection);
+void release_context_from_pool(riak_connection_pool* pool, riak_context *context);
 riak_connection_pool *pool_for_host_port(char* host, int host_len, int port TSRMLS_DC);
 riak_connection_pool_entry *take_connection_entry_from_pool(riak_connection_pool *pool);
 riak_connection_pool* initialize_pool(TSRMLS_D);

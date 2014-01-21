@@ -83,18 +83,6 @@ zend_function_entry riak_functions[] = {
   { NULL, NULL, NULL }
 };
 
-struct RIACK_ALLOCATOR riack_php_persistent_allocator = 
-{
-  riack_php_persistent_alloc,
-  riack_php_persistent_free,
-};
-
-struct RIACK_ALLOCATOR riack_php_allocator =
-{
-  riack_php_alloc,
-  riack_php_free
-};
-
 zend_module_entry riak_module_entry = {
   STANDARD_MODULE_HEADER,
   PHP_RIAK_EXTNAME,
@@ -126,7 +114,7 @@ PHP_INI_END()
 PHP_MINIT_FUNCTION(riak) /* {{{ */
 {
     REGISTER_INI_ENTRIES();
-    riack_init();
+
     le_riak_connection_list = zend_register_list_destructors_ex(NULL, le_riak_connections_pefree, "Persistent clients", module_number);
     riak_connection_init(TSRMLS_C);
     riak_object_init(TSRMLS_C);
@@ -193,7 +181,6 @@ PHP_MINIT_FUNCTION(riak) /* {{{ */
 
 PHP_MSHUTDOWN_FUNCTION(riak) /* {{{ */
 {
-    riack_cleanup();
     UNREGISTER_INI_ENTRIES();
     return SUCCESS;
 }
@@ -223,7 +210,7 @@ PHP_GSHUTDOWN_FUNCTION(riak) /* {{{ */
 #endif
 }
 /* {{{ */
-void riak_throw_exception(riak_connection* cnx, riak_error* err TSRMLS_DC)/* {{{ */
+void riak_throw_exception(riak_connection* cnx, riak_error err TSRMLS_DC)/* {{{ */
 {
     // TODO Fix for basho branch
     // For now just throw a random communication exception
@@ -259,7 +246,7 @@ void *riak_c_realloc(void* data, size_t size) {/* {{{ */
 }
 /* }}} */
 
-void *riak_c_free(void* data)/* {{{ */
+void riak_c_free(void* data)/* {{{ */
 {
     if (data) {
         pefree(data, 0);
@@ -281,7 +268,7 @@ void *riak_c_persistent_realloc(void* data, size_t size) {/* {{{ */
 }
 /* }}} */
 
-void *riak_c_persistent_free(void* data)/* {{{ */
+void riak_c_persistent_free(void* data)/* {{{ */
 {
     if (data) {
         pefree(data, 1);

@@ -31,10 +31,10 @@ zend_bool ensure_connected(riak_context *context TSRMLS_DC) /* {{{ */
        char szport[20];
        sprintf(szport, "%d", context->port);
        riak_error err = riak_connection_new(context->config,
-                                            context->connection,
+                                            &context->connection,
                                             context->szhost, szport, NULL);
-       if (err = ERIAK_OK) {
-           connection->needs_reconnect = 0;
+       if (err == ERIAK_OK) {
+           context->needs_reconnect = 0;
        } else {
            result = 0;
        }
@@ -54,13 +54,12 @@ zend_bool ensure_connected_init(riak_context *context, char* host, int host_len,
             strncmp(context->szhost, host, host_len) != 0 ||
             context->port != port) {
         riak_c_persistent_free(context->szhost);
-        char *szhost;
         // to be on the safe side make a copy with zero termination
         context->szhost = riak_c_persistent_alloc(host_len+1);
         memcpy(context->szhost, host, host_len);
-        szhost[host_len] = 0;
+        context->szhost[host_len] = 0;
         context->port = port;
-        connection->needs_reconnect = 1;
+        context->needs_reconnect = 1;
     }
     result = ensure_connected(context TSRMLS_CC);
 /* TODO
@@ -72,9 +71,9 @@ zend_bool ensure_connected_init(riak_context *context, char* host, int host_len,
 }
 /* }}} */
 
-void mark_for_reconnect(riak_connection *connection) /* {{{ */
+void mark_for_reconnect(riak_context *context) /* {{{ */
 {
-   connection->needs_reconnect = 1;
+   context->needs_reconnect = 1;
 }
 /* }}} */
 
@@ -85,11 +84,11 @@ void mark_for_reconnect(riak_connection *connection) /* {{{ */
 zend_bool lock_pool(TSRMLS_D) /* {{{ */
 {
 #ifdef ZTS
-  if (tsrm_mutex_lock(RIAK_GLOBAL(pool_mutex)) == 0) {
-    return 1;
-  } else {
-    return 0;
-  }
+    if (tsrm_mutex_lock(RIAK_GLOBAL(pool_mutex)) == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
 #endif
   return 1;
 }
@@ -98,12 +97,12 @@ zend_bool lock_pool(TSRMLS_D) /* {{{ */
 void unlock_pool(TSRMLS_D) /* {{{ */
 {
 #ifdef ZTS
-  tsrm_mutex_unlock(RIAK_GLOBAL(pool_mutex));
+    tsrm_mutex_unlock(RIAK_GLOBAL(pool_mutex));
 #endif
 }
 /* }}} */
 
-void release_connection(riak_context *context TSRMLS_DC) /* {{{ */
+void release_context(riak_context *context TSRMLS_DC) /* {{{ */
 {
    riak_connection_pool* pool = NULL;
    RIAK_GLOBAL(open_connections)--;
@@ -112,9 +111,9 @@ void release_connection(riak_context *context TSRMLS_DC) /* {{{ */
       if (lock_pool(TSRMLS_C)) {
          context->last_used_at = time(NULL);
          RIAK_GLOBAL(open_connections_persistent)--;
-         pool = pool_for_host_port(context->host,
+         pool = pool_for_host_port(context->szhost,
             strlen(context->szhost), context->port TSRMLS_CC);
-         release_connection_from_pool(pool, context);
+         release_context_from_pool(pool, context);
          unlock_pool(TSRMLS_C);
       }
    } else {
@@ -122,12 +121,11 @@ void release_connection(riak_context *context TSRMLS_DC) /* {{{ */
           riak_connection_free(&(context->connection));
           context->connection = 0;
       }
-      pefree(connection, 0);
    }
 }
 /* }}} */
 
-riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC) /* {{{ */
+riak_context *take_connection(char* host, int host_len, int port TSRMLS_DC) /* {{{ */
 {
    riak_context* context;
    riak_connection_pool* pool;
@@ -141,8 +139,8 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC) /
    if (entry) {
       context = &entry->context;
       if (!ensure_connected_init(context, host, host_len, port TSRMLS_CC)) {
-         connection->needs_reconnect = 1;
-         release_connection_from_pool(pool, connection);
+         context->needs_reconnect = 1;
+         release_context_from_pool(pool, context);
          return NULL;
       }
       RIAK_GLOBAL(open_connections_persistent)++;
@@ -153,24 +151,24 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC) /
       context->persistent = 0;
       context->last_used_at = time(NULL);
       if (!ensure_connected_init(context, host, host_len, port TSRMLS_CC)) {
-         release_connection(context TSRMLS_CC);
+         release_context(context TSRMLS_CC);
          return NULL;
       }
    }
-   if (connection) {
+   if (context) {
       RIAK_GLOBAL(open_connections)++;
    }
-   return connection;
+   return context;
 }
 /* }}} */
 
-void release_connection_from_pool(riak_connection_pool* pool, riak_connection *connection) /* {{{ */
+void release_context_from_pool(riak_connection_pool* pool, riak_context *context) /* {{{ */
 {
     int i;
     riak_connection_pool_entry* current_entry;
     for (i=0; i<pool->count; ++i) {
         current_entry = &pool->entries[i];
-        if (&(current_entry->connection) == connection) {
+        if (&(current_entry->context) == context) {
             current_entry->in_use = 0;
         }
     }
@@ -194,6 +192,14 @@ riak_connection_pool_entry *take_connection_entry_from_pool(riak_connection_pool
                                 riak_c_persistent_free,
                                 riak_c_pb_persistent_alloc,
                                 riak_c_pb_persistent_free);
+/*
+riak_config_new(riak_config     **cfg,
+                riak_alloc_fn     alloc,
+                riak_realloc_fn   realloc,
+                riak_free_fn      freeme,
+                riak_pb_alloc_fn  pb_alloc,
+                riak_pb_free_fn   pb_free);
+*/
             }
             return current_entry;
         }
@@ -242,7 +248,7 @@ void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC) /* {{{ */
     riak_connection_pool *pool = (riak_connection_pool*)rsrc->ptr;
     if (pool->entries) {
         for (i=0; i<pool->count; ++i) {
-            if (pool->entries[i].context.client) {
+            if (pool->entries[i].context.connection) {
                 riak_connection_free(&(pool->entries[i].context.connection));
             }
             if (pool->entries[i].context.config) {

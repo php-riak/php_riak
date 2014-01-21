@@ -47,6 +47,7 @@ void riak_output_index_output_init(TSRMLS_D)
     zend_declare_property_null(riak_index_output_ce, "continuation", sizeof("continuation")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 
+/*
 zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSRMLS_DC)
 {
     zval *zresult;
@@ -72,8 +73,8 @@ zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSR
         zval_ptr_dtor(&zcurrent);
     }
     return zresult;
-}
-
+}*/
+/*
 zval *riak_index_output_from_string_list_and_continuation(RIACK_STRING_LIST *result_keys, RIACK_STRING *continuation TSRMLS_DC) {
     zval* zlist, *zresult;
     MAKE_STD_ZVAL(zresult);
@@ -91,7 +92,7 @@ zval *riak_index_output_from_string_list_and_continuation(RIACK_STRING_LIST *res
     }
     zval_ptr_dtor(&zlist);
     return zresult;
-}
+}*/
 
 PHP_METHOD(Riak_Index_Output, __construct)
 {

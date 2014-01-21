@@ -27,10 +27,10 @@ typedef struct _client_data {
   /* required */
   zend_object std;
 
-  riak_connection *connection;
+  riak_context *context;
 } client_data;
 
-#define GET_RIAK_CONNECTION(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->connection
+#define GET_RIAK_CONTEXT(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->context
 
 /*************************************************
 * Constants

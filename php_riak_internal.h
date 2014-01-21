@@ -134,6 +134,12 @@
        RIACK_STR.len = Z_STRLEN_P(ZVAL); \
        RIACK_STR.value = Z_STRVAL_P(ZVAL); } else
 
+#define CHECK_RIAK_STATUS_THROW_AND_RETURN_ON_ERROR(CONTEXT, ERR) \
+    if ( ERR != ERIAK_OK) { \
+      CONTEXT->needs_reconnect = 1; \
+      riak_throw_exception(CONTEXT->connection,  ERR TSRMLS_CC); \
+    return; }
+
 #ifdef ZTS
 #include <TSRM.h>
 # define RIAK_GLOBAL(v) TSRMG(riak_globals_id, zend_riak_globals *, v)
@@ -175,10 +181,10 @@ ZEND_EXTERN_MODULE_GLOBALS(riak)
 
 void *riak_c_alloc(size_t size);
 void *riak_c_realloc(void* data, size_t size);
-void *riak_c_free(void* data);
+void riak_c_free(void* data);
 void *riak_c_persistent_alloc(size_t size);
 void *riak_c_persistent_realloc(void* data, size_t size);
-void *riak_c_persistent_free(void* data);
+void riak_c_persistent_free(void* data);
 
 void *riak_c_pb_alloc(void *allocator_data, size_t size);
 void riak_c_pb_free (void *allocator_data, void *data);
@@ -186,6 +192,6 @@ void riak_c_pb_free (void *allocator_data, void *data);
 void *riak_c_pb_persistent_alloc(void *allocator_data, size_t size);
 void riak_c_pb_persistent_free (void *allocator_data, void *data);
 
-void riak_throw_exception(riak_connection* cnx, riak_error* err TSRMLS_DC);
+void riak_throw_exception(riak_connection* cnx, riak_error err TSRMLS_DC);
 
 #endif // PHP_RIAK_INTERNAL_H

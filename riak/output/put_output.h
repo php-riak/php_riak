@@ -22,6 +22,6 @@
 extern zend_class_entry *riak_put_output_ce;
 
 void riak_output_put_output_init(TSRMLS_D);
-zval *put_output_from_riack_object(struct RIACK_OBJECT* obj, zval* zkey TSRMLS_DC);
+// zval *put_output_from_riack_object(struct RIACK_OBJECT* obj, zval* zkey TSRMLS_DC);
 
 #endif //RIAK_OUTPUT__PUT_OUTPUT__H__

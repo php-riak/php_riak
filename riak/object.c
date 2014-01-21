@@ -393,9 +393,9 @@ void riak_key_from_object(zval *zobject, char** key, int* keylen TSRMLS_DC)/* {{
 }
 /* }}} */
 
-zval *links_from_content(struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
-{
-    struct RIACK_LINK *curr_link;
+// zval *links_from_content(struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
+// {
+   /* struct RIACK_LINK *curr_link;
     char *tag, *bucket, *key;
     zval *zlinkarr, *zlink;
     size_t i;
@@ -413,39 +413,40 @@ zval *links_from_content(struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
             pefree(bucket, 0); pefree(key, 0); pefree(tag, 0);
         }
     }
-    return zlinkarr;
-}
+    return zlinkarr;*/
+// }
 /* }}} */
 
 /* Get metadata array from returned content */
-zval *assoc_array_from_riack_pairs(struct RIACK_PAIR* pairs, size_t pairscnt TSRMLS_DC) /* {{{ */
-{
-    zval *zresultarr;
-	size_t i;
-    struct RIACK_PAIR* currentpair;
-	char* currentKey;
-    MAKE_STD_ZVAL(zresultarr);
-    array_init(zresultarr);
-    for (i=0; i<pairscnt; ++i) {
-        currentpair = &(pairs[i]);
-        if (currentpair) {
-            currentKey = pestrndup(currentpair->key.value, currentpair->key.len, 0);
-            if (currentpair->value_present) {
-                add_assoc_stringl(zresultarr, currentKey, (char*)currentpair->value, currentpair->value_len, 1);
-			} else {
-                add_assoc_null(zresultarr, currentKey);
-			}
-			pefree(currentKey, 0);
-		}
-	}
-    return zresultarr;
-}
+// zval *assoc_array_from_riack_pairs(struct RIACK_PAIR* pairs, size_t pairscnt TSRMLS_DC) /* {{{ */
+// {
+//     zval *zresultarr;
+// 	size_t i;
+//     struct RIACK_PAIR* currentpair;
+// 	char* currentKey;
+//     MAKE_STD_ZVAL(zresultarr);
+//     array_init(zresultarr);
+//     for (i=0; i<pairscnt; ++i) {
+//         currentpair = &(pairs[i]);
+//         if (currentpair) {
+//             currentKey = pestrndup(currentpair->key.value, currentpair->key.len, 0);
+//             if (currentpair->value_present) {
+//                 add_assoc_stringl(zresultarr, currentKey, (char*)currentpair->value, currentpair->value_len, 1);
+// 			} else {
+//                 add_assoc_null(zresultarr, currentKey);
+// 			}
+// 			pefree(currentKey, 0);
+// 		}
+// 	}
+//     return zresultarr;
+// }
 /* }}} */
 
 
 /* Set object properties from returned content */
-void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC) /* {{{ */
-{
+// void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC) /* {{{ */
+// {
+/*
     zval* zmetadata, *zlinks, *zindexes;
 
     zend_update_property_stringl(riak_object_ce, object, "content", sizeof("content")-1,
@@ -485,14 +486,14 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
 
     zlinks = links_from_content(content TSRMLS_CC);
     zend_update_property(riak_object_ce, object, "links", sizeof("links")-1, zlinks TSRMLS_CC);
-    zval_ptr_dtor(&zlinks);
-}
+    zval_ptr_dtor(&zlinks);*/
+// }
 /* }}} */
 
 /* Called once for each link in the links property of RiakObject */
-void set_links_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
-{
-    zval *zbucket, *ztag, *zkey;
+// void set_links_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+// {
+  /*  zval *zbucket, *ztag, *zkey;
     RIACK_STRING rbucket, rtag, rkey;
     struct RIACK_CLIENT* client = (struct RIACK_CLIENT*)callingObj;
     struct RIACK_CONTENT* content = (struct RIACK_CONTENT*)custom_ptr;
@@ -510,28 +511,28 @@ void set_links_from_object_cb(void* callingObj, void* custom_ptr, char* key, uin
     ztag = zend_read_property(riak_link_ce, *data, "tag", sizeof("tag")-1, 1 TSRMLS_CC);
     rtag.len = Z_STRLEN_P(ztag);
     rtag.value = Z_STRVAL_P(ztag);
-    content->links[cnt].tag = riack_copy_string(client, rtag);
-}
+    content->links[cnt].tag = riack_copy_string(client, rtag);*/
+// }
 /* }}} */
 
 /* Copy all links from link array to a content structure */
-void set_links_from_object(struct RIACK_CONTENT* content, zval* zlinksarr, struct RIACK_CLIENT* client TSRMLS_DC)/* {{{ */
-{
-    if (zlinksarr && Z_TYPE_P(zlinksarr) == IS_ARRAY) {
+// void set_links_from_object(struct RIACK_CONTENT* content, zval* zlinksarr, struct RIACK_CLIENT* client TSRMLS_DC)/* {{{ */
+// {
+/*    if (zlinksarr && Z_TYPE_P(zlinksarr) == IS_ARRAY) {
         content->link_count = zend_hash_num_elements(Z_ARRVAL_P(zlinksarr));
         if (content->link_count > 0) {
             content->links = RMALLOC(client, sizeof(struct RIACK_LINK) * content->link_count);
             memset(content->links, 0, sizeof(struct RIACK_LINK) * content->link_count);
             foreach_in_hashtable(client, content, Z_ARRVAL_P(zlinksarr), &set_links_from_object_cb TSRMLS_CC);
         }
-    }
-}
+    } */
+// }
 /* }}} */
 
 /* Called once for each metadata or index entry in the RiakObject */
-void set_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
-{
-    zval *tmp;
+// void set_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+// {
+/*    zval *tmp;
     RIACK_STRING rkey;
     struct RIACK_CLIENT* client = (struct RIACK_CLIENT*)callingObj;
     struct RIACK_PAIR* pairs = (struct RIACK_PAIR*)custom_ptr;
@@ -560,42 +561,42 @@ void set_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uin
         RMALLOCCOPY(client, pairs[cnt].value, pairs[cnt].value_len, Z_STRVAL_P(tmp), Z_STRLEN_P(tmp));
         zval_ptr_dtor(&tmp);
     }
-
-}
+*/
+// }
 /* }}} */
 
 /* Copy all metadata from metadata array to a content structure */
-void set_metadata_from_object(struct RIACK_CONTENT* content, zval* zMetadata, struct RIACK_CLIENT* client TSRMLS_DC) /* {{{ */
-{
-    if (zMetadata && Z_TYPE_P(zMetadata) == IS_ARRAY) {
+// void set_metadata_from_object(struct RIACK_CONTENT* content, zval* zMetadata, struct RIACK_CLIENT* client TSRMLS_DC) /* {{{ */
+// {
+/*    if (zMetadata && Z_TYPE_P(zMetadata) == IS_ARRAY) {
         content->usermeta_count = zend_hash_num_elements(Z_ARRVAL_P(zMetadata));
         if (content->usermeta_count > 0) {
 			content->usermetas = RMALLOC(client, sizeof(struct RIACK_PAIR) * content->usermeta_count);
 			memset(content->usermetas, 0, sizeof(struct RIACK_PAIR) * content->usermeta_count);
             foreach_in_hashtable(client, content->usermetas, Z_ARRVAL_P(zMetadata), &set_pairs_from_object_cb TSRMLS_CC);
 		}
-	}
-}
+    }*/
+// }
 /* }}} */
 
 /* Copy all indexes from array to a content structure */
-void set_indexes_from_object(struct RIACK_CONTENT* content, zval* zindexsarray, struct RIACK_CLIENT* client TSRMLS_DC) /* {{{ */
-{
-    if (zindexsarray && Z_TYPE_P(zindexsarray)) {
+// void set_indexes_from_object(struct RIACK_CONTENT* content, zval* zindexsarray, struct RIACK_CLIENT* client TSRMLS_DC) /* {{{ */
+// {
+  /*  if (zindexsarray && Z_TYPE_P(zindexsarray)) {
         content->index_count = zend_hash_num_elements(Z_ARRVAL_P(zindexsarray));
         if (content->index_count > 0) {
             content->indexes = RMALLOC(client, sizeof(struct RIACK_PAIR) * content->index_count);
             memset(content->indexes, 0, sizeof(struct RIACK_PAIR) * content->index_count);
             foreach_in_hashtable(client, content->indexes, Z_ARRVAL_P(zindexsarray), &set_pairs_from_object_cb TSRMLS_CC);
         }
-    }
-}
+    }*/
+// }
 /* }}} */
 
 /* Fill out members of a content struct with this objects values */
-void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC)/* {{{ */
-{
-	zval* zTmp;
+// void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC)/* {{{ */
+// {
+    /*zval* zTmp;
     zTmp = zend_read_property(riak_object_ce, object, "content", sizeof("content")-1, 1 TSRMLS_CC);
 	if (Z_TYPE_P(zTmp) == IS_STRING) {
 		content->data_len = Z_STRLEN_P(zTmp);
@@ -613,6 +614,6 @@ void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, s
 	set_metadata_from_object(content, zTmp, client TSRMLS_CC);
 
     zTmp = zend_read_property(riak_object_ce, object, "links", sizeof("links")-1, 1 TSRMLS_CC);
-    set_links_from_object(content, zTmp, client TSRMLS_CC);
-}
+    set_links_from_object(content, zTmp, client TSRMLS_CC); */
+// }
 /* }}} */

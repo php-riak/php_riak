@@ -95,8 +95,8 @@ void free_client_data(void *object TSRMLS_DC) /* {{{ */
 
 	zend_object_std_dtor(&data->std TSRMLS_CC);
 
-	if (data->connection) {
-		release_connection(data->connection TSRMLS_CC);
+    if (data->context) {
+        release_context(data->context TSRMLS_CC);
 	}
 
 	efree(data);
@@ -148,9 +148,9 @@ PHP_METHOD(RiakConnection, __construct)
 
 	data = (client_data*)zend_object_store_get_object(getThis() TSRMLS_CC);
 
-	data->connection = take_connection(host, hostLen, port TSRMLS_CC);
+    data->context = take_connection(host, hostLen, port TSRMLS_CC);
 
-	if (!data->connection) {
+    if (!data->context) {
 		zend_throw_exception(riak_connection_exception_ce, "Connection error", 1000 TSRMLS_CC);
 	}
 }
@@ -172,15 +172,14 @@ PHP_METHOD(RiakConnection, getServerInfo)
 Ping riak to see if it is alive, an exception is thrown if no response is received */
 PHP_METHOD(RiakConnection, ping)
 {
-	int pingStatus;
-	riak_connection *connection;
+    riak_error result;
+    riak_context *context;
 
-	GET_RIAK_CONNECTION(getThis(), connection);
-	ensure_connected(connection TSRMLS_CC);
+    GET_RIAK_CONTEXT(getThis(), context);
+    ensure_connected(context TSRMLS_CC);
 
-	pingStatus = riack_ping(connection->client);
-
-	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, pingStatus);
+    result = riak_ping(context->connection);
+    CHECK_RIAK_STATUS_THROW_AND_RETURN_ON_ERROR(context, result);
 }
 /* }}} */
 

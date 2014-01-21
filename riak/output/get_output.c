@@ -36,8 +36,8 @@ void riak_output_get_output_init(TSRMLS_D)/* {{{ */
 }
 /* }}} */
 
-zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC) /* {{{ */
-{
+// zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC) /* {{{ */
+/*{
     zval *zoutput;
     MAKE_STD_ZVAL(zoutput);
     object_init_ex(zoutput, riak_get_output_ce);
@@ -46,7 +46,7 @@ zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zk
     }
     riak_set_output_properties(zoutput, zkey, &getobj->object TSRMLS_CC);
     return zoutput;
-}
+}*/
 /* }}} */
 
 

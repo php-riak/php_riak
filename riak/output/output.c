@@ -56,8 +56,9 @@ void riak_output_init(TSRMLS_D)/* {{{ */
 }
 /* }}} */
 
-void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* obj TSRMLS_DC) /* {{{ */
-{
+// void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* obj TSRMLS_DC) /* {{{ */
+// {
+/*
     size_t content_cnt, i;
     zval *zobjectlist;
     if (obj->vclock.len > 0) {
@@ -99,7 +100,8 @@ void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* 
     }
     zend_update_property(riak_output_ce, zoutput, "objectList", sizeof("objectList")-1, zobjectlist TSRMLS_CC);
     zval_ptr_dtor(&zobjectlist);
-}
+    */
+// }
 /* }}} */
 
 /*************************************************************

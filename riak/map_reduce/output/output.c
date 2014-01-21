@@ -47,9 +47,9 @@ void riak_map_reduce_output_output_init(TSRMLS_D)/* {{{ */
 /* }}} */
 
 
-zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC)/* {{{ */
-{
-    zval *zresult, *zvalue, *zphase;
+// zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC)/* {{{ */
+// {
+   /* zval *zresult, *zvalue, *zphase;
     MAKE_STD_ZVAL(zresult);
     MAKE_STD_ZVAL(zvalue);
 
@@ -65,8 +65,8 @@ zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TS
         RIAK_CALL_METHOD1(Riak_MapReduce_Output_Output, __construct, zresult, zresult, zvalue);
     }
     zval_ptr_dtor(&zvalue);
-    return zresult;
-}
+    return zresult; */
+// }
 /* }}} */
 
 /* {{{ proto void Riak\MapReduce\Output\Output->__construct($value, [, int $phase])

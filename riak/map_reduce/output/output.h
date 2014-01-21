@@ -23,7 +23,7 @@ extern zend_class_entry *riak_mroutput_ce;
 
 void riak_map_reduce_output_output_init(TSRMLS_D);
 
-zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC);
+// zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC);
 
 PHP_METHOD(Riak_MapReduce_Output_Output, __construct);
 PHP_METHOD(Riak_MapReduce_Output_Output, getValue);
