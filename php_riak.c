@@ -223,9 +223,13 @@ PHP_GSHUTDOWN_FUNCTION(riak) /* {{{ */
 #endif
 }
 /* {{{ */
-void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)/* {{{ */
+void riak_throw_exception(riak_connection* cnx, riak_error* err TSRMLS_DC)/* {{{ */
 {
-    if (errorStatus == RIACK_ERROR_COMMUNICATION) {
+    // TODO Fix for basho branch
+    // For now just throw a random communication exception
+    zend_throw_exception(riak_communication_exception_ce, "Unknown error", 1001 TSRMLS_CC);
+
+/*    if (errorStatus == RIACK_ERROR_COMMUNICATION) {
         zend_throw_exception(riak_communication_exception_ce, "Communication error", 1001 TSRMLS_CC);
     } else if (errorStatus == RIACK_ERROR_RESPONSE) {
         if (client->last_error) {
@@ -233,7 +237,7 @@ void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC
         } else {
             zend_throw_exception(riak_response_exception_ce, "Unexpected response from riak", 1002 TSRMLS_CC);
         }
-    }
+    }*/
 }
 /* }}} */
 
@@ -241,17 +245,21 @@ void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC
  * Riack allocator
 */
 
-void *riack_php_alloc(void* ptr, size_t size)/* {{{ */
+void *riak_c_alloc(size_t size)/* {{{ */
 {
     if (size == 0) {
         return 0;
     }
-
     return pemalloc(size, 0);
 }
 /* }}} */
 
-void riack_php_free(void *ptr, void *data)/* {{{ */
+void *riak_c_realloc(void* data, size_t size) {/* {{{ */
+    return perealloc(data, size, 0);
+}
+/* }}} */
+
+void *riak_c_free(void* data)/* {{{ */
 {
     if (data) {
         pefree(data, 0);
@@ -259,17 +267,55 @@ void riack_php_free(void *ptr, void *data)/* {{{ */
 }
 /* }}} */
 
-void *riack_php_persistent_alloc(void *ptr, size_t size)/* {{{ */
+void *riak_c_persistent_alloc(size_t size)/* {{{ */
 {
     if (size == 0) {
         return 0;
     }
-
     return pemalloc(size, 1);
 }
 /* }}} */
 
-void riack_php_persistent_free (void *ptr, void *data)/* {{{ */
+void *riak_c_persistent_realloc(void* data, size_t size) {/* {{{ */
+    return perealloc(data, size, 1);
+}
+/* }}} */
+
+void *riak_c_persistent_free(void* data)/* {{{ */
+{
+    if (data) {
+        pefree(data, 1);
+    }
+}
+/* }}} */
+
+void *riak_c_pb_alloc(void* ptr, size_t size)/* {{{ */
+{
+    if (size == 0) {
+        return 0;
+    }
+    return pemalloc(size, 0);
+}
+/* }}} */
+
+void riak_c_pb_free(void *ptr, void *data)/* {{{ */
+{
+    if (data) {
+        pefree(data, 0);
+    }
+}
+/* }}} */
+
+void *riak_c_pb_persistent_alloc(void *ptr, size_t size)/* {{{ */
+{
+    if (size == 0) {
+        return 0;
+    }
+    return pemalloc(size, 1);
+}
+/* }}} */
+
+void riak_c_pb_persistent_free (void *ptr, void *data)/* {{{ */
 {
     if (data) {
         pefree(data, 1);

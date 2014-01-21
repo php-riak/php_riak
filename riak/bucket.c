@@ -406,7 +406,6 @@ PHP_METHOD(RiakBucket, indexQuery)
     if (RSTR_HAS_CONTENT(continuation)) {
         RSTR_SAFE_FREE(connection->client, continuation);
     }
-
     RETURN_ZVAL(zresult, 0, 1);
 }
 /* }}} */
@@ -438,7 +437,6 @@ void riak_set_commit_hooks_properties(riak_connection *connection, zval *zhook_l
         zval *ziter, *zcount;
         MAKE_STD_ZVAL(zcount);
         RIAK_CALL_METHOD(RiakCommitHookList, count, zcount, zhook_list)
-
         MAKE_STD_ZVAL(ziter);
         object_init(ziter);
         RIAK_CALL_METHOD(RiakCommitHookList, getIterator, ziter, zhook_list)

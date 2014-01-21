@@ -24,7 +24,8 @@
 #endif
 
 #include <php.h>
-#include <riack.h>
+#include <riak.h>
+#include <riak_config.h>
 
 /*************************************************
 * Macros
@@ -140,7 +141,6 @@
 # define RIAK_GLOBAL(v) (riak_globals.v)
 #endif
 
-
 /*************************************************
 * Vars
 *************************************************/
@@ -173,12 +173,19 @@ ZEND_EXTERN_MODULE_GLOBALS(riak)
 * Functions
 *************************************************/
 
-void *riack_php_alloc(void *allocator_data, size_t size);
-void riack_php_free (void *allocator_data, void *data);
+void *riak_c_alloc(size_t size);
+void *riak_c_realloc(void* data, size_t size);
+void *riak_c_free(void* data);
+void *riak_c_persistent_alloc(size_t size);
+void *riak_c_persistent_realloc(void* data, size_t size);
+void *riak_c_persistent_free(void* data);
 
-void *riack_php_persistent_alloc(void *allocator_data, size_t size);
-void riack_php_persistent_free (void *allocator_data, void *data);
+void *riak_c_pb_alloc(void *allocator_data, size_t size);
+void riak_c_pb_free (void *allocator_data, void *data);
 
-void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
+void *riak_c_pb_persistent_alloc(void *allocator_data, size_t size);
+void riak_c_pb_persistent_free (void *allocator_data, void *data);
+
+void riak_throw_exception(riak_connection* cnx, riak_error* err TSRMLS_DC);
 
 #endif // PHP_RIAK_INTERNAL_H

@@ -22,16 +22,21 @@
 #include <php.h>
 #include <time.h>
 
-typedef struct _riak_connection {
-  struct RIACK_CLIENT *client;
+typedef struct {
+  riak_connection* connection;
+  riak_config* config;
+
+  char* szhost;
+  int port;
+
   zend_bool needs_reconnect;
   zend_bool persistent;
   time_t last_used_at;
-} riak_connection;
+} riak_context;
 
 typedef struct _riak_connection_pool_entry {
   zend_bool in_use;
-  riak_connection connection;
+  riak_context context;
 } riak_connection_pool_entry;
 
 typedef struct _riak_connection_pool {
@@ -39,11 +44,11 @@ typedef struct _riak_connection_pool {
   riak_connection_pool_entry *entries;
 } riak_connection_pool;
 
-zend_bool ensure_connected(riak_connection *connection TSRMLS_DC);
-zend_bool ensure_connected_init(riak_connection *connection, char* host, int host_len, int port TSRMLS_DC);
-void mark_for_reconnect(riak_connection *connection);
+zend_bool ensure_connected(riak_context *context TSRMLS_DC);
+zend_bool ensure_connected_init(riak_context *context, char* host, int host_len, int port TSRMLS_DC);
+void mark_for_reconnect(riak_context *context);
 
-void release_connection(riak_connection *connection TSRMLS_DC);
+void release_connection(riak_context *context TSRMLS_DC);
 riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC);
 
 void le_riak_connections_pefree(zend_rsrc_list_entry *rsrc TSRMLS_DC);

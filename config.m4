@@ -2,12 +2,52 @@ dnl lines starting with "dnl" are comments
 
 PHP_ARG_ENABLE(riak, whether to enable Riak extension, [  --enable-riak   Enable Riak extension])
 PHP_ARG_ENABLE(riak-session, whether to enable riak sessions, [ --disable-riak-session Disable riak session support], yes, no)
-if test "$PHP_RIAK" != "no"; then
-  if test "$PHP_RIAK_SESSION" != "no"; then
-    AC_DEFINE(PHP_RIAK_SESSION,1,[riak session])
-  fi
 
-  dnl this defines the extension
+dnl
+dnl Checks for the configure options
+dnl
+
+if test -z "$PHP_RIAK_C_DIR"; then
+  PHP_ARG_WITH(riak-c-dir, for the location of Riak C,
+  [  --with-riak-c-dir[=DIR]     Set the path to riak-c install prefix.], no, no)
+fi
+
+AC_DEFUN(RIAK_C_LIB,[
+  if test "$PHP_RIAK_C_DIR" != "no"; then
+    LIB_RIAK_C_NAME=riak_c_client-0.1
+
+    for i in $PHP_RIAK_C_DIR /usr/local /usr; do
+      if test -f "$i/include/riak.h"; then
+        PHP_RIAK_C_DIR=$i
+        break;
+      fi
+    done
+
+    PHP_CHECK_LIBRARY($LIB_RIAK_C_NAME, riak_ping,
+      [
+        PHP_ADD_INCLUDE($PHP_RIAK_C_DIR)
+        PHP_ADD_INCLUDE($PHP_RIAK_C_DIR/include)
+        PHP_ADD_LIBRARY_WITH_PATH($LIB_RIAK_C_NAME, $PHP_RIAK_C_DIR/lib, RIAK_SHARED_LIBADD)
+      ],[
+        AC_MSG_ERROR([Problem with $LIB_RIAK_C_NAME.(a|so). Please check config.log for more information.])
+      ],[
+        -L$PHP_RIAK_C_DIR/lib
+      ])
+  else
+    AC_MSG_RESULT([If configure fails try --with-riak-c-dir=<DIR>])
+  fi
+])
+
+if test "$PHP_RIAK_SESSION" != "no"; then
+  AC_DEFINE(PHP_RIAK_SESSION,1,[riak session])
+fi
+
+dnl
+dnl this defines the extension
+dnl
+if test "$PHP_RIAK" != "no"; then
+  RIAK_C_LIB
+
   PHP_NEW_EXTENSION(riak, php_riak.c \
     ht_utils.c \
     riak_session.c \
@@ -61,48 +101,27 @@ if test "$PHP_RIAK" != "no"; then
     riak/map_reduce/functions/base_function.c \
     riak/map_reduce/functions/javascript_function.c \
     riak/map_reduce/functions/erlang_function.c \
-    LibRiack/src/riack_sock.c \
-    LibRiack/src/riack.c \
-    LibRiack/src/riack_kv.c \
-    LibRiack/src/riack_search.c \
-    LibRiack/src/riack_msg.c \
-    LibRiack/src/riack_mem.c \
-    LibRiack/src/riack_helpers.c \
-    LibRiack/src/protocol/riak_msg_codes.c \
-    LibRiack/src/protocol/riak_search.pb-c.c \
-    LibRiack/src/protocol/riak.pb-c.c \
-    LibRiack/src/protocol/riak_kv.pb-c.c \
-    LibRiack/src/google/protobuf-c/protobuf-c.c, $ext_shared)
+    , $ext_shared)
 
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/crdt], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/crdt/input], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/exception], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/input], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/output], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/property], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/property/replication_mode], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/functions], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/input], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/output], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/phase], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/search], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/query], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/input], 1)
-    PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/output], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/crdt], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/crdt/input], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/exception], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/input], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/output], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/property], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/property/replication_mode], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/functions], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/input], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/output], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/map_reduce/phase], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/search], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/query], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/input], 1)
+  PHP_ADD_BUILD_DIR([$ext_builddir/riak/search/output], 1)
 
-  PHP_ADD_BUILD_DIR([$ext_builddir/LibRiack/src], 1)
-  PHP_ADD_INCLUDE([$ext_builddir/LibRiack/src])
-  PHP_ADD_INCLUDE([$ext_srcdir/LibRiack/src])
-
-  PHP_ADD_BUILD_DIR([$ext_builddir/LibRiack/src/protocol], 1)
-  PHP_ADD_INCLUDE([$ext_builddir/LibRiack/src/protocol])
-  PHP_ADD_INCLUDE([$ext_srcdir/LibRiack/src/protocol])
-
-  PHP_ADD_BUILD_DIR([$ext_builddir/LibRiack/src/google/protobuf-c], 1)
-  PHP_ADD_INCLUDE([$ext_builddir/LibRiack/src/google/protobuf-c])
-  PHP_ADD_INCLUDE([$ext_srcdir/LibRiack/src/google/protobuf-c])
+  PHP_SUBST(RIAK_SHARED_LIBADD)
 
   dnl this is boilerplate to make the extension work on OS X
   case $build_os in
@@ -117,4 +136,5 @@ if test "$PHP_RIAK" != "no"; then
     AC_MSG_RESULT([yes])
     ;;
   esac
+
 fi
