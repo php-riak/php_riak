@@ -4,7 +4,7 @@ cd riak-c-client
 ./autogen.sh
 ./configure
 make
-
+cd ..
 phpize
 ./configure --with-riak-c-dir=./riak-c-client/src --quiet
 make install
