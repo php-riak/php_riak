@@ -45,7 +45,7 @@ void riak_search_output_output_init(TSRMLS_D) /* {{{  */
 * Implementation: Riak\Search\Output\Output
 *************************************************************/
 
-zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *search_result TSRMLS_DC)
+/*zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *search_result TSRMLS_DC)
 {
     zval *zresult;
     MAKE_STD_ZVAL(zresult);
@@ -71,7 +71,7 @@ zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *se
     }
     return zresult;
 }
-
+*/
 PHP_METHOD(Riak_Search_Output_Output, hasMaxScore)
 {
     zval *zprop = zend_read_property(riak_search_output_ce, getThis(), "maxScore", sizeof("maxScore")-1, 1 TSRMLS_CC);

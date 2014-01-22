@@ -55,7 +55,7 @@ PHP_METHOD(Riak_Server_Info, __construct)/* {{{ */
 }
 /* }}} */
 
-int riak_get_server_info_as_zvals(riak_connection **connection, zval** znode,
+/*int riak_get_server_info_as_zvals(riak_connection **connection, zval** znode,
                                   zval **zserver_version, zval* zthis TSRMLS_DC)
 {
     zval *zconn;
@@ -78,10 +78,10 @@ int riak_get_server_info_as_zvals(riak_connection **connection, zval** znode,
     RSTR_SAFE_FREE((*connection)->client, server_version);
     return riackresult;
 }
-
+*/
 PHP_METHOD(Riak_Server_Info, getNode)/* {{{ */
 {
-    riak_connection *connection;
+/*    riak_connection *connection;
     zval *znode, *zserver;
     int riackresult;
     riackresult = riak_get_server_info_as_zvals(&connection, &znode, &zserver, getThis() TSRMLS_CC);
@@ -92,13 +92,13 @@ PHP_METHOD(Riak_Server_Info, getNode)/* {{{ */
         CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackresult);
     } else {
         RETURN_ZVAL(znode, 0, 1);
-    }
+    }*/
 }
 /* }}} */
 
 PHP_METHOD(Riak_Server_Info, getServerVersion)/* {{{ */
 {
-    riak_connection *connection;
+/*    riak_connection *connection;
     zval *znode, *zserver;
     int riackresult;
     riackresult = riak_get_server_info_as_zvals(&connection, &znode, &zserver, getThis() TSRMLS_CC);
@@ -109,6 +109,6 @@ PHP_METHOD(Riak_Server_Info, getServerVersion)/* {{{ */
         CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackresult);
     } else {
         RETURN_ZVAL(zserver, 0, 1);
-    }
+    }*/
 }
 /* }}} */

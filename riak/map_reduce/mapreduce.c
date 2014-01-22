@@ -123,8 +123,8 @@ struct riak_mr_stream_params {/* {{{ */
 /* }}} */
 
 
-void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPRED_RESPONSE* response) /* {{{ */
-{
+//void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPRED_RESPONSE* response) /* {{{ */
+/*{
     zval zfuncname, *zresponse, zret;
     struct riak_mr_stream_params *params = (struct riak_mr_stream_params*)arg;
     ZVAL_STRING(&zfuncname, "receive", 0);
@@ -136,14 +136,14 @@ void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPR
     call_user_function(NULL, &params->zstreamer, &zfuncname, &zret, 1, &zresponse);
 #endif
     zval_ptr_dtor(&zresponse);
-}
+}*/
 /* }}} */
 
 /* {{{ proto array Riak\MapReduce\MapReduce->run([RiakMrStreamer $streamer])
 Runs the mapreduce query and returns the results as an array of Riak_MapReduce_Output_Output */
 PHP_METHOD(RiakMapreduce, run)
 {
-    zval* zjson, *zclient, *zresult, *zstreamer;
+/*    zval* zjson, *zclient, *zresult, *zstreamer;
     riak_connection *connection, *stream_connection;
     struct RIACK_MAPRED_RESPONSE_LIST *mapresult;
     struct RIACK_MAPRED_RESPONSE_LIST *mapresult_iter;
@@ -200,12 +200,12 @@ PHP_METHOD(RiakMapreduce, run)
             }
         }
     }
-    zval_ptr_dtor(&zjson);
+    zval_ptr_dtor(&zjson);*/
 }
 /* }}} */
 
-void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
-{
+//void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+/*{
     zval *zarr, *ztargetarr, zfuncname;
     ztargetarr = (zval*)custom_ptr;
 
@@ -215,15 +215,15 @@ void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint key
     //call_user_function(NULL, &zfunc, &zname, zfuncarray, 0, NULL TSRMLS_CC);
     if (zarr && Z_TYPE_P(zarr) == IS_ARRAY) {
         add_next_index_zval(ztargetarr, zarr);
-    }
-}
+   }
+}*/
 /* }}} */
 
 /* {{{ proto array Riak\MapReduce\MapReduce->toArray()
 Returns the current mapreduce query as an array, this is mostly usefull when debugging failing mr queries */
 PHP_METHOD(RiakMapreduce, toArray)
 {
-    zval *zinput, *zinputval, *zphasearr, *zarray, zfuncname;
+/*    zval *zinput, *zinputval, *zphasearr, *zarray, zfuncname;
     zval *zqueryarr;
 
     zinput = zend_read_property(riak_mapreduce_ce, getThis(), "input", sizeof("input")-1, 1 TSRMLS_CC);
@@ -241,14 +241,14 @@ PHP_METHOD(RiakMapreduce, toArray)
     MAKE_STD_ZVAL(zqueryarr);
     array_init(zqueryarr);
     foreach_in_hashtable(getThis(), zqueryarr, Z_ARRVAL_P(zphasearr), &riak_mr_to_array_cb TSRMLS_CC);
-
+*/
     /* Build result array */
-    MAKE_STD_ZVAL(zarray);
+/*    MAKE_STD_ZVAL(zarray);
     array_init(zarray);
     add_assoc_zval_ex(zarray, "inputs", sizeof("inputs"), zinputval);
     add_assoc_zval_ex(zarray, "query", sizeof("query"), zqueryarr);
 
-    RETURN_ZVAL(zarray, 0, 1);
+    RETURN_ZVAL(zarray, 0, 1);*/
 }
 /* }}} */
 

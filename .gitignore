@@ -2,6 +2,7 @@ modules/
 build/
 include/
 autom4te.cache/
+riak-c-client
 
 *.iml
 .idea/

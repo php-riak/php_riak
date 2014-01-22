@@ -603,9 +603,9 @@ void riak_object_properties_set(riak_object *obj, zval* zobj, riak_context *ctx 
         bin = riak_binary_new(ctx->config, Z_STRLEN_P(ztmp), (riak_uint8_t*)Z_STRVAL_P(ztmp));
         riak_object_set_value(obj, bin);
     }
-    bin = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobj, "contentType");
+    bin = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobj, "contentType" TSRMLS_CC);
     riak_object_set_content_type(obj, bin);
-    bin = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobj, "contentEncoding");
+    bin = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobj, "contentEncoding" TSRMLS_CC);
     riak_object_set_encoding(obj, bin);
 
     ztmp = zend_read_property(riak_object_ce, zobj, "indexes", sizeof("indexes")-1, 1 TSRMLS_CC);

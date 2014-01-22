@@ -49,6 +49,6 @@ riak_context *get_riak_context(zval *zbucket TSRMLS_DC);
 // zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC);
 // RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC);
 void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC);
-riak_binary* binary_bucket_name_new(riak_context *ctx, zval* zbucket);
+riak_binary* binary_bucket_name_new(riak_context *ctx, zval* zbucket TSRMLS_DC);
 
 #endif

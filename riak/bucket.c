@@ -806,7 +806,7 @@ PHP_METHOD(RiakBucket, delete)
         return;
     }
     ctx = get_riak_context(getThis() TSRMLS_CC);
-    bucket = binary_bucket_name_new(ctx, getThis());
+    bucket = binary_bucket_name_new(ctx, getThis() TSRMLS_CC);
     opts = riak_delete_options_new(ctx->config);
 
     ZVAL_NULL(&zkey);
@@ -882,7 +882,7 @@ PHP_METHOD(RiakBucket, put)
     opts = riak_put_options_new(ctx->config);
     obj = riak_object_new(ctx->config);
     bucket = binary_bucket_name_new(ctx, getThis() TSRMLS_CC);
-    key = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobject, "key");
+    key = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobject, "key" TSRMLS_CC);
 
     ZVAL_NULL(&zvclock);
     if (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT) {
@@ -1071,11 +1071,11 @@ void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC)/* 
 }
 /* }}} */
 
-riak_binary* binary_bucket_name_new(riak_context *ctx, zval* zbucket)
+riak_binary* binary_bucket_name_new(riak_context *ctx, zval* zbucket TSRMLS_DC)
 {
     char* name;
     int namelen;
-    riak_name_from_bucket(zbucket, &name, &namelen);
+    riak_name_from_bucket(zbucket, &name, &namelen TSRMLS_CC);
     return riak_binary_new(ctx->config, namelen, (riak_uint8_t*)name);
 }
 
