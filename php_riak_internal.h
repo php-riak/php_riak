@@ -31,10 +31,10 @@
 * Macros
 *************************************************/
 
-#define RIACK_RETRY_OP(RIACK_RESULT_VAR, OPERATION) { long retry_cnt; \
-        retry_cnt = RIAK_GLOBAL(default_retries); \
-        do { RIACK_RESULT_VAR = OPERATION; retry_cnt--; } \
-        while (RIACK_RESULT_VAR != RIACK_SUCCESS && retry_cnt >= 0); }
+// #define RIACK_RETRY_OP(RIACK_RESULT_VAR, OPERATION) { long retry_cnt; \
+//         retry_cnt = RIAK_GLOBAL(default_retries); \
+//         do { RIACK_RESULT_VAR = OPERATION; retry_cnt--; } \
+//         while (RIACK_RESULT_VAR != RIACK_SUCCESS && retry_cnt >= 0); }
 
 #define RIAK_PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
 #define RIAK_POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
@@ -117,22 +117,22 @@
   RIAK_CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
   RIAK_POP_PARAM(); RIAK_POP_PARAM();
 
-#define CHECK_RIACK_STATUS_THROW_ON_ERROR(CONNECTION, STATUS) \
-  if ( STATUS != RIACK_SUCCESS) { \
-    CONNECTION->needs_reconnect = 1; \
-    riak_throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
-  }
+// #define CHECK_RIACK_STATUS_THROW_ON_ERROR(CONNECTION, STATUS) \
+//   if ( STATUS != RIACK_SUCCESS) { \
+//     CONNECTION->needs_reconnect = 1; \
+//     riak_throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
+//   }
 
-#define CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(CONNECTION, STATUS) \
-  if ( STATUS != RIACK_SUCCESS) { \
-    CONNECTION->needs_reconnect = 1; \
-    riak_throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
-  return; }
+//#define CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(CONNECTION, STATUS) \
+//  if ( STATUS != RIACK_SUCCESS) { \
+//    CONNECTION->needs_reconnect = 1; \
+//    riak_throw_exception(CONNECTION->client,  STATUS TSRMLS_CC); \
+//  return; }
 
-#define GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(CE, ZOBJ, KEY, ZVAL, RIACK_STR) ZVAL = zend_read_property(CE, ZOBJ, KEY, sizeof(KEY)-1, 1 TSRMLS_CC); \
-     if (Z_TYPE_P(ZVAL) == IS_STRING) { \
-       RIACK_STR.len = Z_STRLEN_P(ZVAL); \
-       RIACK_STR.value = Z_STRVAL_P(ZVAL); } else
+//#define GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(CE, ZOBJ, KEY, ZVAL, RIACK_STR) ZVAL = zend_read_property(CE, ZOBJ, KEY, sizeof(KEY)-1, 1 TSRMLS_CC); \
+//     if (Z_TYPE_P(ZVAL) == IS_STRING) { \
+//       RIACK_STR.len = Z_STRLEN_P(ZVAL); \
+//       RIACK_STR.value = Z_STRVAL_P(ZVAL); } else
 
 #define CHECK_RIAK_STATUS_THROW_AND_RETURN_ON_ERROR(CONTEXT, ERR) \
     if ( ERR != ERIAK_OK) { \
@@ -174,6 +174,18 @@ ZEND_BEGIN_MODULE_GLOBALS(riak)
 #endif
 ZEND_END_MODULE_GLOBALS(riak)
 ZEND_EXTERN_MODULE_GLOBALS(riak)
+
+typedef struct {
+  riak_connection* connection;
+  riak_config* config;
+
+  char* szhost;
+  int port;
+
+  zend_bool needs_reconnect;
+  zend_bool persistent;
+  time_t last_used_at;
+} riak_context;
 
 /*************************************************
 * Functions

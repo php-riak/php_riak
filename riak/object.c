@@ -19,6 +19,7 @@
 #include "link.h"
 #include "ht_utils.h"
 #include "exception/exception.h"
+#include "riak_c_helpers.h"
 
 zend_class_entry *riak_object_ce;
 
@@ -593,27 +594,26 @@ void riak_key_from_object(zval *zobject, char** key, int* keylen TSRMLS_DC)/* {{
 // }
 /* }}} */
 
-/* Fill out members of a content struct with this objects values */
-// void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC)/* {{{ */
-// {
-    /*zval* zTmp;
-    zTmp = zend_read_property(riak_object_ce, object, "content", sizeof("content")-1, 1 TSRMLS_CC);
-	if (Z_TYPE_P(zTmp) == IS_STRING) {
-		content->data_len = Z_STRLEN_P(zTmp);
-		content->data = (uint8_t*)Z_STRVAL_P(zTmp);
-	}
-	// Set content type
-	GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, object, "contentType", zTmp, content->content_type) ;
-	// Set content encoding
-	GET_PROPERTY_INTO_RIACK_STR_OR_ELSE(riak_object_ce, object, "contentEncoding", zTmp, content->content_encoding) ;
+void riak_object_properties_set(riak_object *obj, zval* zobj, riak_context *ctx TSRMLS_DC)/* {{{ */
+{
+    zval* ztmp;
+    riak_binary *bin;
+    ztmp = zend_read_property(riak_object_ce, zobj, "content", sizeof("content")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(ztmp) == IS_STRING) {
+        bin = riak_binary_new(ctx->config, Z_STRLEN_P(ztmp), (riak_uint8_t*)Z_STRVAL_P(ztmp));
+        riak_object_set_value(obj, bin);
+    }
+    bin = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobj, "contentType");
+    riak_object_set_content_type(obj, bin);
+    bin = riak_binary_shallow_from_property(ctx->config, riak_object_ce, zobj, "contentEncoding");
+    riak_object_set_encoding(obj, bin);
 
-    zTmp = zend_read_property(riak_object_ce, object, "indexes", sizeof("indexes")-1, 1 TSRMLS_CC);
-    set_indexes_from_object(content, zTmp, client TSRMLS_CC);
-
-	zTmp = zend_read_property(riak_object_ce, object, "metadata", sizeof("metadata")-1, 1 TSRMLS_CC);
-	set_metadata_from_object(content, zTmp, client TSRMLS_CC);
-
-    zTmp = zend_read_property(riak_object_ce, object, "links", sizeof("links")-1, 1 TSRMLS_CC);
-    set_links_from_object(content, zTmp, client TSRMLS_CC); */
-// }
+    ztmp = zend_read_property(riak_object_ce, zobj, "indexes", sizeof("indexes")-1, 1 TSRMLS_CC);
+    // TODO Set set_indexes_from_object
+    ztmp = zend_read_property(riak_object_ce, zobj, "metadata", sizeof("metadata")-1, 1 TSRMLS_CC);
+    // TODO Set set_metadata_from_object
+    ztmp = zend_read_property(riak_object_ce, zobj, "links", sizeof("links")-1, 1 TSRMLS_CC);
+    // TODO Set set_links_from_object
+}
 /* }}} */
+

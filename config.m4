@@ -51,6 +51,7 @@ if test "$PHP_RIAK" != "no"; then
   PHP_NEW_EXTENSION(riak, php_riak.c \
     ht_utils.c \
     riak_session.c \
+    riak_c_helpers.c \
     riak/bucket.c \
     riak/connection.c \
     riak/object.c \

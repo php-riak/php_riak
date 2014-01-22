@@ -19,6 +19,7 @@
 #define RIAK_OBJECT__H__
 
 #include "php_riak_internal.h"
+#include <riak_object.h>
 
 extern zend_class_entry *riak_object_ce;
 
@@ -29,6 +30,7 @@ void riak_object_init(TSRMLS_D);
 //  void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC);
 // TODO
 //  void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC);
+void riak_object_properties_set(riak_object *obj, zval* zobj, riak_context *ctx TSRMLS_DC);
 
 void riak_key_from_object(zval *zobject, char** key, int* keylen  TSRMLS_DC);
 

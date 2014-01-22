@@ -204,3 +204,5 @@ tests/bucket.phpt
 tests/bucket_props.phpt
 tests/bucket_props_ext.phpt
 tests/builtin_conflict_resolver_db_objs.phpt
+riak_c_helpers.h
+riak_c_helpers.c

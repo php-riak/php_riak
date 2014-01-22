@@ -22,18 +22,6 @@
 #include <php.h>
 #include <time.h>
 
-typedef struct {
-  riak_connection* connection;
-  riak_config* config;
-
-  char* szhost;
-  int port;
-
-  zend_bool needs_reconnect;
-  zend_bool persistent;
-  time_t last_used_at;
-} riak_context;
-
 typedef struct _riak_connection_pool_entry {
   zend_bool in_use;
   riak_context context;
