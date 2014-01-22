@@ -977,10 +977,10 @@ PHP_METHOD(RiakBucket, get)
     result = riak_get(ctx->connection, bucket, key, opts, &response);
     if (result == ERIAK_OK) {
         zval *zout, *zResolver;
-        zout      = get_output_from_riack_get_object(&getResult, zKey TSRMLS_CC);
-        zResolver = (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT)
-            ? zend_read_property(riak_get_resolver_input_ce, zinput, "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC)
-            : zend_read_property(riak_bucket_ce, getThis(), "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC);
+        //zout      = get_output_from_riack_get_object(&getResult, zkey TSRMLS_CC);
+        //zResolver = (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT)
+        //    ? zend_read_property(riak_get_resolver_input_ce, zinput, "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC)
+        //    : zend_read_property(riak_bucket_ce, getThis(), "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC);
         /*
         if (Z_TYPE_P(zResolver) == IS_OBJECT) {
             zend_update_property(riak_output_ce, zout, "conflictResolver", sizeof("conflictResolver")-1, zResolver TSRMLS_CC);
