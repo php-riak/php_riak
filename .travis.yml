@@ -9,6 +9,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -qq valgrind
   - sudo apt-get install -qq libevent-dev
+  - sudo apt-get install -qq protobuf-compiler
   - sudo apt-get install -qq protobuf-c-compiler
   - sudo apt-get install -qq libprotobuf-dev
   - sudo apt-get install -qq libprotoc-dev
