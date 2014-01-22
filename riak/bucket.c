@@ -39,9 +39,10 @@
 #include "riak_c_helpers.h"
 #include <messages/riak_delete.h>
 #include <messages/riak_put.h>
+#include <messages/riak_get.h>
+#include <riak_object.h>
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
-#include <riak_object.h>
 
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC);
 
@@ -938,26 +939,26 @@ PHP_METHOD(RiakBucket, put)
 Get value from riak */
 PHP_METHOD(RiakBucket, get)
 {
-/*	char *key;
-    int keyLen, riackResult;
-    zval *zKey, *zinput;
-	struct RIACK_GET_PROPERTIES props;
-	struct RIACK_GET_OBJECT getResult;
-	RIACK_STRING rsBucket, rsKey;
-	riak_connection *connection;
+    riak_error result;
+    riak_context *ctx;
+    riak_get_response *response;
+    riak_get_options *opts;
+    riak_binary *bucket, *key;
+    zval *zinput;
+    char *skey;
+    int skeylen;
 
     zinput = NULL;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|o", &key, &keyLen, &zinput) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|o", &skey, &skeylen, &zinput) == FAILURE) {
         zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
-		return;
+        return;
     }
-    connection = get_riak_connection(getThis() TSRMLS_CC);
-
-	MAKE_STD_ZVAL(zKey);
-	ZVAL_STRINGL(zKey, key, keyLen, 1);
-	memset(&props, 0, sizeof(props));
-    memset(&getResult, 0, sizeof(getResult));
+    ctx = get_riak_context(getThis() TSRMLS_CC);
+    bucket = binary_bucket_name_new(ctx, getThis() TSRMLS_CC);
+    key = riak_binary_new(ctx->config, (riak_uint32_t)skeylen, (riak_uint8_t*)key);
+    opts = riak_get_options_new(ctx->config);
     if (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT) {
+/*
         zval zget;
         RIAK_REQ_PROP_SET_BOOL(Riak_Input_GetInput, zget, getReturnHead, props.head);
         RIAK_REQ_PROP_SET_LONG(Riak_Input_GetInput, zget, getR, props.r);
@@ -971,42 +972,37 @@ PHP_METHOD(RiakBucket, get)
             RMALLOCCOPY(connection->client, props.if_modified.clock, props.if_modified.len, Z_STRVAL(zget), Z_STRLEN(zget));
             zval_dtor(&zget);
         }
+*/
     }
-
-    rsKey.len   = keyLen;
-    rsKey.value = key;
-    rsBucket    = riack_name_from_bucket(getThis() TSRMLS_CC);
-
-    RIACK_RETRY_OP(riackResult, riack_get(connection->client, rsBucket, rsKey, &props, &getResult));
-    if (props.if_modified.clock) {
-        RFREE(connection->client, props.if_modified.clock);
-    }
-
-    if (riackResult == RIACK_SUCCESS) {
+    result = riak_get(ctx->connection, bucket, key, opts, &response);
+    if (result == ERIAK_OK) {
         zval *zout, *zResolver;
         zout      = get_output_from_riack_get_object(&getResult, zKey TSRMLS_CC);
         zResolver = (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT)
             ? zend_read_property(riak_get_resolver_input_ce, zinput, "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC)
             : zend_read_property(riak_bucket_ce, getThis(), "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC);
-
+        /*
         if (Z_TYPE_P(zResolver) == IS_OBJECT) {
             zend_update_property(riak_output_ce, zout, "conflictResolver", sizeof("conflictResolver")-1, zResolver TSRMLS_CC);
         }
         zend_update_property(riak_output_ce, zout, "bucket", sizeof("bucket")-1, getThis() TSRMLS_CC);
         RETVAL_ZVAL(zout, 0, 1);
         riack_free_get_object(connection->client, &getResult);
+*/
     } else {
-        connection->needs_reconnect = 1;
+        ctx->needs_reconnect = 1;
         // Hack warning, same as above
         if (!EG(current_execute_data)) {
             // No stack dont throw
             RETVAL_NULL();
         } else {
-            riak_throw_exception(connection->client,  riackResult TSRMLS_CC);
+            riak_throw_exception(ctx->connection, result TSRMLS_CC);
         }
-	}
-    zval_ptr_dtor(&zKey);
-*/
+    }
+    riak_get_response_free(ctx->config, &response);
+    riak_get_options_free(ctx->config, &opts);
+    riak_binary_free(ctx->config, &bucket);
+    riak_binary_free(ctx->config, &key);
 }
 /* }}} */
 
@@ -1082,16 +1078,6 @@ riak_binary* binary_bucket_name_new(riak_context *ctx, zval* zbucket)
     riak_name_from_bucket(zbucket, &name, &namelen);
     return riak_binary_new(ctx->config, namelen, (riak_uint8_t*)name);
 }
-
-// RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)/* {{{ */
-// {
-//     RIACK_STRING bucketName;
-//     int namelen;
-//     riak_name_from_bucket(bucket, &bucketName.value, &namelen TSRMLS_CC);
-//     bucketName.len = namelen;
-//     return bucketName;
-// }
-/* }}} */
 
 riak_context *get_riak_context(zval *zbucket TSRMLS_DC)/* {{{ */
 {

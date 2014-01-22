@@ -12,7 +12,6 @@ before_install:
   - ulimit -n 2048
   - sudo service riak start
 before_script:
-  - git submodule update --init --recursive
   - ./script/build_module.sh
   - search-cmd install testsearch
 script:
