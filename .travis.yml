@@ -7,10 +7,14 @@ before_install:
   - curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -
   - sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"
   - sudo apt-get update
-  - sudo apt-get install -qq valgrind
+  - sudo apt-get install -qq valgrind libevent-dev protobuf-c-compiler dev-libprotobuf dev-libprotoc libcunit1 libcunit1-ncurses-dev
   - "yes n | sudo apt-get install riak"
   - ulimit -n 2048
   - sudo service riak start
+  - wget https://protobuf-c.googlecode.com/files/protobuf-c-0.15.tar.gz
+  - cd protobuf-c-0.15
+  - "./configure && make && sudo make install"
+  - cd ..
 before_script:
   - ./script/build_module.sh
   - search-cmd install testsearch
