@@ -21,7 +21,7 @@ before_install:
   - wget https://protobuf-c.googlecode.com/files/protobuf-c-0.15.tar.gz
   - tar xvzf protobuf-c-0.15.tar.gz
   - cd protobuf-c-0.15
-  - "./configure && make && sudo make install"
+  - "./configure --prefix=/usr && make && sudo make install"
   - cd ..
 before_script:
   - ./script/build_module.sh
