@@ -2,7 +2,7 @@
 git clone https://github.com/TriKaspar/riak-c-client.git
 cd riak-c-client
 ./autogen.sh
-./configure
+./configure --prefix=/usr
 make
 sudo make install
 cd ..
