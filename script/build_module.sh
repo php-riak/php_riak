@@ -1,5 +1,5 @@
 #!/bin/bash
-git clone https://github.com/TriKaspar/riak-c-client.git
+git clone https://github.com/TriKaspar/riak-c-client.git --branch=riak-binary
 cd riak-c-client
 ./autogen.sh
 ./configure --prefix=/usr
