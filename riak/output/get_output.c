@@ -36,17 +36,21 @@ void riak_output_get_output_init(TSRMLS_D)/* {{{ */
 }
 /* }}} */
 
-// zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC) /* {{{ */
-/*{
+zval *get_output_from_riack_get_response(riak_get_response* response, zval *zkey TSRMLS_DC) /* {{{ */
+{
     zval *zoutput;
     MAKE_STD_ZVAL(zoutput);
     object_init_ex(zoutput, riak_get_output_ce);
-    if (getobj->unchanged_present) {
-        zend_update_property_bool(riak_get_output_ce, zoutput, "unchanged", sizeof("unchanged")-1, getobj->unchanged TSRMLS_CC);
+    if (riak_get_get_has_unmodified(response)) {
+        zend_update_property_bool(riak_get_output_ce, zoutput, "unchanged", sizeof("unchanged")-1,
+                                  riak_get_get_unmodified(response) TSRMLS_CC);
     }
-    riak_set_output_properties(zoutput, zkey, &getobj->object TSRMLS_CC);
+    // TODO vclock & deleted
+    riak_int32_t n = riak_get_get_n_content(response);
+    riak_object **objs = riak_get_get_content(response);
+    riak_set_output_properties(zoutput, zkey, n, objs TSRMLS_CC);
     return zoutput;
-}*/
+}
 /* }}} */
 
 

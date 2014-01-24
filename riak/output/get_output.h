@@ -18,11 +18,12 @@
 #define RIAK_OUTPUT__GET_OUTPUT__H__
 
 #include "php_riak_internal.h"
+#include <messages/riak_get.h>
 
 extern zend_class_entry *riak_get_output_ce;
 
 void riak_output_get_output_init(TSRMLS_D);
-// zval *get_output_from_riack_get_object(struct RIACK_GET_OBJECT* getobj, zval* zkey TSRMLS_DC);
+zval *get_output_from_riack_get_response(riak_get_response* response, zval *zkey TSRMLS_DC);
 
 PHP_METHOD(Riak_Output_GetOutput, isUnchanged);
 

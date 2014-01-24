@@ -444,39 +444,80 @@ void riak_key_from_object(zval *zobject, char** key, int* keylen TSRMLS_DC)/* {{
 /* }}} */
 
 
+void set_object_properties_from_riak_object(zval* zobject, riak_object* robject TSRMLS_DC)  /* {{{ */
+{
+    zval* zmetadata, *zlinks, *zindexes;
+    riak_binary *bin;
+
+    bin = riak_object_get_value(robject);
+    zend_update_property_stringl(riak_object_ce, zobject, "content", sizeof("content")-1,
+                                 (const char*)riak_binary_data(bin), riak_binary_len(bin) TSRMLS_CC);
+    if (riak_object_get_has_content_encoding(robject)) {
+        bin = riak_object_get_encoding(robject);
+        zend_update_property_stringl(riak_object_ce, zobject, "contentEncoding", sizeof("contentEncoding")-1,
+            (const char*)riak_binary_data(bin), riak_binary_len(bin) TSRMLS_CC);
+    }
+    if (riak_object_get_has_content_type(robject)) {
+        bin = riak_object_get_content_type(robject);
+        zend_update_property_stringl(riak_object_ce, zobject, "contentType", sizeof("contentType")-1,
+                                     (const char*)riak_binary_data(bin), riak_binary_len(bin) TSRMLS_CC);
+    }
+    if (riak_object_get_has_vtag(robject)) {
+        bin = riak_object_get_content_type(robject);
+        zend_update_property_stringl(riak_object_ce, zobject, "vtag", sizeof("vtag")-1,
+                                     (const char*)riak_binary_data(bin), riak_binary_len(bin) TSRMLS_CC);
+    }
+    if (riak_object_get_has_charset(robject)) {
+        bin = riak_object_get_charset(robject);
+        zend_update_property_stringl(riak_object_ce, zobject, "charset", sizeof("charset")-1,
+                                     (const char*)riak_binary_data(bin), riak_binary_len(bin) TSRMLS_CC);
+    }
+    if (riak_object_get_has_deleted(robject)) {
+        zend_update_property_bool(riak_object_ce, zobject, "isDeleted", sizeof("isDeleted")-1,
+                                  riak_object_get_deleted(robject) TSRMLS_CC);
+    } else {
+        zend_update_property_null(riak_object_ce, zobject, "isDeleted", sizeof("isDeleted")-1 TSRMLS_CC);
+    }
+    if (riak_object_get_has_last_mod(robject)) {
+        zend_update_property_long(riak_object_ce, zobject, "lastModified", sizeof("lastModified")-1, riak_object_get_last_mod(robject) TSRMLS_CC);
+    } else {
+        zend_update_property_null(riak_object_ce, zobject, "lastModified", sizeof("lastModified")-1 TSRMLS_CC);
+    }
+    if (riak_object_get_has_last_mod_usecs(robject)) {
+        zend_update_property_long(riak_object_ce, zobject, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1,
+                                  riak_object_get_last_mod_usecs(robject) TSRMLS_CC);
+    } else {
+        zend_update_property_null(riak_object_ce, zobject, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1 TSRMLS_CC);
+    }
+    /*
+     *
+     *zmetadata = assoc_array_from_riack_pairs(content->usermetas, content->usermeta_count TSRMLS_CC);
+    zend_update_property(riak_object_ce, object, "metadata", sizeof("metadata")-1, zmetadata TSRMLS_CC);
+    zval_ptr_dtor(&zmetadata);
+riak_int32_t   riak_object_get_n_usermeta(riak_object *obj);
+riak_pair    **riak_object_get_usermeta(riak_object *obj);
+
+    zindexes = assoc_array_from_riack_pairs(content->indexes, content->index_count TSRMLS_CC);
+    zend_update_property(riak_object_ce, object, "indexes", sizeof("indexes")-1, zindexes TSRMLS_CC);
+    zval_ptr_dtor(&zindexes);
+riak_int32_t   riak_object_get_n_indexes(riak_object *obj);
+riak_pair    **riak_object_get_indexes(riak_object *obj);
+
+    zlinks = links_from_content(content TSRMLS_CC);
+    zend_update_property(riak_object_ce, object, "links", sizeof("links")-1, zlinks TSRMLS_CC);
+    zval_ptr_dtor(&zlinks);
+
+riak_int32_t   riak_object_get_n_links(riak_object *obj);
+riak_link    **riak_object_get_links(riak_object *obj);
+*/
+}
+/* }}} */
+
 /* Set object properties from returned content */
 // void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC) /* {{{ */
 // {
 /*
     zval* zmetadata, *zlinks, *zindexes;
-
-    zend_update_property_stringl(riak_object_ce, object, "content", sizeof("content")-1,
-		(const char*)content->data, content->data_len TSRMLS_CC);
-	zend_update_property_stringl(riak_object_ce, object, "contentEncoding", sizeof("contentEncoding")-1, 
-		(const char*)content->content_encoding.value, content->content_encoding.len TSRMLS_CC);
-	zend_update_property_stringl(riak_object_ce, object, "contentType", sizeof("contentType")-1, 
-		(const char*)content->content_type.value, content->content_type.len TSRMLS_CC);
-    if (content->vtag.len > 0 && content->vtag.value != NULL) {
-        zend_update_property_stringl(riak_object_ce, object, "vtag", sizeof("vtag")-1,
-            (const char*)content->vtag.value, content->vtag.len TSRMLS_CC);
-    }
-	zend_update_property_stringl(riak_object_ce, object, "charset", sizeof("charset")-1, content->charset.value, content->charset.len TSRMLS_CC);
-
-	if (content->deleted_present) {
-		zend_update_property_bool(riak_object_ce, object, "isDeleted", sizeof("isDeleted")-1, content->deleted TSRMLS_CC);
-	} else {
-		zend_update_property_null(riak_object_ce, object, "isDeleted", sizeof("isDeleted")-1 TSRMLS_CC);
-	}
-	if (content->last_modified_present) {
-		zend_update_property_long(riak_object_ce, object, "lastModified", sizeof("lastModified")-1, content->last_modified TSRMLS_CC);
-	} else {
-		zend_update_property_null(riak_object_ce, object, "lastModified", sizeof("lastModified")-1 TSRMLS_CC);
-	}
-	if (content->last_modified_usecs_present) {
-		zend_update_property_long(riak_object_ce, object, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1, content->last_modified_usecs TSRMLS_CC);
-	} else {
-		zend_update_property_null(riak_object_ce, object, "lastModifiedUSecs", sizeof("lastModifiedUSecs")-1 TSRMLS_CC);
-	}
     zmetadata = assoc_array_from_riack_pairs(content->usermetas, content->usermeta_count TSRMLS_CC);
     zend_update_property(riak_object_ce, object, "metadata", sizeof("metadata")-1, zmetadata TSRMLS_CC);
     zval_ptr_dtor(&zmetadata);

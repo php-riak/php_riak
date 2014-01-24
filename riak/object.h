@@ -26,8 +26,7 @@ extern zend_class_entry *riak_object_ce;
 zval* create_object_object(const char* key TSRMLS_DC);
 
 void riak_object_init(TSRMLS_D);
-// TODO
-//  void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC);
+void set_object_properties_from_riak_object(zval* zobject, riak_object* robject TSRMLS_DC);
 // TODO
 //  void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC);
 void riak_object_properties_set(riak_object *obj, zval* zobj, riak_context *ctx TSRMLS_DC);

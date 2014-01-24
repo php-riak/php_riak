@@ -56,15 +56,10 @@ void riak_output_init(TSRMLS_D)/* {{{ */
 }
 /* }}} */
 
-// void riak_set_output_properties(zval* zoutput, zval* zkey, struct RIACK_OBJECT* obj TSRMLS_DC) /* {{{ */
-// {
-/*
-    size_t content_cnt, i;
+void riak_set_output_properties(zval* zoutput, zval *zkey, riak_int32_t cnt, riak_object **objects TSRMLS_DC)
+{
+    riak_int32_t i;
     zval *zobjectlist;
-    if (obj->vclock.len > 0) {
-        zend_update_property_stringl(riak_output_ce, zoutput, "vClock", sizeof("vClock")-1,
-                                     (char*)obj->vclock.clock, obj->vclock.len TSRMLS_CC);
-    }
     if (Z_TYPE_P(zkey) == IS_STRING) {
         zend_update_property_stringl(riak_output_ce, zoutput, "key", sizeof("key")-1,
                                      Z_STRVAL_P(zkey), Z_STRLEN_P(zkey) TSRMLS_CC);
@@ -72,25 +67,25 @@ void riak_output_init(TSRMLS_D)/* {{{ */
     MAKE_STD_ZVAL(zobjectlist);
     object_init_ex(zobjectlist, riak_output_object_list_ce);
     RIAK_CALL_METHOD(Riak_Object_List, __construct, NULL, zobjectlist);
-    content_cnt = obj->content_count;
-    for (i=0; i<content_cnt; ++i) {
-        // Create a new Riak\Object for each content
+    for (i=0; i<cnt; ++i) {
         zval *zobject, *zoffset;
         MAKE_STD_ZVAL(zobject);
         object_init_ex(zobject, riak_object_ce);
-
+        // Create a new Riak\Object for each object
         if (Z_TYPE_P(zkey) != IS_NULL) {
             RIAK_CALL_METHOD1(RiakObject, __construct, NULL, zobject, zkey);
         } else {
             RIAK_CALL_METHOD(RiakObject, __construct, NULL, zobject);
         }
-
+        // TODO vClock
+        /*
         if (obj->vclock.len > 0) {
             zend_update_property_stringl(riak_object_ce, zobject, "vClock", sizeof("vClock")-1,
                                      (char*)obj->vclock.clock, obj->vclock.len TSRMLS_CC);
         }
+        */
 
-        set_object_from_riak_content(zobject, &obj->content[i] TSRMLS_CC);
+        set_object_properties_from_riak_object(zobject, objects[i] TSRMLS_DC);
 
         MAKE_STD_ZVAL(zoffset);
         ZVAL_LONG(zoffset, i);
@@ -100,9 +95,7 @@ void riak_output_init(TSRMLS_D)/* {{{ */
     }
     zend_update_property(riak_output_ce, zoutput, "objectList", sizeof("objectList")-1, zobjectlist TSRMLS_CC);
     zval_ptr_dtor(&zobjectlist);
-    */
-// }
-/* }}} */
+}
 
 /*************************************************************
 * Implementation: Riak\Output\Output

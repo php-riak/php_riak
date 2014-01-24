@@ -911,6 +911,10 @@ PHP_METHOD(RiakBucket, put)
     //
     result = riak_put(ctx->connection, obj, opts, &response);
     // TODO Handle response values!!
+    if (result == ERIAK_OK) {
+        //
+    }
+
     riak_put_options_free(ctx->config, &opts);
     riak_object_free(ctx->config, &obj);
     riak_put_response_free(ctx->config, &response);
