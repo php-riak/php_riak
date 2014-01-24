@@ -84,8 +84,7 @@ void riak_set_output_properties(zval* zoutput, zval *zkey, riak_int32_t cnt, ria
                                      (char*)obj->vclock.clock, obj->vclock.len TSRMLS_CC);
         }
         */
-
-        set_object_properties_from_riak_object(zobject, objects[i] TSRMLS_DC);
+        set_object_properties_from_riak_object(zobject, objects[i] TSRMLS_CC);
 
         MAKE_STD_ZVAL(zoffset);
         ZVAL_LONG(zoffset, i);
