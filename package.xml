@@ -15,10 +15,10 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2013-12-20</date>
-    <time>06:50:00</time>
+    <date>2013-03-20</date>
+    <time>20:00:00</time>
     <version>
-        <release>1.1.3</release>
+        <release>1.1.4</release>
         <api>1.1.3</api>
     </version>
     <stability>
@@ -27,13 +27,8 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
 <notes>
-Since 1.0 stable
-Features:
-Issue 10: Automatic retry implemented and set to 1 retry by default
-Issue 50: vClock now gets read from object if not present in input, making vclock easier to work with.
-Issue 54: Conflict resolver can now be set on a bucket or passed along to the get function, which can make conflict resolving a lot easier.
-Fixes:
-Issue 55: Implemented missing getter for last modified on object.
+Since 1.1.3
+Fixes serious issue 68: Protobuf implementation not thread safe.
 </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -274,6 +269,21 @@ Issue 55: Implemented missing getter for last modified on object.
     <changelog>
     <release>
         <version>
+            <release>1.1.4</release>
+            <api>1.1.3</api>
+        </version>
+        <stability>
+            <release>stable</release>
+            <api>stable</api>
+        </stability>
+        <date>2013-03-20</date>
+        <license>Apache2</license>
+<notes>
+
+</notes>
+    </release>
+    <release>
+        <version>
             <release>1.1.3</release>
             <api>1.1.3</api>
         </version>
@@ -284,13 +294,8 @@ Issue 55: Implemented missing getter for last modified on object.
         <date>2013-12-20</date>
         <license>Apache2</license>
 <notes>
-Since 1.0 stable
-Features:
-Issue 10: Automatic retry implemented and set to 1 retry by default
-Issue 50: vClock now gets read from object if not present in input, making vclock easier to work with.
-Issue 54: Conflict resolver can now be set on a bucket or passed along to the get function, which can make conflict resolving a lot easier.
-Fixes:
-Issue 55: Implemented missing getter for last modified on object.
+Since 1.1.3
+Fixes serious issue 68: Protobuf implementation not thread safe.
 </notes>
     </release>
     <release>

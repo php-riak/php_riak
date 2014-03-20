@@ -34,12 +34,11 @@
     retry_cnt = RIAK_GLOBAL(default_retries); \
     do {  \
         RIACK_RESULT_VAR = OPERATION; \
-        if (RIACK_RESULT_VAR != RIACK_ERROR_COMMUNICATION) { \
+        if (RIACK_RESULT_VAR != RIACK_SUCCESS) { \
             CONN->needs_reconnect = 1; \
-            ensure_connected(CONN TSRMLS_CC); \
         } \
         retry_cnt--; \
-    } while (RIACK_RESULT_VAR != RIACK_SUCCESS && retry_cnt >= 0); }
+    } while (RIACK_RESULT_VAR != RIACK_SUCCESS && retry_cnt >= 0 && ensure_connected(CONN TSRMLS_CC)); }
 
 #define RIAK_PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
 #define RIAK_POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
