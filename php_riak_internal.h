@@ -30,10 +30,16 @@
 * Macros
 *************************************************/
 
-#define RIACK_RETRY_OP(RIACK_RESULT_VAR, OPERATION) { long retry_cnt; \
-        retry_cnt = RIAK_GLOBAL(default_retries); \
-        do { RIACK_RESULT_VAR = OPERATION; retry_cnt--; } \
-        while (RIACK_RESULT_VAR != RIACK_SUCCESS && retry_cnt >= 0); }
+#define RIACK_RETRY_OP(RIACK_RESULT_VAR, CONN, OPERATION) { long retry_cnt; \
+    retry_cnt = RIAK_GLOBAL(default_retries); \
+    do {  \
+        RIACK_RESULT_VAR = OPERATION; \
+        if (RIACK_RESULT_VAR != RIACK_ERROR_COMMUNICATION) { \
+            CONN->needs_reconnect = 1; \
+            ensure_connected(CONN TSRMLS_CC); \
+        } \
+        retry_cnt--; \
+    } while (RIACK_RESULT_VAR != RIACK_SUCCESS && retry_cnt >= 0); }
 
 #define RIAK_PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
 #define RIAK_POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
