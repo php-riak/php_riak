@@ -1,16 +1,14 @@
 language: php
 php:
+  - "5.6"
   - "5.5"
   - "5.4"
   - "5.3"
+-services:
+  - riak
 before_install:
-  - curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -
-  - sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"
   - sudo apt-get update
   - sudo apt-get install -qq valgrind
-  - "yes n | sudo apt-get install riak"
-  - ulimit -n 2048
-  - sudo service riak start
 before_script:
   - git submodule update --init --recursive
   - ./script/build_module.sh
