@@ -12,8 +12,8 @@ before_install:
 before_script:
   - git submodule update --init --recursive
   - ./script/build_module.sh
-  - sudo search-cmd install testsearch
 script:
+  - sudo search-cmd install testsearch
   - PHP=`which php`
   - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q -m --show-diff
   - find . -name *.mem | xargs cat
