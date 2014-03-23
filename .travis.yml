@@ -12,7 +12,7 @@ before_install:
 before_script:
   - git submodule update --init --recursive
   - ./script/build_module.sh
-  - search-cmd install testsearch
+  - sudo search-cmd install testsearch
 script:
   - PHP=`which php`
   - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q -m --show-diff
