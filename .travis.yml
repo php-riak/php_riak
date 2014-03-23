@@ -4,7 +4,7 @@ php:
   - "5.5"
   - "5.4"
   - "5.3"
--services:
+services:
   - riak
 before_install:
   - sudo apt-get update
