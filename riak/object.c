@@ -202,7 +202,7 @@ PHP_METHOD(RiakObject, getContent)
  */
 PHP_METHOD(RiakObject, setContent)
 {
-    RIAK_SETTER_STRING(riak_object_ce, "content");
+    RIAK_SETTER_OPTIONAL_STRING(riak_object_ce, "content");
     RIAK_RETURN_THIS
 }
 /* }}} */
@@ -266,10 +266,10 @@ PHP_METHOD(RiakObject, addLink)
 }
 /* }}} */
 
-/* {{{ proto Riak\Object Riak\Object->setCharset(string $charset) */
+/* {{{ proto Riak\Object Riak\Object->setCharset(null|string $charset) */
 PHP_METHOD(RiakObject, setCharset)
 {
-    RIAK_SETTER_STRING(riak_object_ce, "charset");
+    RIAK_SETTER_OPTIONAL_STRING(riak_object_ce, "charset");
     RIAK_RETURN_THIS
 }
 /* }}} */
@@ -281,10 +281,10 @@ PHP_METHOD(RiakObject, getCharset)
 }
 /* }}} */
 
-/* {{{ proto Riak\Object Riak\Object->setContentType(string $contentType) */
+/* {{{ proto Riak\Object Riak\Object->setContentType(null|string $contentType) */
 PHP_METHOD(RiakObject, setContentType)
 {
-    RIAK_SETTER_STRING(riak_object_ce, "contentType");
+    RIAK_SETTER_OPTIONAL_STRING(riak_object_ce, "contentType");
     RIAK_RETURN_THIS
 }
 /* }}} */
@@ -296,10 +296,10 @@ PHP_METHOD(RiakObject, getContentType)
 }
 /* }}} */
 
-/* {{{ proto Riak\Object Riak\Object->setContentEncoding(string $contentEncoding) */
+/* {{{ proto Riak\Object Riak\Object->setContentEncoding(null|string $contentEncoding) */
 PHP_METHOD(RiakObject, setContentEncoding)
 {
-    RIAK_SETTER_STRING(riak_object_ce, "contentEncoding");
+    RIAK_SETTER_OPTIONAL_STRING(riak_object_ce, "contentEncoding");
     RIAK_RETURN_THIS
 }
 /* }}} */
@@ -357,10 +357,10 @@ PHP_METHOD(RiakObject, getVClock)
 }
 /* }}} */
 
-/* {{{ proto void Riak\Object->setVClock(string $vclock) */
+/* {{{ proto void Riak\Object->setVClock(null|string $vclock) */
 PHP_METHOD(RiakObject, setVClock)
 {
-    RIAK_SETTER_STRING(riak_object_ce, "vClock");
+    RIAK_SETTER_OPTIONAL_STRING(riak_object_ce, "vClock");
     RIAK_RETURN_THIS
 }
 /* }}} */
@@ -449,16 +449,23 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
     zval* zmetadata, *zlinks, *zindexes;
 
     zend_update_property_stringl(riak_object_ce, object, "content", sizeof("content")-1,
-		(const char*)content->data, content->data_len TSRMLS_CC);
-	zend_update_property_stringl(riak_object_ce, object, "contentEncoding", sizeof("contentEncoding")-1, 
-		(const char*)content->content_encoding.value, content->content_encoding.len TSRMLS_CC);
-	zend_update_property_stringl(riak_object_ce, object, "contentType", sizeof("contentType")-1, 
-		(const char*)content->content_type.value, content->content_type.len TSRMLS_CC);
+        (const char*)content->data, content->data_len TSRMLS_CC);
+    if (content->content_encoding.len > 0 && content->content_encoding.value != NULL) {
+        zend_update_property_stringl(riak_object_ce, object, "contentEncoding", sizeof("contentEncoding")-1,
+            (const char*)content->content_encoding.value, content->content_encoding.len TSRMLS_CC);
+    }
+    if (content->content_type.len > 0 && content->content_type.value != NULL) {
+        zend_update_property_stringl(riak_object_ce, object, "contentType", sizeof("contentType")-1,
+            (const char*)content->content_type.value, content->content_type.len TSRMLS_CC);
+    }
     if (content->vtag.len > 0 && content->vtag.value != NULL) {
         zend_update_property_stringl(riak_object_ce, object, "vtag", sizeof("vtag")-1,
             (const char*)content->vtag.value, content->vtag.len TSRMLS_CC);
     }
-	zend_update_property_stringl(riak_object_ce, object, "charset", sizeof("charset")-1, content->charset.value, content->charset.len TSRMLS_CC);
+    if (content->charset.len > 0 && content->charset.value != NULL) {
+        zend_update_property_stringl(riak_object_ce, object, "charset", sizeof("charset")-1,
+            content->charset.value, content->charset.len TSRMLS_CC);
+    }
 
 	if (content->deleted_present) {
 		zend_update_property_bool(riak_object_ce, object, "isDeleted", sizeof("isDeleted")-1, content->deleted TSRMLS_CC);

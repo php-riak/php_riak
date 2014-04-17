@@ -252,3 +252,4 @@ tests/bucket.phpt
 tests/bucket_props.phpt
 tests/bucket_props_ext.phpt
 tests/builtin_conflict_resolver_db_objs.phpt
+tests/reset_object_properties.phpt

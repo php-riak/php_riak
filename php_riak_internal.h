@@ -96,6 +96,16 @@
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &val, &val_len) == FAILURE) { return; } \
     zend_update_property_stringl(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val, val_len TSRMLS_CC);
 
+#define RIAK_SETTER_OPTIONAL_STRING(CE, PROPERTY_NAME) \
+    char* val; int val_len; \
+    val = 0; \
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s!", &val, &val_len) == FAILURE) { return; } \
+    if (val == 0) { \
+        zend_update_property_null(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1 TSRMLS_CC); \
+    } else { \
+        zend_update_property_stringl(CE, getThis(), PROPERTY_NAME, sizeof(PROPERTY_NAME)-1, val, val_len TSRMLS_CC); \
+    }
+
 #define RIAK_CALL_METHOD_BASE(classname, name) zim_##classname##_##name
 
 #define RIAK_CALL_METHOD_HELPER(classname, name, retval, thisptr, num, param) \
