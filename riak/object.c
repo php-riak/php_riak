@@ -211,7 +211,7 @@ PHP_METHOD(RiakObject, setContent)
  */
 PHP_METHOD(RiakObject, addIndex)
 {
-    zval *zindexarr, *zidxvalue;
+    zval *zindexarr, *zidxvalue, **zfoundval;
     char* idxname;
     int idxname_len;
     zidxvalue = NULL;
@@ -219,11 +219,38 @@ PHP_METHOD(RiakObject, addIndex)
         return;
     }
     zindexarr = zend_read_property(riak_object_ce, getThis(), "indexes", sizeof("indexes")-1, 1 TSRMLS_CC);
-    if (zidxvalue != NULL && Z_TYPE_P(zidxvalue) != IS_NULL) {
-        zval_addref_p(zidxvalue);
-        add_assoc_zval_ex(zindexarr, idxname, idxname_len+1, zidxvalue);
+
+    // We need to check if the index already exists and if it does we should change it to an array or
+    // create a new array and add the existing and the new one.
+    zval_addref_p(zidxvalue);
+    if (zend_hash_find(Z_ARRVAL_P(zindexarr), idxname, idxname_len+1, (void**) &zfoundval) == SUCCESS) {
+        zval *ztmp;
+        ALLOC_ZVAL(ztmp);
+        *ztmp = **zfoundval;
+        INIT_PZVAL(ztmp);
+        zval_copy_ctor(ztmp);
+        if (Z_TYPE_PP(zfoundval) != IS_ARRAY) {
+            zval *zarr;
+            MAKE_STD_ZVAL(zarr);
+            array_init(zarr);
+            add_next_index_zval(zarr, ztmp);
+            zend_hash_update(Z_ARRVAL_P(zindexarr), idxname, idxname_len+1, zarr, sizeof(zval*), NULL);
+            ztmp = zarr;
+            zval_copy_ctor(ztmp);
+        }
+        // TODO Most likely a bug second time we hit here
+        if (zidxvalue == NULL) {
+            add_next_index_null(ztmp);
+        } else {
+            add_next_index_zval(ztmp, zidxvalue);
+        }
+        zval_ptr_dtor(&ztmp);
     } else {
-        add_assoc_null_ex(zindexarr, idxname, idxname_len+1);
+        if (zidxvalue == NULL) {
+            add_assoc_null_ex(zindexarr, idxname, idxname_len+1);
+        } else {
+            add_assoc_zval_ex(zindexarr, idxname, idxname_len+1, zidxvalue);
+        }
     }
     RIAK_RETURN_THIS
 }
@@ -535,39 +562,55 @@ void set_links_from_object(struct RIACK_CONTENT* content, zval* zlinksarr, struc
 }
 /* }}} */
 
+/* Copies the content of a zval to the value of a riack pair */
+void copy_zval_to_pair_value(struct RIACK_CLIENT* client, zval* zv, struct RIACK_PAIR* pair TSRMLS_DC)
+{
+    if (Z_TYPE_P(zv) != IS_NULL) {
+        zval* ztmp;
+        ALLOC_ZVAL(ztmp);
+        *ztmp = *zv;
+        INIT_PZVAL(ztmp);
+        zval_copy_ctor(ztmp);
+        if (Z_TYPE_P(ztmp) != IS_STRING) {
+            convert_to_string(ztmp);
+        }
+        pair->value_present = 1;
+        RMALLOCCOPY(client, pair->value, pair->value_len, Z_STRVAL_P(ztmp), Z_STRLEN_P(ztmp));
+        zval_ptr_dtor(&ztmp);
+    }
+}
+
+/* Copies a key name to a riack pair key */
+void copy_key_string_to_pair(struct RIACK_CLIENT* client, char* key, uint keylen, struct RIACK_PAIR* pair TSRMLS_DC)
+{
+    RIACK_STRING rkey;
+    rkey.value = key;
+    rkey.len = keylen;
+    pair->key = riack_copy_string(client, rkey);
+}
+
+/* Converts an index integer to a string and sets the pair key to it */
+void copy_index_to_pair_key(struct RIACK_CLIENT* client, uint index, struct RIACK_PAIR* pair TSRMLS_DC)
+{
+    zval* ztmp;
+    MAKE_STD_ZVAL(ztmp);
+    ZVAL_LONG(ztmp, index);
+    convert_to_string(ztmp);
+    copy_key_string_to_pair(client, Z_STRVAL_P(ztmp), Z_STRLEN_P(ztmp), pair TSRMLS_CC);
+    zval_ptr_dtor(&ztmp);
+}
+
 /* Called once for each metadata or index entry in the RiakObject */
 void set_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
 {
-    zval *tmp;
-    RIACK_STRING rkey;
     struct RIACK_CLIENT* client = (struct RIACK_CLIENT*)callingObj;
     struct RIACK_PAIR* pairs = (struct RIACK_PAIR*)custom_ptr;
     if (key) {
-        rkey.value = key;
-        rkey.len = keylen-1;
-        pairs[cnt].key = riack_copy_string(client, rkey);
+        copy_key_string_to_pair(client, key, keylen-1, &(pairs[cnt]) TSRMLS_CC);
     } else {
-        MAKE_STD_ZVAL(tmp);
-        ZVAL_LONG(tmp, index);
-        convert_to_string(tmp);
-        rkey.value = Z_STRVAL_P(tmp);
-        rkey.len = Z_STRLEN_P(tmp);
-        pairs[cnt].key = riack_copy_string(client, rkey);
-        zval_ptr_dtor(&tmp);
+        copy_index_to_pair_key(client, index, &(pairs[cnt]) TSRMLS_CC);
     }
-    ALLOC_ZVAL(tmp);
-    *tmp = **data;
-    if (Z_TYPE_P(tmp) != IS_NULL) {
-        INIT_PZVAL(tmp);
-        zval_copy_ctor(tmp);
-        if (Z_TYPE_P(tmp) != IS_STRING) {
-            convert_to_string(tmp);
-        }
-        pairs[cnt].value_present = 1;
-        RMALLOCCOPY(client, pairs[cnt].value, pairs[cnt].value_len, Z_STRVAL_P(tmp), Z_STRLEN_P(tmp));
-        zval_ptr_dtor(&tmp);
-    }
-
+    copy_zval_to_pair_value(client, *data, &(pairs[cnt]) TSRMLS_CC);
 }
 /* }}} */
 
@@ -577,32 +620,57 @@ void set_metadata_from_object(struct RIACK_CONTENT* content, zval* zMetadata, st
     if (zMetadata && Z_TYPE_P(zMetadata) == IS_ARRAY) {
         content->usermeta_count = zend_hash_num_elements(Z_ARRVAL_P(zMetadata));
         if (content->usermeta_count > 0) {
-			content->usermetas = RMALLOC(client, sizeof(struct RIACK_PAIR) * content->usermeta_count);
-			memset(content->usermetas, 0, sizeof(struct RIACK_PAIR) * content->usermeta_count);
+            content->usermetas = RMALLOC(client, sizeof(struct RIACK_PAIR) * content->usermeta_count);
+            memset(content->usermetas, 0, sizeof(struct RIACK_PAIR) * content->usermeta_count);
             foreach_in_hashtable(client, content->usermetas, Z_ARRVAL_P(zMetadata), &set_pairs_from_object_cb TSRMLS_CC);
-		}
-	}
+        }
+    }
+}
+/* }}} */
+
+/* This functions count recursuve how many values are in an array (including sub array values)
+ * custom_ptr should point to an integer
+*/
+void count_index_values_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+{
+    size_t *count = custom_ptr;
+    if (Z_TYPE_PP(data) != IS_ARRAY) {
+        (*count)++;
+    } else {
+        foreach_in_hashtable(NULL, count, Z_ARRVAL_PP(data), &count_index_values_cb TSRMLS_CC);
+    }
+}
+
+/* Called once for each metadata or index entry in the RiakObject */
+void set_index_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+{
+    if (Z_TYPE_PP(data) == IS_ARRAY) {
+        foreach_in_hashtable(callingObj, custom_ptr, Z_ARRVAL_PP(data), &set_index_pairs_from_object_cb TSRMLS_CC);
+    } else {
+        set_pairs_from_object_cb(callingObj, custom_ptr, key, keylen, index, data, cnt TSRMLS_CC);
+    }
 }
 /* }}} */
 
 /* Copy all indexes from array to a content structure */
 void set_indexes_from_object(struct RIACK_CONTENT* content, zval* zindexsarray, struct RIACK_CLIENT* client TSRMLS_DC) /* {{{ */
 {
-    if (zindexsarray && Z_TYPE_P(zindexsarray)) {
-        content->index_count = zend_hash_num_elements(Z_ARRVAL_P(zindexsarray));
+    if (zindexsarray && Z_TYPE_P(zindexsarray) == IS_ARRAY) {
+        foreach_in_hashtable(NULL, &content->index_count, Z_ARRVAL_P(zindexsarray), &count_index_values_cb TSRMLS_CC);
         if (content->index_count > 0) {
             content->indexes = RMALLOC(client, sizeof(struct RIACK_PAIR) * content->index_count);
             memset(content->indexes, 0, sizeof(struct RIACK_PAIR) * content->index_count);
-            foreach_in_hashtable(client, content->indexes, Z_ARRVAL_P(zindexsarray), &set_pairs_from_object_cb TSRMLS_CC);
+            foreach_in_hashtable(client, content->indexes, Z_ARRVAL_P(zindexsarray), &set_index_pairs_from_object_cb TSRMLS_CC);
         }
     }
 }
 /* }}} */
 
+
 /* Fill out members of a content struct with this objects values */
 void set_riak_content_from_object(struct RIACK_CONTENT* content, zval* object, struct RIACK_CLIENT* client TSRMLS_DC)/* {{{ */
 {
-	zval* zTmp;
+    zval* zTmp;
     zTmp = zend_read_property(riak_object_ce, object, "content", sizeof("content")-1, 1 TSRMLS_CC);
 	if (Z_TYPE_P(zTmp) == IS_STRING) {
 		content->data_len = Z_STRLEN_P(zTmp);
