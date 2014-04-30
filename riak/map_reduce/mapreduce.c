@@ -204,7 +204,7 @@ PHP_METHOD(RiakMapreduce, run)
 }
 /* }}} */
 
-void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int *cnt TSRMLS_DC)/* {{{ */
 {
     zval *zarr, *ztargetarr, zfuncname;
     ztargetarr = (zval*)custom_ptr;
@@ -212,7 +212,6 @@ void riak_mr_to_array_cb(void* callingObj, void* custom_ptr, char* key, uint key
     MAKE_STD_ZVAL(zarr);
     ZVAL_STRING(&zfuncname, "toArray", 0);
     call_user_function(NULL, data, &zfuncname, zarr, 0, NULL TSRMLS_CC);
-    //call_user_function(NULL, &zfunc, &zname, zfuncarray, 0, NULL TSRMLS_CC);
     if (zarr && Z_TYPE_P(zarr) == IS_ARRAY) {
         add_next_index_zval(ztargetarr, zarr);
     }

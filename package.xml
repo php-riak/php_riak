@@ -230,7 +230,7 @@ Fixes issue 72: Riak HTTP stops working after update
                 <file name="conflict_resolver_key.phpt" role="test" />
                 <file name="conflict_resolver_precedence.phpt" role="test" />
                 <file name="get1.phpt" role="test" />
-                <file name="indexquery.phpt" role="test" />
+                <file name="index_perform.phpt" role="test" />
                 <file name="key_not_found.phpt" role="test" />
                 <file name="links.phpt" role="test" />
                 <file name="list_keys.phpt" role="test" />

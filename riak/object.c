@@ -225,26 +225,21 @@ PHP_METHOD(RiakObject, addIndex)
     zval_addref_p(zidxvalue);
     if (zend_hash_find(Z_ARRVAL_P(zindexarr), idxname, idxname_len+1, (void**) &zfoundval) == SUCCESS) {
         zval *ztmp;
-        ALLOC_ZVAL(ztmp);
-        *ztmp = **zfoundval;
-        INIT_PZVAL(ztmp);
-        zval_copy_ctor(ztmp);
+        ztmp = *zfoundval;
         if (Z_TYPE_PP(zfoundval) != IS_ARRAY) {
             zval *zarr;
             MAKE_STD_ZVAL(zarr);
             array_init(zarr);
+            zval_addref_p(ztmp);
             add_next_index_zval(zarr, ztmp);
-            zend_hash_update(Z_ARRVAL_P(zindexarr), idxname, idxname_len+1, zarr, sizeof(zval*), NULL);
+            zend_hash_update(Z_ARRVAL_P(zindexarr), idxname, idxname_len+1, &zarr, sizeof(zval*), NULL);
             ztmp = zarr;
-            zval_copy_ctor(ztmp);
         }
-        // TODO Most likely a bug second time we hit here
         if (zidxvalue == NULL) {
             add_next_index_null(ztmp);
         } else {
             add_next_index_zval(ztmp, zidxvalue);
         }
-        zval_ptr_dtor(&ztmp);
     } else {
         if (zidxvalue == NULL) {
             add_assoc_null_ex(zindexarr, idxname, idxname_len+1);
@@ -524,7 +519,7 @@ void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TS
 /* }}} */
 
 /* Called once for each link in the links property of RiakObject */
-void set_links_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+void set_links_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int *cnt TSRMLS_DC)/* {{{ */
 {
     zval *zbucket, *ztag, *zkey;
     RIACK_STRING rbucket, rtag, rkey;
@@ -534,17 +529,17 @@ void set_links_from_object_cb(void* callingObj, void* custom_ptr, char* key, uin
     zbucket = zend_read_property(riak_link_ce, *data, "bucket", sizeof("bucket")-1, 1 TSRMLS_CC);
     rbucket.len = Z_STRLEN_P(zbucket);
     rbucket.value = Z_STRVAL_P(zbucket);
-    content->links[cnt].bucket = riack_copy_string(client, rbucket);
+    content->links[*cnt].bucket = riack_copy_string(client, rbucket);
 
     zkey = zend_read_property(riak_link_ce, *data, "key", sizeof("key")-1, 1 TSRMLS_CC);
     rkey.len = Z_STRLEN_P(zkey);
     rkey.value = Z_STRVAL_P(zkey);
-    content->links[cnt].key = riack_copy_string(client, rkey);
+    content->links[*cnt].key = riack_copy_string(client, rkey);
 
     ztag = zend_read_property(riak_link_ce, *data, "tag", sizeof("tag")-1, 1 TSRMLS_CC);
     rtag.len = Z_STRLEN_P(ztag);
     rtag.value = Z_STRVAL_P(ztag);
-    content->links[cnt].tag = riack_copy_string(client, rtag);
+    content->links[*cnt].tag = riack_copy_string(client, rtag);
 }
 /* }}} */
 
@@ -601,16 +596,16 @@ void copy_index_to_pair_key(struct RIACK_CLIENT* client, uint index, struct RIAC
 }
 
 /* Called once for each metadata or index entry in the RiakObject */
-void set_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+void set_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int *cnt TSRMLS_DC)/* {{{ */
 {
     struct RIACK_CLIENT* client = (struct RIACK_CLIENT*)callingObj;
     struct RIACK_PAIR* pairs = (struct RIACK_PAIR*)custom_ptr;
     if (key) {
-        copy_key_string_to_pair(client, key, keylen-1, &(pairs[cnt]) TSRMLS_CC);
+        copy_key_string_to_pair(client, key, keylen-1, &(pairs[*cnt]) TSRMLS_CC);
     } else {
-        copy_index_to_pair_key(client, index, &(pairs[cnt]) TSRMLS_CC);
+        copy_index_to_pair_key(client, index, &(pairs[*cnt]) TSRMLS_CC);
     }
-    copy_zval_to_pair_value(client, *data, &(pairs[cnt]) TSRMLS_CC);
+    copy_zval_to_pair_value(client, *data, &(pairs[*cnt]) TSRMLS_CC);
 }
 /* }}} */
 
@@ -631,7 +626,7 @@ void set_metadata_from_object(struct RIACK_CONTENT* content, zval* zMetadata, st
 /* This functions count recursuve how many values are in an array (including sub array values)
  * custom_ptr should point to an integer
 */
-void count_index_values_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+void count_index_values_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int *cnt TSRMLS_DC)/* {{{ */
 {
     size_t *count = custom_ptr;
     if (Z_TYPE_PP(data) != IS_ARRAY) {
@@ -641,11 +636,24 @@ void count_index_values_cb(void* callingObj, void* custom_ptr, char* key, uint k
     }
 }
 
-/* Called once for each metadata or index entry in the RiakObject */
-void set_index_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{ */
+/* Called once for each index entry in the RiakObject */
+void set_index_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int *cnt TSRMLS_DC)/* {{{ */
 {
     if (Z_TYPE_PP(data) == IS_ARRAY) {
-        foreach_in_hashtable(callingObj, custom_ptr, Z_ARRVAL_PP(data), &set_index_pairs_from_object_cb TSRMLS_CC);
+        zval **zcurr;
+        HashPosition pointer;
+        HashTable *hindex = Z_ARRVAL_PP(data);
+        zcurr = NULL;
+        for(zend_hash_internal_pointer_reset_ex(hindex, &pointer);
+            zend_hash_get_current_data_ex(hindex, (void**)&zcurr, &pointer) == SUCCESS;
+            zend_hash_move_forward_ex(hindex, &pointer)) {
+            set_index_pairs_from_object_cb(callingObj, custom_ptr, key, keylen, 0, zcurr, cnt);
+            (*cnt)++;
+        }
+        if (zcurr != NULL) {
+            (*cnt)--;
+        }
+        //foreach_in_hashtable(callingObj, custom_ptr, Z_ARRVAL_PP(data), &set_index_pairs_from_object_cb TSRMLS_CC);
     } else {
         set_pairs_from_object_cb(callingObj, custom_ptr, key, keylen, index, data, cnt TSRMLS_CC);
     }

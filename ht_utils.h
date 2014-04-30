@@ -20,7 +20,7 @@
 
 #include <php.h>
 
-typedef void (*ht_entry_callback)(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int cnt TSRMLS_DC);
+typedef void (*ht_entry_callback)(void* callingObj, void* custom_ptr, char* key, uint keylen, uint index, zval** data, int *cnt TSRMLS_DC);
 
 void foreach_in_hashtable(void* callingObj, void* custom_ptr, HashTable* ht, ht_entry_callback cb TSRMLS_DC);
 

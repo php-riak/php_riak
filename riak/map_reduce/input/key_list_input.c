@@ -68,7 +68,7 @@ zval *riak_create_kv_pair(char* bucket, int bucketlen, char* key, int keylen)/* 
 /* }}} */
 
 void riak_array_to_tupple_array_deep_cb(void* callingObj, void* custom_ptr, char* key,
-                                   uint keylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{{ */
+                                   uint keylen, uint index, zval** data, int *cnt TSRMLS_DC)/* {{{{ */
 {
     zval *add;
     char* addkey;
@@ -88,7 +88,7 @@ void riak_array_to_tupple_array_deep_cb(void* callingObj, void* custom_ptr, char
 /* }}} */
 
 void riak_array_to_tupple_array_cb(void* callingObj, void* custom_ptr, char* arraykey,
-                                   uint arraykeylen, uint index, zval** data, int cnt TSRMLS_DC)/* {{{{ */
+                                   uint arraykeylen, uint index, zval** data, int *cnt TSRMLS_DC)/* {{{{ */
 {
     char* riakkey;
     int riakkeylen;

@@ -1,5 +1,5 @@
 --TEST--
-Test index queries
+Test basic index queries
 --FILE--
 <?php
 use \Riak\BucketPropertyList;
@@ -13,10 +13,7 @@ try {
     for ($i=0; $i<10; $i++) {
         $obj = new \Riak\Object("obj$i");
         $obj->setContent("test-idx");
-        $obj->addIndex("tal_int", 2)->addIndex("tekst_bin", "text$i");
-        $obj->addIndex("tal_int", 3);//->addIndex("tekst_bin", "text$i");
-        var_dump($obj->getIndexMap() );
-//        $obj->addIndex("tal_int", $i)->addIndex("tekst_bin", "text$i");
+        $obj->addIndex("tal_int", $i)->addIndex("tekst_bin", "text$i");
         $bucket->put($obj);
     }
     $result = $bucket->index("tal_int", 1);

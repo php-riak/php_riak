@@ -31,9 +31,11 @@ void foreach_in_hashtable(void* callingObj, void* custom_ptr, HashTable *ht, ht_
         zend_hash_move_forward_ex(hindex, &pointer)) {
         key_type = zend_hash_get_current_key_ex(hindex, &key, &key_len, &index, 0, &pointer);
         if (key_type == HASH_KEY_IS_STRING) {
-            (*cb)(callingObj, custom_ptr, key, key_len, 0, data, cnt++ TSRMLS_CC);
+            (*cb)(callingObj, custom_ptr, key, key_len, 0, data, &cnt TSRMLS_CC);
+            cnt++;
         } else if (key_type == HASH_KEY_IS_LONG) {
-            (*cb)(callingObj, custom_ptr, NULL, 0, index, data, cnt++ TSRMLS_CC);
+            (*cb)(callingObj, custom_ptr, NULL, 0, index, data, &cnt TSRMLS_CC);
+            cnt++;
         }
     }
 }

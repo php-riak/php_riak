@@ -105,7 +105,7 @@ tests/mrfunctions.phpt
 tests/mrinputs.phpt
 tests/session_respects_options.phpt
 tests/mrkeyfilters.phpt
-tests/indexquery.phpt
+tests/index_perform.phpt
 package.xml
 config.w32
 tests/list_keys.phpt
@@ -253,3 +253,4 @@ tests/bucket_props.phpt
 tests/bucket_props_ext.phpt
 tests/builtin_conflict_resolver_db_objs.phpt
 tests/reset_object_properties.phpt
+tests/index_perform_arr.phpt
