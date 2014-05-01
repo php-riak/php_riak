@@ -647,7 +647,7 @@ void set_index_pairs_from_object_cb(void* callingObj, void* custom_ptr, char* ke
         for(zend_hash_internal_pointer_reset_ex(hindex, &pointer);
             zend_hash_get_current_data_ex(hindex, (void**)&zcurr, &pointer) == SUCCESS;
             zend_hash_move_forward_ex(hindex, &pointer)) {
-            set_index_pairs_from_object_cb(callingObj, custom_ptr, key, keylen, 0, zcurr, cnt);
+            set_index_pairs_from_object_cb(callingObj, custom_ptr, key, keylen, 0, zcurr, cnt TSRMLS_CC);
             (*cnt)++;
         }
         if (zcurr != NULL) {
