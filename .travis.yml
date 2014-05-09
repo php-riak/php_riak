@@ -14,6 +14,6 @@ before_script:
   - ./script/build_module.sh
 script:
   - sudo search-cmd install testsearch
-  - PHP=`which php`
+  - PHP=`make findphp`
   - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q -m --show-diff
   - find . -name *.mem | xargs cat
