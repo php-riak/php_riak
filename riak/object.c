@@ -451,19 +451,39 @@ zval *assoc_array_from_riack_pairs(struct RIACK_PAIR* pairs, size_t pairscnt TSR
     for (i=0; i<pairscnt; ++i) {
         currentpair = &(pairs[i]);
         if (currentpair) {
+            zval **zfoundval;
             currentKey = pestrndup(currentpair->key.value, currentpair->key.len, 0);
-            if (currentpair->value_present) {
-                add_assoc_stringl(zresultarr, currentKey, (char*)currentpair->value, currentpair->value_len, 1);
-			} else {
-                add_assoc_null(zresultarr, currentKey);
-			}
+            if (zend_hash_find(Z_ARRVAL_P(zresultarr), currentKey, currentpair->key.len+1, (void**) &zfoundval) == SUCCESS) {
+                // TODO Make this conversion into a function, we are doing the same in two places
+                zval *ztmp;
+                ztmp = *zfoundval;
+                if (Z_TYPE_PP(zfoundval) != IS_ARRAY) {
+                    zval *zarr;
+                    MAKE_STD_ZVAL(zarr);
+                    array_init(zarr);
+                    zval_addref_p(ztmp);
+                    add_next_index_zval(zarr, ztmp);
+                    zend_hash_update(Z_ARRVAL_P(zresultarr), currentKey, currentpair->key.len+1, &zarr, sizeof(zval*), NULL);
+                    ztmp = zarr;
+                }
+                if (currentpair->value_present) {
+                    add_next_index_stringl(ztmp, (char*)currentpair->value, currentpair->value_len, 1);
+                } else {
+                    add_next_index_null(ztmp);
+                }
+            } else {
+                if (currentpair->value_present) {
+                    add_assoc_stringl(zresultarr, currentKey, (char*)currentpair->value, currentpair->value_len, 1);
+                } else {
+                    add_assoc_null(zresultarr, currentKey);
+                }
+            }
 			pefree(currentKey, 0);
 		}
 	}
     return zresultarr;
 }
 /* }}} */
-
 
 /* Set object properties from returned content */
 void set_object_from_riak_content(zval* object, struct RIACK_CONTENT* content TSRMLS_DC) /* {{{ */

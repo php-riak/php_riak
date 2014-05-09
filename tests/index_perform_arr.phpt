@@ -15,10 +15,25 @@ try {
         ->addIndex("tal_int", 1)->addIndex("tekst_bin", "text1")
         ->addIndex("tal_int", 2)->addIndex("tekst_bin", "text3")
         ->addIndex("tal_int", 3)->addIndex("tekst_bin", "text4");
+    $in = $obj->getIndexMap("tal_int");
     $bucket->put($obj);
     $getOutput = $bucket->get("obj");
     $getObj = $getOutput->getObject();
-/* TODO Check getObj  */
+    $out = $obj->getIndexMap("tal_int");
+    if ($in !== $out) {
+        echo "Different 1".PHP_EOL;
+        var_dump($in);
+        var_dump($out);
+    }
+    $bucket->put($getObj);
+    $getOutput = $bucket->get("obj");
+    $getObj = $getOutput->getObject();
+    $out2 = $obj->getIndexMap("tal_int");
+    if ($in !== $out2) {
+        echo "Different 2".PHP_EOL;
+        var_dump($in);
+        var_dump($out2);
+    }
     echo "done!";
 } catch (Exception $e) {
     var_dump($e);
