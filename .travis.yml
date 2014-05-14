@@ -15,5 +15,6 @@ before_script:
 script:
   - sudo search-cmd install testsearch
   - PHP=`which php`
+  - PHP=~/.phpenv/versions/$(phpenv version-name)/bin/php
   - REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$PHP $PHP run-tests.php -q -m --show-diff
   - find . -name *.mem | xargs cat
