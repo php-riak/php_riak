@@ -15,11 +15,11 @@
         <email>kasparp@me.com</email>
         <active>yes</active>
     </lead>
-    <date>2014-04-17</date>
-    <time>15:00:00</time>
+    <date>2014-05-15</date>
+    <time>08:00:00</time>
     <version>
-        <release>1.1.5</release>
-        <api>1.1.5</api>
+        <release>1.1.6</release>
+        <api>1.1.6</api>
     </version>
     <stability>
         <release>stable</release>
@@ -27,9 +27,8 @@
     </stability>
     <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</license>
 <notes>
-Since 1.1.4
-New: Object now allows contentEncoding, contentType, content and vTag to be set to NULL.
-Fixes issue 72: Riak HTTP stops working after update
+Fixes issue 73: Secondary index - multiple values:
+Too keep backward compatibility indexes with only one value will still point to a string but indexes with multiple values will instead have an array of strings.
 </notes>
     <contents>
         <dir baseinstalldir="/" name="/">
@@ -269,6 +268,22 @@ Fixes issue 72: Riak HTTP stops working after update
     <providesextension>riak</providesextension>
     <extsrcrelease />
     <changelog>
+    <release>
+        <version>
+            <release>1.1.6</release>
+            <api>1.1.6</api>
+        </version>
+        <stability>
+            <release>stable</release>
+            <api>stable</api>
+        </stability>
+        <date>2013-05-15</date>
+        <license>Apache2</license>
+<notes>
+Fixes issue 73: Secondary index - multiple values:
+Too keep backward compatibility indexes with only one value will still point to a string but indexes with multiple values will instead have an array of strings.
+</notes>
+    </release>
     <release>
         <version>
             <release>1.1.5</release>
