@@ -784,7 +784,11 @@ PHP_METHOD(RiakBucket, delete)
         return;
     }
 
-    if (Z_TYPE_P(zparam) != IS_STRING && ! instanceof_function(Z_OBJCE_P(zparam), riak_object_ce TSRMLS_CC)) {
+    if (Z_TYPE_P(zparam) == IS_DOUBLE || Z_TYPE_P(zparam) == IS_LONG) {
+        convert_to_string(zparam);
+    }
+
+    if (Z_TYPE_P(zparam) != IS_STRING && (Z_TYPE_P(zparam) != IS_OBJECT || ! instanceof_function(Z_OBJCE_P(zparam), riak_object_ce TSRMLS_CC))) {
         zend_throw_exception(riak_badarguments_exception_ce, "Argument 1 passed to Riak\\Bucket#delete() must be a string or an instance of Riak\\Object.", 5001 TSRMLS_CC);
         return;
     }
