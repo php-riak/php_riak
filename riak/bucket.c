@@ -36,6 +36,7 @@
 #include "query/index_query.h"
 #include "output/key_stream_output.h"
 #include "crdt/counter.h"
+#include "zend_interfaces.h"
 #include <ext/spl/spl_iterators.h>
 #include <ext/spl/spl_array.h>
 
@@ -220,6 +221,9 @@ PHP_METHOD(RiakBucket, getKeyStream)
     // Create a new connection only for this stream
     // LibRiack can only handle one operation at the time pr connection
     connection = get_riak_connection(getThis() TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
+
     stream_connection = take_connection(connection->client->host, strlen(connection->client->host), connection->client->port TSRMLS_CC);
     if (!stream_connection) {
         CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(stream_connection, RIACK_ERROR_COMMUNICATION);
@@ -247,9 +251,13 @@ PHP_METHOD(RiakBucket, getKeyList)
     zval* zresultarr;
     int riackstatus;
     connection = get_riak_connection(getThis() TSRMLS_CC);
-    rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
+    rsbucket   = riack_name_from_bucket(getThis() TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
+
     // Not gonna do a retry here on purpose... no reason to retry a mistake in the first place
     riackstatus = riack_list_keys(connection->client, rsbucket, &resultlist);
+
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
 
     MAKE_STD_ZVAL(zresultarr);
@@ -307,6 +315,8 @@ PHP_METHOD(RiakBucket, index)
     connection = get_riak_connection(getThis() TSRMLS_CC);
     rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
+
     rsindex.len = indexlen;
     rsindex.value = index;
     rsfrom.len = fromlen;
@@ -348,6 +358,8 @@ PHP_METHOD(RiakBucket, indexQuery)
     }
     // TODO Validate query have exact or ranged values
     connection = get_riak_connection(getThis() TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
     memset(&req, 0, sizeof(req));
     memset(&continuation, 0, sizeof(continuation));
@@ -511,6 +523,8 @@ PHP_METHOD(RiakBucket, setPropertyList)
 
     connection = get_riak_connection(getThis() TSRMLS_CC);
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
     SET_PROPLIST_LONG(getNValue, n_val);
     SET_PROPLIST_BOOL(getAllowMult, allow_mult);
@@ -683,6 +697,8 @@ PHP_METHOD(RiakBucket, getPropertyList)
     connection = get_riak_connection(getThis() TSRMLS_CC);
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
 
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
+
     RIACK_RETRY_OP(riackResult, connection, riack_get_bucket_props_ext(connection->client,  bucketName, &properties));
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
@@ -799,6 +815,8 @@ PHP_METHOD(RiakBucket, delete)
     connection = get_riak_connection(getThis() TSRMLS_CC);
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
 
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
+
     key.len   = 0;
     key.value = NULL;
 
@@ -870,6 +888,8 @@ PHP_METHOD(RiakBucket, put)
 		return;
 	}
     connection = get_riak_connection(getThis() TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
 	memset(&obj, 0, sizeof(obj));
 	memset(&returnedObj, 0, sizeof(returnedObj));
@@ -947,6 +967,8 @@ PHP_METHOD(RiakBucket, get)
 		return;
     }
     connection = get_riak_connection(getThis() TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
 	MAKE_STD_ZVAL(zKey);
 	ZVAL_STRINGL(zKey, key, keyLen, 1);
@@ -1082,12 +1104,13 @@ RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)/* {{{ */
 riak_connection *get_riak_connection(zval *zbucket TSRMLS_DC)/* {{{ */
 {
     zval *zclient;
-    riak_connection *connection = NULL;
-    zclient = zend_read_property(riak_bucket_ce, zbucket, "connection", sizeof("connection")-1, 1 TSRMLS_CC);
-    if (zclient) {
-        GET_RIAK_CONNECTION(zclient, connection);
-		ensure_connected(connection TSRMLS_CC);
+
+    zend_call_method_with_0_params(&zbucket, NULL, NULL, "getConnection", &zclient);
+
+    if ( ! zclient) {
+        return NULL;
     }
-	return connection;
+
+    return get_client_connection(zclient TSRMLS_CC);
 }
 /* }}} */

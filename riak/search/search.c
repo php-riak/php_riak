@@ -18,6 +18,7 @@
 #include "riak/connection.h"
 #include "input/parameter_bag.h"
 #include "output/output.h"
+#include "riak/exception/exception.h"
 
 zend_class_entry *riak_search_ce;
 
@@ -85,7 +86,11 @@ PHP_METHOD(Riak_Search, search)
         return;
     }
     zclient = zend_read_property(riak_search_ce, getThis(), "connection", sizeof("connection")-1, 1 TSRMLS_CC);
-    GET_RIAK_CONNECTION(zclient, connection);
+
+    connection = get_client_connection(zclient TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
+
     memset(&search_params, 0, sizeof(struct RIACK_SEARCH_OPTIONAL_PARAMETERS));
     rsquery.value = query;
     rsquery.len = query_len;

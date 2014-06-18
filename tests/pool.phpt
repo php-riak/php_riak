@@ -7,24 +7,33 @@ riak.persistent.timeout=2000
 <?php
 include_once "connect.inc";
 
-echo \Riak\PoolInfo::getNumActiveConnection().PHP_EOL;
+use Riak\PoolInfo;
+use Riak\Connection;
+
 $clients = array();
+
+
+echo 'active connection     : ' . PoolInfo::getNumActiveConnection().PHP_EOL;
+
 for ($i=0; $i<25; ++$i) {
-	$clients[] = new \Riak\Connection($host, $port);
+    $clients[] = new Connection($host, $port);
+
+    $clients[$i]->ping();
 }
-echo \Riak\PoolInfo::getNumActiveConnection().PHP_EOL;
-echo \Riak\PoolInfo::getNumActivePersistentConnection().PHP_EOL;
+
+echo 'active connection     : ' . PoolInfo::getNumActiveConnection().PHP_EOL;
+echo 'persistent connection : ' . PoolInfo::getNumActivePersistentConnection().PHP_EOL;
 
 $clients = NULL;
 
-echo \Riak\PoolInfo::getNumActiveConnection().PHP_EOL;
-echo \Riak\PoolInfo::getNumActivePersistentConnection().PHP_EOL;
-echo \Riak\PoolInfo::getNumReconnect().PHP_EOL;
+echo 'active connection     : ' . PoolInfo::getNumActiveConnection().PHP_EOL;
+echo 'persistent connection : ' . PoolInfo::getNumActivePersistentConnection().PHP_EOL;
+echo 'reconnect             : ' . PoolInfo::getNumReconnect().PHP_EOL;
 ?>
 --EXPECT--
-0
-25
-20
-0
-0
-0
+active connection     : 0
+active connection     : 25
+persistent connection : 20
+active connection     : 0
+persistent connection : 0
+reconnect             : 0

@@ -30,8 +30,6 @@ typedef struct _client_data {
   riak_connection *connection;
 } client_data;
 
-#define GET_RIAK_CONNECTION(ZOBJ, VAR) VAR = ((client_data*)zend_object_store_get_object(ZOBJ TSRMLS_CC))->connection
-
 /*************************************************
 * Constants
 *************************************************/
@@ -45,6 +43,8 @@ typedef struct _client_data {
 zval* create_client_object(char* host, long port TSRMLS_DC);
 
 void riak_connection_init(TSRMLS_D);
+int create_object_connection(zval* zConn TSRMLS_DC);
+riak_connection *get_client_connection(zval *zclient TSRMLS_DC);
 zend_object_value create_client_data(zend_class_entry *class_type TSRMLS_DC);
 void free_client_data(void *object TSRMLS_DC);
 

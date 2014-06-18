@@ -55,6 +55,7 @@ zend_bool ensure_connected_init(riak_connection *connection, char* host, int hos
     } else {
         result = ensure_connected(connection TSRMLS_CC);
     }
+
     return result;
 }
 /* }}} */
@@ -94,12 +95,13 @@ void release_connection(riak_connection *connection TSRMLS_DC) /* {{{ */
 {
    riak_connection_pool* pool = NULL;
    RIAK_GLOBAL(open_connections)--;
+
    if (connection->persistent) {
       /* If we fail to lock we might have a stuck client, find a way to deal with this. */
       if (lock_pool(TSRMLS_C)) {
          connection->last_used_at = time(NULL);
          RIAK_GLOBAL(open_connections_persistent)--;
-         pool = pool_for_host_port(connection->client->host, 
+         pool = pool_for_host_port(connection->client->host,
             strlen(connection->client->host), connection->client->port TSRMLS_CC);
          release_connection_from_pool(pool, connection);
          unlock_pool(TSRMLS_C);
@@ -124,6 +126,7 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC) /
       entry = take_connection_entry_from_pool(pool);
       unlock_pool(TSRMLS_C);
    }
+
    if (entry) {
       connection = &entry->connection;
       if (!ensure_connected_init(connection, host, host_len, port TSRMLS_CC)) {
@@ -144,9 +147,11 @@ riak_connection *take_connection(char* host, int host_len, int port TSRMLS_DC) /
          return NULL;
       }
    }
+
    if (connection) {
       RIAK_GLOBAL(open_connections)++;
    }
+
    return connection;
 }
 /* }}} */
