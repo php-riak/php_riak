@@ -161,8 +161,9 @@ PHP_METHOD(RiakMapreduce, run)
 
     zclient = zend_read_property(riak_mapreduce_ce, getThis(), "connection", sizeof("connection")-1, 1 TSRMLS_CC);
     if (Z_TYPE_P(zclient) == IS_OBJECT) {
-        GET_RIAK_CONNECTION(zclient, connection);
-        ensure_connected(connection TSRMLS_CC);
+
+        connection = get_client_connection(zclient TSRMLS_CC);
+        THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
         if (zstreamer) {
             // Create a new connection only for this stream

@@ -66,7 +66,11 @@ int riak_get_server_info_as_zvals(riak_connection **connection, zval** znode,
     node.value = server_version.value = 0;
 
     zconn = zend_read_property(riak_server_info_ce, zthis, "connection", sizeof("connection")-1, 1 TSRMLS_CC);
-    GET_RIAK_CONNECTION(zconn, *connection);
+
+    *connection = get_client_connection(zconn TSRMLS_CC);
+
+    THROW_EXCEPTION_IF_CONNECTION_IS_NULL_WITH_RETURN(connection, riackresult);
+
     riackresult = riack_server_info((*connection)->client, &node, &server_version);
     if (riackresult == RIACK_SUCCESS) {
         MAKE_STD_ZVAL(*znode);
