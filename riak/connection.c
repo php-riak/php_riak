@@ -125,11 +125,12 @@ zval* create_client_object(char* host, long port TSRMLS_DC) /* {{{ */
 
 riak_connection *get_client_connection(zval *zclient TSRMLS_DC)/* {{{ */
 {
+    client_data *data;
     if ( ! zclient) {
         return NULL;
     }
 
-    client_data *data = (client_data*) zend_object_store_get_object(zclient TSRMLS_CC);
+    data = (client_data*) zend_object_store_get_object(zclient TSRMLS_CC);
 
     if (data->connection) {
         ensure_connected(data->connection TSRMLS_CC);
@@ -147,12 +148,13 @@ riak_connection *get_client_connection(zval *zclient TSRMLS_DC)/* {{{ */
 
 int create_object_connection(zval* zConn TSRMLS_DC)/* {{{ */
 {
+    client_data* data;
     zval *zHost, *zPort;
 
     zend_call_method_with_0_params(&zConn, NULL, NULL, "getHost", &zHost);
     zend_call_method_with_0_params(&zConn, NULL, NULL, "getPort", &zPort);
 
-    client_data* data = (client_data*) zend_object_store_get_object(zConn TSRMLS_CC);
+    data = (client_data*) zend_object_store_get_object(zConn TSRMLS_CC);
     data->connection  = take_connection(Z_STRVAL_P(zHost), Z_STRLEN_P(zHost), Z_LVAL_P(zPort) TSRMLS_CC);
 
     zval_ptr_dtor(&zHost);
@@ -207,11 +209,12 @@ PHP_METHOD(RiakConnection, getServerInfo)
 Ping riak to see if it is alive, an exception is thrown if no response is received */
 PHP_METHOD(RiakConnection, ping)
 {
+    int pingStatus;
     riak_connection *connection = get_client_connection(getThis() TSRMLS_CC);
 
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
-    int pingStatus = riack_ping(connection->client);
+    pingStatus = riack_ping(connection->client);
 
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, pingStatus);
 }
