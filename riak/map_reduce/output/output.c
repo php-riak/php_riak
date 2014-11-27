@@ -47,7 +47,7 @@ void riak_map_reduce_output_output_init(TSRMLS_D)/* {{{ */
 /* }}} */
 
 
-zval *riak_mroutput_from_riack_mapred(struct RIACK_MAPRED_RESPONSE *mapresult TSRMLS_DC)/* {{{ */
+zval *riak_mroutput_from_riack_mapred(riack_mapred_response *mapresult TSRMLS_DC)/* {{{ */
 {
     zval *zresult, *zvalue, *zphase;
     MAKE_STD_ZVAL(zresult);

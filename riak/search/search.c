@@ -75,9 +75,9 @@ Create a new Search object */
 PHP_METHOD(Riak_Search, search)
 {
     riak_connection *connection;
-    struct RIACK_SEARCH_OPTIONAL_PARAMETERS search_params;
-    struct RIACK_SEARCH_RESULT search_result;
-    RIACK_STRING rsquery, rsindex;
+    riack_search_optional_params search_params;
+    riack_search_result *search_result;
+    riack_string rsquery, rsindex;
     char* index, *query;
     int index_len, query_len, riackstatus;
     zval *zclient, *zresult, *zparams = NULL;
@@ -91,17 +91,17 @@ PHP_METHOD(Riak_Search, search)
 
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
-    memset(&search_params, 0, sizeof(struct RIACK_SEARCH_OPTIONAL_PARAMETERS));
+    memset(&search_params, 0, sizeof(riack_search_optional_params));
     rsquery.value = query;
     rsquery.len = query_len;
     rsindex.value = index;
     rsindex.len = index_len;
     riak_search_set_optional_params(connection->client, zparams, &search_params TSRMLS_CC);
-    RIACK_RETRY_OP(riackstatus, connection, riack_search(connection->client, rsquery, rsindex, &search_params, &search_result));
+    RIACK_RETRY_OP(riackstatus, connection, riack_search(connection->client, &rsquery, &rsindex, &search_params, &search_result));
     riak_search_free_optional_params(connection->client, &search_params TSRMLS_CC);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
-    zresult = riak_search_output_from_riack_search_result(&search_result TSRMLS_CC);
-    riack_free_search_result(connection->client, &search_result);
+    zresult = riak_search_output_from_riack_search_result(search_result TSRMLS_CC);
+    riack_free_search_result_p(connection->client, &search_result);
 
     RETURN_ZVAL(zresult, 0, 1);
 }
@@ -124,7 +124,7 @@ PHP_METHOD(Riak_Search, search)
         TARGET##_present = 1; \
         TARGET= Z_LVAL_P(ZTMP); }
 
-void riak_search_free_optional_params(struct RIACK_CLIENT *client, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC)
+void riak_search_free_optional_params(riack_client *client, riack_search_optional_params* search_params TSRMLS_DC)
 {
     size_t cnt = search_params->field_limits_count;
     if (cnt > 0) {
@@ -133,7 +133,7 @@ void riak_search_free_optional_params(struct RIACK_CLIENT *client, struct RIACK_
     }
 }
 
-void riak_search_set_optional_params(struct RIACK_CLIENT *client, zval* zparams, struct RIACK_SEARCH_OPTIONAL_PARAMETERS* search_params TSRMLS_DC)
+void riak_search_set_optional_params(riack_client *client, zval* zparams, riack_search_optional_params* search_params TSRMLS_DC)
 {
     zval *zprop;
     if (!zparams || Z_TYPE_P(zparams) == IS_NULL) {
@@ -151,7 +151,7 @@ void riak_search_set_optional_params(struct RIACK_CLIENT *client, zval* zparams,
         int i, cnt = zend_hash_num_elements(Z_ARRVAL_P(zprop));
         if (cnt > 0) {
             search_params->field_limits_count = cnt;
-            search_params->field_limits = RMALLOC(client, sizeof(RIACK_STRING) * cnt);
+            search_params->field_limits = RMALLOC(client, sizeof(riack_string) * cnt);
             for (i=0; i<cnt; ++i) {
                 zval **zflpp;
                 /* important these string are not copied so only the array should be freed later */

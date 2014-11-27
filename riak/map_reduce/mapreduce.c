@@ -123,7 +123,7 @@ struct riak_mr_stream_params {/* {{{ */
 /* }}} */
 
 
-void riak_mr_result_cb(struct RIACK_CLIENT* client, void* arg, struct RIACK_MAPRED_RESPONSE* response) /* {{{ */
+void riak_mr_result_cb(riack_client* client, void* arg, riack_mapred_response* response) /* {{{ */
 {
     zval zfuncname, *zresponse, zret;
     struct riak_mr_stream_params *params = (struct riak_mr_stream_params*)arg;
@@ -145,8 +145,8 @@ PHP_METHOD(RiakMapreduce, run)
 {
     zval* zjson, *zclient, *zresult, *zstreamer;
     riak_connection *connection, *stream_connection;
-    struct RIACK_MAPRED_RESPONSE_LIST *mapresult;
-    struct RIACK_MAPRED_RESPONSE_LIST *mapresult_iter;
+    riack_mapred_response_list *mapresult;
+    riack_mapred_response_list *mapresult_iter;
     struct riak_mr_stream_params stream_params;
     int riackResult;
 

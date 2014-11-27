@@ -33,7 +33,7 @@ void riak_output_put_output_init(TSRMLS_D)/* {{{ */
 /* }}} */
 
 
-zval *put_output_from_riack_object(struct RIACK_OBJECT* obj, zval* zkey TSRMLS_DC) /* {{{ */
+zval *put_output_from_riack_object(riack_object* obj, zval* zkey TSRMLS_DC) /* {{{ */
 {
     zval *zoutput;
     MAKE_STD_ZVAL(zoutput);

@@ -23,7 +23,7 @@ extern zend_class_entry *riak_index_output_ce;
 
 void riak_output_index_output_init(TSRMLS_D);
 
-zval *riak_index_output_from_string_list_and_continuation(RIACK_STRING_LIST *result_keys, RIACK_STRING *continuation TSRMLS_DC);
+zval *riak_index_output_from_string_list_and_continuation(riack_string_list *result_keys, riack_string *continuation TSRMLS_DC);
 
 PHP_METHOD(Riak_Index_Output, __construct);
 PHP_METHOD(Riak_Index_Output, getResultList);

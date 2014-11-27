@@ -34,7 +34,7 @@ void riak_search_output_document_output_init(TSRMLS_D) /* {{{  */
 }
 /* }}} */
 
-zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* document TSRMLS_DC) /* {{{  */
+zval *riak_search_document_from_riack_document(riack_search_doc* document TSRMLS_DC) /* {{{  */
 {
     int cnt, i;
     zval *zresult, *zarr;
@@ -48,7 +48,7 @@ zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* doc
     for (i=0; i<cnt; ++i) {
         char* szkey;
         size_t key_len;
-        struct RIACK_PAIR *current_pair = &document->fields[i];
+        riack_pair *current_pair = &document->fields[i];
         key_len = current_pair->key.len;
         // Silly... we need to make a copy because add_assoc relies on zero terminated string
         // riack will not zero terminate since it includes a length.

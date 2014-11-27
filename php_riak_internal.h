@@ -170,8 +170,8 @@
 * Vars
 *************************************************/
 
-extern struct RIACK_ALLOCATOR riack_php_allocator;
-extern struct RIACK_ALLOCATOR riack_php_persistent_allocator;
+extern riack_allocator riack_php_allocator;
+extern riack_allocator riack_php_persistent_allocator;
 
 extern int le_riak_connection_list;
 
@@ -204,6 +204,6 @@ void riack_php_free (void *allocator_data, void *data);
 void *riack_php_persistent_alloc(void *allocator_data, size_t size);
 void riack_php_persistent_free (void *allocator_data, void *data);
 
-void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC);
+void riak_throw_exception(riack_client* client, int errorStatus TSRMLS_DC);
 
 #endif // PHP_RIAK_INTERNAL_H

@@ -45,7 +45,7 @@ void riak_search_output_output_init(TSRMLS_D) /* {{{  */
 * Implementation: Riak\Search\Output\Output
 *************************************************************/
 
-zval* riak_search_output_from_riack_search_result(struct RIACK_SEARCH_RESULT *search_result TSRMLS_DC)
+zval* riak_search_output_from_riack_search_result(riack_search_result *search_result TSRMLS_DC)
 {
     zval *zresult;
     MAKE_STD_ZVAL(zresult);

@@ -41,7 +41,7 @@ zend_bool ensure_connected_init(riak_connection *connection, char* host, int hos
     result = 0;
 
     if (connection->client->sockfd <= 0) {
-        struct RIACK_CONNECTION_OPTIONS options;
+        riack_connection_options options;
         options.send_timeout_ms = RIAK_GLOBAL(send_timeout);
         options.recv_timeout_ms = RIAK_GLOBAL(recv_timeout);
         options.keep_alive_enabled = RIAK_GLOBAL(keep_alive);

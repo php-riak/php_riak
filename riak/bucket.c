@@ -188,7 +188,7 @@ struct riak_stream_key_cb_param {/* {{{ */
 };
 /* }}} */
 
-void riak_stream_key_cb(struct RIACK_CLIENT* c, void* p, RIACK_STRING key) {/* {{{ */
+void riak_stream_key_cb(riack_client* c, void* p, riack_string key) {/* {{{ */
     zval *zkey, zret, zfuncname;
 
     struct riak_stream_key_cb_param *param = (struct riak_stream_key_cb_param*)p;
@@ -210,7 +210,7 @@ Streams all keys in the bucket */
 PHP_METHOD(RiakBucket, getKeyStream)
 {
     struct riak_stream_key_cb_param cb_params;
-    RIACK_STRING rsbucket;
+    riack_string rsbucket;
     riak_connection *connection, *stream_connection;
     zval* zstreamer;
     int riackstatus;
@@ -234,7 +234,7 @@ PHP_METHOD(RiakBucket, getKeyStream)
 #endif
     cb_params.zstreamer = zstreamer;
     // Not gonna do a retry here on purpose... no reason to retry a mistake in the first place
-    riackstatus = riack_stream_keys(stream_connection->client, rsbucket, riak_stream_key_cb, &cb_params);
+    riackstatus = riack_stream_keys(stream_connection->client, &rsbucket, riak_stream_key_cb, &cb_params);
     CHECK_RIACK_STATUS_THROW_ON_ERROR(stream_connection, riackstatus);
     release_connection(stream_connection TSRMLS_CC);
 }
@@ -245,8 +245,8 @@ PHP_METHOD(RiakBucket, getKeyStream)
 List all keys in the bucket */
 PHP_METHOD(RiakBucket, getKeyList)
 {
-    struct RIACK_STRING_LINKED_LIST* resultlist, *curr;
-    RIACK_STRING rsbucket;
+    riack_string_linked_list* resultlist, *curr;
+    riack_string rsbucket;
     riak_connection *connection;
     zval* zresultarr;
     int riackstatus;
@@ -256,7 +256,7 @@ PHP_METHOD(RiakBucket, getKeyList)
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
     // Not gonna do a retry here on purpose... no reason to retry a mistake in the first place
-    riackstatus = riack_list_keys(connection->client, rsbucket, &resultlist);
+    riackstatus = riack_list_keys(connection->client, &rsbucket, &resultlist);
 
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
 
@@ -267,7 +267,7 @@ PHP_METHOD(RiakBucket, getKeyList)
         add_next_index_stringl(zresultarr, curr->string.value, curr->string.len, 1);
         curr = curr->next;
     }
-    riack_free_string_linked_list(connection->client, &resultlist);
+    riack_free_string_linked_list_p(connection->client, &resultlist);
 
     RETURN_ZVAL(zresultarr, 0, 1);
 }
@@ -301,8 +301,8 @@ PHP_METHOD(RiakBucket, counter)
 Perform a secondary index lookup */
 PHP_METHOD(RiakBucket, index)
 {
-    RIACK_STRING rsbucket, rsindex, rsfrom, rsto;
-    RIACK_STRING_LIST resultlist;
+    riack_string rsbucket, rsindex, rsfrom, rsto;
+    riack_string_list *resultlist;
     char *index, *from, *to;
     int indexlen, fromlen, tolen, riackstatus, i;
     riak_connection *connection;
@@ -324,18 +324,18 @@ PHP_METHOD(RiakBucket, index)
     if (to != NULL && tolen > 0) {
         rsto.len = tolen;
         rsto.value = to;
-        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_range(connection->client, rsbucket, rsindex, rsfrom, rsto, &resultlist));
+        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_range(connection->client, &rsbucket, &rsindex, &rsfrom, &rsto, &resultlist));
     } else {
-        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_exact(connection->client, rsbucket, rsindex, rsfrom, &resultlist));
+        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_exact(connection->client, &rsbucket, &rsindex, &rsfrom, &resultlist));
     }
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
 
     MAKE_STD_ZVAL(zresult);
     array_init(zresult);
-    for (i=0; i<resultlist.string_count; ++i) {
-        add_next_index_stringl(zresult, resultlist.strings[i].value, resultlist.strings[i].len, 1);
+    for (i=0; i<resultlist->string_count; ++i) {
+        add_next_index_stringl(zresult, resultlist->strings[i].value, resultlist->strings[i].len, 1);
     }
-    riack_free_string_list(connection->client, &resultlist);
+    riack_free_string_list_p(connection->client, &resultlist);
     RETURN_ZVAL(zresult, 0, 1);
 }
 /* }}} */
@@ -346,9 +346,9 @@ Apply given properties to this bucket */
 PHP_METHOD(RiakBucket, indexQuery)
 {
     riak_connection *connection;
-    struct RIACK_2I_QUERY_REQ req;
-    RIACK_STRING_LIST result_keys;
-    RIACK_STRING continuation;
+    riack_2i_query_req req;
+    riack_string_list *result_keys;
+    riack_string *continuation;
     zval *zquery, *zinput, *zname, *zisrange, *zcontinuation, *zresult;
     int riackstatus;
     zinput = zquery = 0;
@@ -358,12 +358,9 @@ PHP_METHOD(RiakBucket, indexQuery)
     }
     // TODO Validate query have exact or ranged values
     connection = get_riak_connection(getThis() TSRMLS_CC);
-
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
     memset(&req, 0, sizeof(req));
-    memset(&continuation, 0, sizeof(continuation));
-    memset(&result_keys, 0, sizeof(RIACK_STRING_LIST));
     req.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 
     MAKE_STD_ZVAL(zname);
@@ -371,6 +368,7 @@ PHP_METHOD(RiakBucket, indexQuery)
     req.index.len = Z_STRLEN_P(zname);
     req.index.value = Z_STRVAL_P(zname);
 
+    continuation = NULL;
     zcontinuation = NULL;
     if (zinput) {
         zval *zmaxresults;
@@ -399,13 +397,13 @@ PHP_METHOD(RiakBucket, indexQuery)
         req.search_min.value = Z_STRVAL_P(zmin);
         req.search_max.len = Z_STRLEN_P(zmax);
         req.search_max.value = Z_STRVAL_P(zmax);
-        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_ext(connection->client, &req, &result_keys, &continuation));
+        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query(connection->client, &req, &result_keys, &continuation));
     } else {
         zval *zexact;
         zexact = zend_read_property(riak_index_query_ce, zquery, "exactValue", sizeof("exactValue")-1, 1 TSRMLS_CC);
         req.search_exact.len = Z_STRLEN_P(zexact);
         req.search_exact.value = Z_STRVAL_P(zexact);
-        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_ext(connection->client, &req, &result_keys, &continuation));
+        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query(connection->client, &req, &result_keys, &continuation));
     }
     zval_ptr_dtor(&zname);
     zval_ptr_dtor(&zisrange);
@@ -414,20 +412,18 @@ PHP_METHOD(RiakBucket, indexQuery)
     }
 
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
-    zresult = riak_index_output_from_string_list_and_continuation(&result_keys, &continuation TSRMLS_CC);
-    if (RSTR_HAS_CONTENT(continuation)) {
-        RSTR_SAFE_FREE(connection->client, continuation);
-    }
-
+    zresult = riak_index_output_from_string_list_and_continuation(result_keys, continuation TSRMLS_CC);
+    riack_free_string_p(connection->client, &continuation);
+    riack_free_string_list_p(connection->client, &result_keys);
     RETURN_ZVAL(zresult, 0, 1);
 }
 /* }}} */
 
 /* {{{ */
-void riak_set_riack_commit_hook(riak_connection *connection, zval* zhook, struct RIACK_COMMIT_HOOK* hook TSRMLS_DC)
+void riak_set_riack_commit_hook(riak_connection *connection, zval* zhook, riack_commit_hook* hook TSRMLS_DC)
 {
     zval *zjs;
-    memset(hook, 0, sizeof(struct RIACK_COMMIT_HOOK));
+    memset(hook, 0, sizeof(riack_commit_hook));
     MAKE_STD_ZVAL(zjs);
     RIAK_CALL_METHOD(RiakCommitHook, isJavascript, zjs, zhook);
     if (Z_BVAL_P(zjs)) {
@@ -442,7 +438,7 @@ void riak_set_riack_commit_hook(riak_connection *connection, zval* zhook, struct
 
 /* {{{ */
 void riak_set_commit_hooks_properties(riak_connection *connection, zval *zhook_list,  uint8_t *has_hooks,
-                                      size_t* hook_count, struct RIACK_COMMIT_HOOK** hooks TSRMLS_DC)
+                                      size_t* hook_count, riack_commit_hook** hooks TSRMLS_DC)
 {
     *has_hooks = 0;
     *hook_count = 0;
@@ -460,7 +456,7 @@ void riak_set_commit_hooks_properties(riak_connection *connection, zval *zhook_l
             int i=0;
             *has_hooks = 1;
             *hook_count = Z_LVAL_P(zcount);
-            *hooks = RMALLOC(connection->client, sizeof(struct RIACK_COMMIT_HOOK) * Z_LVAL_P(zcount));
+            *hooks = RMALLOC(connection->client, sizeof(riack_commit_hook) * Z_LVAL_P(zcount));
 
             ZVAL_STRING(&zcurrname, "current", 0);
             ZVAL_STRING(&znextname, "next", 0);
@@ -511,15 +507,15 @@ PHP_METHOD(RiakBucket, setPropertyList)
                                                       properties.PROP_NAME = Z_BVAL_P(ztmp); } \
                                                   zval_ptr_dtor(&ztmp);
 	riak_connection *connection;
-    struct RIACK_BUCKET_PROPERTIES properties;
-	RIACK_STRING bucketName;
+    riack_bucket_properties properties;
+    riack_string bucketName;
     zval *ztmp, *zprop_obj;
 	int riackResult;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zprop_obj, riak_bucket_properties_ce) == FAILURE) {
         zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 501 TSRMLS_CC);
 		return;
 	}
-    memset(&properties, 0, sizeof(struct RIACK_BUCKET_PROPERTIES));
+    memset(&properties, 0, sizeof(riack_bucket_properties));
 
     connection = get_riak_connection(getThis() TSRMLS_CC);
     bucketName = riack_name_from_bucket(getThis() TSRMLS_CC);
@@ -602,7 +598,7 @@ PHP_METHOD(RiakBucket, setPropertyList)
     }
     zval_ptr_dtor(&ztmp);
 
-    RIACK_RETRY_OP(riackResult, connection, riack_set_bucket_props_ext(connection->client, bucketName, &properties));
+    RIACK_RETRY_OP(riackResult, connection, riack_set_bucket_props(connection->client, &bucketName, &properties));
 
     RSTR_SAFE_FREE(connection->client, properties.backend);
     RSTR_SAFE_FREE(connection->client, properties.linkfun.module);
@@ -617,7 +613,7 @@ PHP_METHOD(RiakBucket, setPropertyList)
 }
 /* }}} */
 
-zval *riak_linkfun_from_riack(struct RIACK_MODULE_FUNCTION* modfun TSRMLS_DC) {
+zval *riak_linkfun_from_riack(riack_module_function* modfun TSRMLS_DC) {
     zval *zmodfun, *zmod, *zfunc;
     MAKE_STD_ZVAL(zmodfun);
 
@@ -636,7 +632,7 @@ zval *riak_linkfun_from_riack(struct RIACK_MODULE_FUNCTION* modfun TSRMLS_DC) {
 }
 
 /* {{{ */
-zval* zhook_list_from_riack(size_t hook_count, struct RIACK_COMMIT_HOOK* hooks TSRMLS_DC)
+zval* zhook_list_from_riack(size_t hook_count, riack_commit_hook *hooks TSRMLS_DC)
 {
     zval *zhook_list;
     size_t i;
@@ -644,7 +640,7 @@ zval* zhook_list_from_riack(size_t hook_count, struct RIACK_COMMIT_HOOK* hooks T
     object_init_ex(zhook_list, riak_commit_hook_list_ce);
     RIAK_CALL_METHOD(RiakCommitHookList, __construct, zhook_list, zhook_list);
     for (i=0; i<hook_count; ++i) {
-        struct RIACK_COMMIT_HOOK* current_hook;
+        riack_commit_hook* current_hook;
         zval* zhook, *zoffset;
         current_hook = &hooks[i];
 
@@ -688,9 +684,9 @@ PHP_METHOD(RiakBucket, getPropertyList)
                                                         ZVAL_METHOD(ztmp, PROP_NAME); \
                                                         RIAK_CALL_METHOD1(RiakBucketProperties, SETTER_NAME, zbucket_props, zbucket_props, ztmp); \
                                                         zval_ptr_dtor(&ztmp); }
-    struct RIACK_BUCKET_PROPERTIES *properties;
+    riack_bucket_properties *properties;
 	riak_connection *connection;
-    RIACK_STRING bucketName;
+    riack_string bucketName;
     int riackResult;
     zval *ztmp, *zbucket_props;
 
@@ -699,7 +695,7 @@ PHP_METHOD(RiakBucket, getPropertyList)
 
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
-    RIACK_RETRY_OP(riackResult, connection, riack_get_bucket_props_ext(connection->client,  bucketName, &properties));
+    RIACK_RETRY_OP(riackResult, connection, riack_get_bucket_props(connection->client, &bucketName, &properties));
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
 
     MAKE_STD_ZVAL(zbucket_props);
@@ -778,7 +774,7 @@ PHP_METHOD(RiakBucket, getPropertyList)
             zval_ptr_dtor(&zrepclass);
         }
     }
-    riack_free_bucket_properties(connection->client, &properties);
+    riack_free_bucket_properties_p(connection->client, &properties);
     RETURN_ZVAL(zbucket_props, 0, 1);
 }
 /* }}} */
@@ -787,10 +783,10 @@ PHP_METHOD(RiakBucket, getPropertyList)
 Deletes given object from riak */
 PHP_METHOD(RiakBucket, delete)
 {
-    struct RIACK_DEL_PROPERTIES props;
+    riack_del_properties props;
     riak_connection *connection;
     zval *zparam, *zinput, zKey;
-    RIACK_STRING bucketName, key;
+    riack_string bucketName, key;
     int riackResult;
 
     zinput = NULL;
@@ -862,7 +858,7 @@ PHP_METHOD(RiakBucket, delete)
     if (key.len == 0) {
         zend_throw_exception(riak_badarguments_exception_ce, "Unable to resolve the object key.", 5001 TSRMLS_CC);
     }
-    RIACK_RETRY_OP(riackResult, connection, riack_delete(connection->client, bucketName, key, &props));
+    RIACK_RETRY_OP(riackResult, connection, riack_delete(connection->client, &bucketName, &key, &props));
     RFREE(connection->client, props.vclock.clock);
     zval_dtor(&zKey);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
@@ -875,9 +871,9 @@ PHP_METHOD(RiakBucket, put)
 {
     int riackResult;
     zval *zObject, *zTmp, *zinput, *zout, zvclock;
-	struct RIACK_OBJECT obj, returnedObj;
-	struct RIACK_CONTENT riackContent;
-	struct RIACK_PUT_PROPERTIES props;
+    riack_object obj, *returnedObj;
+    riack_content riackContent;
+    riack_put_properties props;
 	riak_connection *connection;
     long options;
 
@@ -928,7 +924,7 @@ PHP_METHOD(RiakBucket, put)
         obj.key.len = 0;
         obj.key.value = 0;
     }
-    RIACK_RETRY_OP(riackResult, connection, riack_put(connection->client, obj, &returnedObj, &props));
+    RIACK_RETRY_OP(riackResult, connection, riack_put(connection->client, &obj, &returnedObj, &props));
     if (obj.vclock.clock) {
         RFREE(connection->client, obj.vclock.clock);
     }
@@ -936,16 +932,16 @@ PHP_METHOD(RiakBucket, put)
 
     // Now make put output from the response
     MAKE_STD_ZVAL(zTmp);
-    if (returnedObj.key.len > 0) {
-        ZVAL_STRINGL(zTmp, (char*)returnedObj.key.value, returnedObj.key.len, 1);
+    if (returnedObj->key.len > 0) {
+        ZVAL_STRINGL(zTmp, (char*)returnedObj->key.value, returnedObj->key.len, 1);
     } else {
         ZVAL_NULL(zTmp);
     }
-    zout = put_output_from_riack_object(&returnedObj, zTmp TSRMLS_CC);
+    zout = put_output_from_riack_object(returnedObj, zTmp TSRMLS_CC);
     RETVAL_ZVAL(zout, 0, 1);
 
     zval_ptr_dtor(&zTmp);
-    riack_free_object(connection->client, &returnedObj);
+    riack_free_object_p(connection->client, &returnedObj);
 }
 /* }}} */
 
@@ -956,9 +952,9 @@ PHP_METHOD(RiakBucket, get)
 	char *key;
     int keyLen, riackResult;
     zval *zKey, *zinput;
-	struct RIACK_GET_PROPERTIES props;
-	struct RIACK_GET_OBJECT getResult;
-	RIACK_STRING rsBucket, rsKey;
+    riack_get_properties props;
+    riack_get_object *getResult;
+    riack_string rsBucket, rsKey;
 	riak_connection *connection;
 
     zinput = NULL;
@@ -972,8 +968,7 @@ PHP_METHOD(RiakBucket, get)
 
 	MAKE_STD_ZVAL(zKey);
 	ZVAL_STRINGL(zKey, key, keyLen, 1);
-	memset(&props, 0, sizeof(props));
-    memset(&getResult, 0, sizeof(getResult));
+    memset(&props, 0, sizeof(props));
     if (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT) {
         zval zget;
         RIAK_REQ_PROP_SET_BOOL(Riak_Input_GetInput, zget, getReturnHead, props.head);
@@ -994,14 +989,14 @@ PHP_METHOD(RiakBucket, get)
     rsKey.value = key;
     rsBucket    = riack_name_from_bucket(getThis() TSRMLS_CC);
 
-    RIACK_RETRY_OP(riackResult, connection, riack_get(connection->client, rsBucket, rsKey, &props, &getResult));
+    RIACK_RETRY_OP(riackResult, connection, riack_get(connection->client, &rsBucket, &rsKey, &props, &getResult));
     if (props.if_modified.clock) {
         RFREE(connection->client, props.if_modified.clock);
     }
 
     if (riackResult == RIACK_SUCCESS) {
         zval *zout, *zResolver;
-        zout      = get_output_from_riack_get_object(&getResult, zKey TSRMLS_CC);
+        zout      = get_output_from_riack_get_object(getResult, zKey TSRMLS_CC);
         zResolver = (zinput != NULL && Z_TYPE_P(zinput) == IS_OBJECT)
             ? zend_read_property(riak_get_resolver_input_ce, zinput, "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC)
             : zend_read_property(riak_bucket_ce, getThis(), "conflictResolver", sizeof("conflictResolver")-1, 1 TSRMLS_CC);
@@ -1011,7 +1006,7 @@ PHP_METHOD(RiakBucket, get)
         }
         zend_update_property(riak_output_ce, zout, "bucket", sizeof("bucket")-1, getThis() TSRMLS_CC);
         RETVAL_ZVAL(zout, 0, 1);
-        riack_free_get_object(connection->client, &getResult);
+        riack_free_get_object_p(connection->client, &getResult);
     } else {
         connection->needs_reconnect = 1;
         // Hack warning, same as above
@@ -1065,7 +1060,7 @@ PHP_METHOD(RiakBucket, setConflictResolver)
 }
 /* }}} */
 
-zval* object_from_riak_content(zval* key, struct RIACK_CONTENT* content TSRMLS_DC)/* {{{ */
+zval* object_from_riak_content(zval* key, riack_content* content TSRMLS_DC)/* {{{ */
 {
 	zval *object;
 	MAKE_STD_ZVAL(object);
@@ -1091,9 +1086,9 @@ void riak_name_from_bucket(zval* bucket, char **name, int *namelen TSRMLS_DC)/* 
 }
 /* }}} */
 
-RIACK_STRING riack_name_from_bucket(zval* bucket TSRMLS_DC)/* {{{ */
+riack_string riack_name_from_bucket(zval* bucket TSRMLS_DC)/* {{{ */
 {
-    RIACK_STRING bucketName;
+    riack_string bucketName;
     int namelen;
     riak_name_from_bucket(bucket, &bucketName.value, &namelen TSRMLS_CC);
     bucketName.len = namelen;

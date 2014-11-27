@@ -83,13 +83,13 @@ zend_function_entry riak_functions[] = {
   { NULL, NULL, NULL }
 };
 
-struct RIACK_ALLOCATOR riack_php_persistent_allocator = 
+riack_allocator riack_php_persistent_allocator =
 {
   riack_php_persistent_alloc,
   riack_php_persistent_free,
 };
 
-struct RIACK_ALLOCATOR riack_php_allocator =
+riack_allocator riack_php_allocator =
 {
   riack_php_alloc,
   riack_php_free
@@ -223,7 +223,7 @@ PHP_GSHUTDOWN_FUNCTION(riak) /* {{{ */
 #endif
 }
 /* {{{ */
-void riak_throw_exception(struct RIACK_CLIENT* client, int errorStatus TSRMLS_DC)/* {{{ */
+void riak_throw_exception(riack_client* client, int errorStatus TSRMLS_DC)/* {{{ */
 {
     if (errorStatus == RIACK_ERROR_COMMUNICATION) {
         zend_throw_exception(riak_communication_exception_ce, "Communication error", 1001 TSRMLS_CC);

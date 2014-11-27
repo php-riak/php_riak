@@ -22,7 +22,7 @@
 extern zend_class_entry *riak_search_doc_ce;
 
 void riak_search_output_document_output_init(TSRMLS_D);
-zval *riak_search_document_from_riack_document(struct RIACK_SEARCH_DOCUMENT* document TSRMLS_DC);
+zval *riak_search_document_from_riack_document(riack_search_doc* document TSRMLS_DC);
 
 
 /* Riak\Search\Output\DocumentOutput */

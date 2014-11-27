@@ -47,7 +47,7 @@ void riak_output_index_output_init(TSRMLS_D)
     zend_declare_property_null(riak_index_output_ce, "continuation", sizeof("continuation")-1, ZEND_ACC_PROTECTED TSRMLS_CC);
 }
 
-zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSRMLS_DC)
+zval *get_index_output_from_riack_string_list(riack_string_list *result_keys TSRMLS_DC)
 {
     zval *zresult;
     size_t i;
@@ -74,7 +74,7 @@ zval *get_index_output_from_riack_string_list(RIACK_STRING_LIST *result_keys TSR
     return zresult;
 }
 
-zval *riak_index_output_from_string_list_and_continuation(RIACK_STRING_LIST *result_keys, RIACK_STRING *continuation TSRMLS_DC) {
+zval *riak_index_output_from_string_list_and_continuation(riack_string_list *result_keys, riack_string *continuation TSRMLS_DC) {
     zval* zlist, *zresult;
     MAKE_STD_ZVAL(zresult);
     object_init_ex(zresult, riak_index_output_ce);

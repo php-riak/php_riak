@@ -81,7 +81,7 @@ PHP_METHOD(Riak_Crdt_Counter, __construct)
 /* }}} */
 
 
-void riak_update_riack_counter_inc_props_from_input(struct RIACK_COUNTER_UPDATE_PROPERTIES *props, zval* zinput TSRMLS_DC) { /* {{{ */
+void riak_update_riack_counter_inc_props_from_input(riack_counter_update_properties *props, zval* zinput TSRMLS_DC) { /* {{{ */
 #define SET_RIAK_CNT_UPDATE_PROP_LONG(GETTER_NAME, PROP_NAME) MAKE_STD_ZVAL(ztmp); \
                                                   RIAK_CALL_METHOD(Riak_Crdt_Input_UpdateInput, GETTER_NAME, ztmp, zinput); \
                                                   props->PROP_NAME##_use = 1; \
@@ -100,10 +100,10 @@ void riak_update_riack_counter_inc_props_from_input(struct RIACK_COUNTER_UPDATE_
 Increment counter, use negative amount to decrement */
 PHP_METHOD(Riak_Crdt_Counter, increment)
 {
-    struct RIACK_COUNTER_UPDATE_PROPERTIES props;
+    riack_counter_update_properties props;
     zval *zinput, *zbucket, *zkey;
     riak_connection *connection;
-    RIACK_STRING bucket, key;
+    riack_string bucket, key;
     long amount;
     int riackresult;
     zinput = 0;
@@ -115,7 +115,7 @@ PHP_METHOD(Riak_Crdt_Counter, increment)
     riak_update_riack_counter_inc_props_from_input(&props, zinput TSRMLS_CC);
     RIAK_COUNTER_GET_BUCKET_KEY_CONN;
 
-    riackresult = riack_counter_increment(connection->client, bucket, key, (int64_t)amount, &props, 0);
+    riackresult = riack_counter_increment(connection->client, &bucket, &key, (int64_t)amount, &props, 0);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackresult);
 }/* }}} */
 
@@ -124,10 +124,10 @@ PHP_METHOD(Riak_Crdt_Counter, increment)
 Increment counter, use negative amount to decrement, returns updated value */
 PHP_METHOD(Riak_Crdt_Counter, incrementAndGet)
 {
-    struct RIACK_COUNTER_UPDATE_PROPERTIES props;
+    riack_counter_update_properties props;
     zval *zinput, *zbucket, *zkey;
     riak_connection *connection;
-    RIACK_STRING bucket, key;
+    riack_string bucket, key;
     long amount;
     int64_t return_val;
     int riackresult;
@@ -140,7 +140,7 @@ PHP_METHOD(Riak_Crdt_Counter, incrementAndGet)
     riak_update_riack_counter_inc_props_from_input(&props, zinput TSRMLS_CC);
     RIAK_COUNTER_GET_BUCKET_KEY_CONN;
 
-    riackresult = riack_counter_increment(connection->client, bucket, key, (int64_t)amount, &props, &return_val);
+    riackresult = riack_counter_increment(connection->client, &bucket, &key, (int64_t)amount, &props, &return_val);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackresult);
     RETURN_LONG((long)return_val);
 }/* }}} */
@@ -160,10 +160,10 @@ PHP_METHOD(Riak_Crdt_Counter, get)
                                                   props.PROP_NAME##_use = 1; \
                                                   props.PROP_NAME = Z_BVAL_P(ztmp); \
                                                   zval_ptr_dtor(&ztmp)
-    struct RIACK_COUNTER_GET_PROPERTIES props;
+    riack_counter_get_properties props;
     zval *zinput, *zbucket, *zkey;
     riak_connection *connection;
-    RIACK_STRING bucket, key;
+    riack_string bucket, key;
     int riackresult;
     int64_t result;
     zinput = 0;
@@ -180,7 +180,7 @@ PHP_METHOD(Riak_Crdt_Counter, get)
         SET_RIAK_CNT_GET_PROP_BOOL(getBasicQuorum, basic_quorum);
         SET_RIAK_CNT_GET_PROP_BOOL(getNotFoundOk, notfound_ok);
     }
-    riackresult = riack_counter_get(connection->client, bucket, key, &props, &result);
+    riackresult = riack_counter_get(connection->client, &bucket, &key, &props, &result);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackresult);
     RETURN_LONG((long)result);
 }/* }}} */

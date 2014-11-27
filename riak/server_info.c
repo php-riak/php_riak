@@ -60,10 +60,10 @@ int riak_get_server_info_as_zvals(riak_connection **connection, zval** znode,
 {
     zval *zconn;
     int riackresult;
-    RIACK_STRING node, server_version;
+    riack_string *node, *server_version;
     *zserver_version = *znode = 0;
-    node.len = server_version.len = 0;
-    node.value = server_version.value = 0;
+    node = 0;
+    server_version = 0;
 
     zconn = zend_read_property(riak_server_info_ce, zthis, "connection", sizeof("connection")-1, 1 TSRMLS_CC);
 
@@ -74,12 +74,12 @@ int riak_get_server_info_as_zvals(riak_connection **connection, zval** znode,
     riackresult = riack_server_info((*connection)->client, &node, &server_version);
     if (riackresult == RIACK_SUCCESS) {
         MAKE_STD_ZVAL(*znode);
-        ZVAL_STRINGL(*znode, node.value, node.len, 1);
+        ZVAL_STRINGL(*znode, node->value, node->len, 1);
         MAKE_STD_ZVAL(*zserver_version);
-        ZVAL_STRINGL(*zserver_version, server_version.value, server_version.len, 1);
+        ZVAL_STRINGL(*zserver_version, server_version->value, server_version->len, 1);
     }
-    RSTR_SAFE_FREE((*connection)->client, node);
-    RSTR_SAFE_FREE((*connection)->client, server_version);
+    riack_free_string_p((*connection)->client, &node);
+    riack_free_string_p((*connection)->client, &server_version);
     return riackresult;
 }
 

@@ -64,6 +64,9 @@ if test "$PHP_RIAK" != "no"; then
     LibRiack/src/riack_sock.c \
     LibRiack/src/riack.c \
     LibRiack/src/riack_kv.c \
+    LibRiack/src/riack_2i.c \
+    LibRiack/src/riack_crdt.c \
+    LibRiack/src/riack_mapreduce.c \
     LibRiack/src/riack_search.c \
     LibRiack/src/riack_msg.c \
     LibRiack/src/riack_mem.c \

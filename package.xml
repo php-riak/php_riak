@@ -185,10 +185,15 @@ Fixes issue 80: Support lazy connection
                     <file role="src" name="riack_helpers.c"/>
                     <file role="src" name="riack_helpers.h"/>
                     <file role="src" name="riack_kv.c"/>
+                    <file role="src" name="riack_2i.c"/>
+                    <file role="src" name="riack_crdt.c"/>
+                    <file role="src" name="riack_mapreduce.c"/>
                     <file role="src" name="riack_search.c"/>
                     <file role="src" name="riack_mem.c"/>
                     <file role="src" name="riack_msg.c"/>
                     <file role="src" name="riack_msg.h"/>
+                    <file role="src" name="riack_compat.h"/>
+                    <file role="src" name="riack_internal.h"/>
                     <file role="src" name="riack_sock.c"/>
                     <file role="src" name="riack_sock.h"/>
                     <file role="src" name="riack-config.h"/>

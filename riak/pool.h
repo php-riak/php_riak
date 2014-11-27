@@ -23,7 +23,7 @@
 #include <time.h>
 
 typedef struct _riak_connection {
-  struct RIACK_CLIENT *client;
+  riack_client *client;
   zend_bool needs_reconnect;
   zend_bool persistent;
   time_t last_used_at;
