@@ -189,6 +189,7 @@ Fixes issue 80: Support lazy connection
                     <file role="src" name="riack_crdt.c"/>
                     <file role="src" name="riack_mapreduce.c"/>
                     <file role="src" name="riack_search.c"/>
+                    <file role="src" name="riack_commands.c"/>
                     <file role="src" name="riack_mem.c"/>
                     <file role="src" name="riack_msg.c"/>
                     <file role="src" name="riack_msg.h"/>
@@ -202,6 +203,10 @@ Fixes issue 80: Support lazy connection
                     <dir name="protocol">
                         <file role="src" name="riak_kv.pb-c.c"/>
                         <file role="src" name="riak_kv.pb-c.h"/>
+                        <file role="src" name="riak_dt.pb-c.c"/>
+                        <file role="src" name="riak_dt.pb-c.h"/>
+                        <file role="src" name="riak_yokozuna.pb-c.c"/>
+                        <file role="src" name="riak_yokozuna.pb-c.h"/>
                         <file role="src" name="riak_search.pb-c.c"/>
                         <file role="src" name="riak_search.pb-c.h"/>
                         <file role="src" name="riak.pb-c.c"/>
@@ -209,14 +214,12 @@ Fixes issue 80: Support lazy connection
                         <file role="src" name="riak_msg_codes.c"/>
                         <file role="src" name="riak_msg_codes.h"/>
                     </dir>
-                    <dir name="google">
-                        <dir name="protobuf-c">
-                            <file role="doc" name="LICENSE"/>
-                            <file role="src" name="protobuf-c-private.h"/>
-                            <file role="src" name="protobuf-c.c"/>
-                            <file role="src" name="protobuf-c.h"/>
-                            <file role="doc" name="README.md"/>
-                        </dir>
+                    <dir name="protobuf-c">
+                        <file role="doc" name="LICENSE"/>
+                        <file role="src" name="protobuf-c-private.h"/>
+                        <file role="src" name="protobuf-c.c"/>
+                        <file role="src" name="protobuf-c.h"/>
+                        <file role="doc" name="README.md"/>
                     </dir>
                 </dir>
             </dir>

@@ -67,6 +67,7 @@ if test "$PHP_RIAK" != "no"; then
     LibRiack/src/riack_2i.c \
     LibRiack/src/riack_crdt.c \
     LibRiack/src/riack_mapreduce.c \
+    LibRiack/src/riack_commands.c \
     LibRiack/src/riack_search.c \
     LibRiack/src/riack_msg.c \
     LibRiack/src/riack_mem.c \
@@ -75,7 +76,9 @@ if test "$PHP_RIAK" != "no"; then
     LibRiack/src/protocol/riak_search.pb-c.c \
     LibRiack/src/protocol/riak.pb-c.c \
     LibRiack/src/protocol/riak_kv.pb-c.c \
-    LibRiack/src/google/protobuf-c/protobuf-c.c, $ext_shared)
+    LibRiack/src/protocol/riak_dt.pb-c.c \
+    LibRiack/src/protocol/riak_yokozuna.pb-c.c \
+    LibRiack/src/protobuf-c/protobuf-c.c, $ext_shared)
 
     PHP_ADD_BUILD_DIR([$ext_builddir/riak], 1)
     PHP_ADD_BUILD_DIR([$ext_builddir/riak/crdt], 1)
