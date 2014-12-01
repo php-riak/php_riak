@@ -5,8 +5,11 @@ Test Riak\Bucket throws exception when connection is NULL
 
 try {
     $connection = null;
-    $bucket     = new \Riak\Bucket($connection, 'test');
+    $bucket     = new \Riak\Bucket($connection, 'test', 'phpriak_type');
 
+    if ($bucket->getType() != 'phpriak_type') {
+        echo "type mismatch " . $bucket->getType() . PHP_EOL;
+    }
     if ($bucket->getName() == 'test') {
         echo "done!" . PHP_EOL;
     }
