@@ -5,7 +5,7 @@ Test extended index querying
 use \Riak\Query\IndexQuery;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new \Riak\Bucket($client, "index_test_bucket");
+$bucket = new \Riak\Bucket($client, "index_test_bucket", "phpriak_type");
 
 for ($i=0; $i<10; $i++) {
     $obj = new \Riak\Object("obj$i");

@@ -320,7 +320,7 @@ PHP_METHOD(RiakBucket, counter)
 Perform a secondary index lookup */
 PHP_METHOD(RiakBucket, index)
 {
-    riack_string rsbucket, rsindex, rsfrom, rsto;
+    riack_string rsbucket, rsindex, rsfrom, rsto, *type;
     riack_string_list *resultlist;
     char *index, *from, *to;
     int indexlen, fromlen, tolen, riackstatus, i;
@@ -333,7 +333,7 @@ PHP_METHOD(RiakBucket, index)
     }
     connection = get_riak_connection(getThis() TSRMLS_CC);
     rsbucket = riack_name_from_bucket(getThis() TSRMLS_CC);
-
+    type = riack_get_bucket_type_from_bucket(connection->client, getThis() TSRMLS_CC);
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
     rsindex.len = indexlen;
@@ -343,10 +343,13 @@ PHP_METHOD(RiakBucket, index)
     if (to != NULL && tolen > 0) {
         rsto.len = tolen;
         rsto.value = to;
-        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_range(connection->client, &rsbucket, &rsindex, &rsfrom, &rsto, &resultlist));
+        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_range_ext(connection->client,
+                &rsbucket, type, &rsindex, &rsfrom, &rsto, &resultlist));
     } else {
-        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_exact(connection->client, &rsbucket, &rsindex, &rsfrom, &resultlist));
+        RIACK_RETRY_OP(riackstatus, connection, riack_2i_query_exact_ext(connection->client,
+                &rsbucket, type, &rsindex, &rsfrom, &resultlist));
     }
+    RFREE(connection->client, type);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
 
     MAKE_STD_ZVAL(zresult);
@@ -367,9 +370,10 @@ PHP_METHOD(RiakBucket, indexQuery)
     riak_connection *connection;
     riack_2i_query_req req;
     riack_string_list *result_keys;
-    riack_string *continuation;
+    riack_string *continuation, *type;
     zval *zquery, *zinput, *zname, *zisrange, *zcontinuation, *zresult;
     int riackstatus;
+
     zinput = zquery = 0;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|O", &zquery, riak_index_query_ce, &zinput, riak_index_input_ce) == FAILURE) {
         zend_throw_exception(riak_badarguments_exception_ce, "Bad or missing argument", 500 TSRMLS_CC);
@@ -380,6 +384,11 @@ PHP_METHOD(RiakBucket, indexQuery)
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
     memset(&req, 0, sizeof(req));
+    type = riack_get_bucket_type_from_bucket(connection->client, getThis() TSRMLS_CC);
+    if (type != NULL) {
+        req.bucket_type.len = type->len;
+        req.bucket_type.value = type->value;
+    }
     req.bucket = riack_name_from_bucket(getThis() TSRMLS_CC);
 
     MAKE_STD_ZVAL(zname);
@@ -429,7 +438,7 @@ PHP_METHOD(RiakBucket, indexQuery)
     if (zcontinuation) {
         zval_ptr_dtor(&zcontinuation);
     }
-
+    RFREE(connection->client, type);
     CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackstatus);
     zresult = riak_index_output_from_string_list_and_continuation(result_keys, continuation TSRMLS_CC);
     riack_free_string_p(connection->client, &continuation);
