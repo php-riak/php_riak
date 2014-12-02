@@ -527,7 +527,7 @@ PHP_METHOD(RiakBucket, setPropertyList)
                                                   zval_ptr_dtor(&ztmp);
 	riak_connection *connection;
     riack_bucket_properties properties;
-    riack_string bucketName;
+    riack_string bucketName, *type;
     zval *ztmp, *zprop_obj;
 	int riackResult;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &zprop_obj, riak_bucket_properties_ce) == FAILURE) {
@@ -617,13 +617,15 @@ PHP_METHOD(RiakBucket, setPropertyList)
     }
     zval_ptr_dtor(&ztmp);
 
-    RIACK_RETRY_OP(riackResult, connection, riack_set_bucket_props(connection->client, &bucketName, &properties));
+    type = riack_get_bucket_type_from_bucket(connection->client, getThis() TSRMLS_CC);
+    RIACK_RETRY_OP(riackResult, connection, riack_set_bucket_props_ext(connection->client, &bucketName, type, &properties));
 
     RSTR_SAFE_FREE(connection->client, properties.backend);
     RSTR_SAFE_FREE(connection->client, properties.linkfun.module);
     RSTR_SAFE_FREE(connection->client, properties.linkfun.function);
     RSTR_SAFE_FREE(connection->client, properties.chash_keyfun.module);
     RSTR_SAFE_FREE(connection->client, properties.chash_keyfun.function);
+    RFREE(connection->client, type);
     RFREE(connection->client, properties.precommit_hooks);
     RFREE(connection->client, properties.postcommit_hooks);
  	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
@@ -705,7 +707,7 @@ PHP_METHOD(RiakBucket, getPropertyList)
                                                         zval_ptr_dtor(&ztmp); }
     riack_bucket_properties *properties;
 	riak_connection *connection;
-    riack_string bucketName;
+    riack_string bucketName, *type;
     int riackResult;
     zval *ztmp, *zbucket_props;
 
@@ -714,8 +716,10 @@ PHP_METHOD(RiakBucket, getPropertyList)
 
     THROW_EXCEPTION_IF_CONNECTION_IS_NULL(connection);
 
-    RIACK_RETRY_OP(riackResult, connection, riack_get_bucket_props(connection->client, &bucketName, &properties));
+    type = riack_get_bucket_type_from_bucket(connection->client, getThis() TSRMLS_CC);
+    RIACK_RETRY_OP(riackResult, connection, riack_get_bucket_props_ext(connection->client, &bucketName, type, &properties));
 	CHECK_RIACK_STATUS_THROW_AND_RETURN_ON_ERROR(connection, riackResult);
+    RFREE(connection->client, type);
 
     MAKE_STD_ZVAL(zbucket_props);
     object_init_ex(zbucket_props, riak_bucket_properties_ce);

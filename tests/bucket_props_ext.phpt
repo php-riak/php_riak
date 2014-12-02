@@ -6,7 +6,7 @@ use \Riak\BucketPropertyList;
 use \Riak\Property\ReplicationMode as RM;
 include_once "connect.inc";
 $client = new \Riak\Connection($host, $port);
-$bucket = new \Riak\Bucket($client, "test_bucket_asdf_props_ext");
+$bucket = new \Riak\Bucket($client, "test_bucket_asdf_props_ext", "phpriak_type");
 $oldProps = $bucket->getPropertyList();
 
 $newProps = new BucketPropertyList();
