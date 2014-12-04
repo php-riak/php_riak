@@ -571,8 +571,10 @@ PHP_METHOD(RiakBucket, setPropertyList)
     SET_PROPLIST_BOOL(getNotFoundOk, notfound_ok);
 
     SET_PROPLIST_BOOL(getSearchEnabled, search);
+    SET_PROPLIST_BOOL(isConsistent, consistent);
 
     RIAK_GET_STR_COPY_TO(RiakBucketProperties, getBackend, zprop_obj, properties.backend.value, properties.backend.len);
+    RIAK_GET_STR_COPY_TO(RiakBucketProperties, getDatatype, zprop_obj, properties.datatype.value, properties.datatype.len);
 
     MAKE_STD_ZVAL(ztmp);
     RIAK_CALL_METHOD(RiakBucketProperties, getLinkFun, ztmp, zprop_obj);
@@ -630,6 +632,7 @@ PHP_METHOD(RiakBucket, setPropertyList)
     RIACK_RETRY_OP(riackResult, connection, riack_set_bucket_props_ext(connection->client, &bucketName, type, &properties));
 
     RSTR_SAFE_FREE(connection->client, properties.backend);
+    RSTR_SAFE_FREE(connection->client, properties.datatype);
     RSTR_SAFE_FREE(connection->client, properties.linkfun.module);
     RSTR_SAFE_FREE(connection->client, properties.linkfun.function);
     RSTR_SAFE_FREE(connection->client, properties.chash_keyfun.module);
@@ -752,6 +755,13 @@ PHP_METHOD(RiakBucket, getPropertyList)
     GET_PROP_SET_ON_LIST(ZVAL_BOOL, setBasicQuorum, properties->basic_quorum);
     GET_PROP_SET_ON_LIST(ZVAL_BOOL, setNotFoundOk, properties->notfound_ok);
     GET_PROP_SET_ON_LIST(ZVAL_BOOL, setSearchEnabled, properties->search);
+    GET_PROP_SET_ON_LIST(ZVAL_BOOL, setConsistent, properties->consistent);
+    if (RSTR_HAS_CONTENT(properties->datatype)) {
+        MAKE_STD_ZVAL(ztmp);
+        ZVAL_STRINGL(ztmp, properties->datatype.value, properties->datatype.len, 1);
+        RIAK_CALL_METHOD1(RiakBucketProperties, setDatatype, zbucket_props, zbucket_props, ztmp);
+        zval_ptr_dtor(&ztmp);
+    }
     if (RSTR_HAS_CONTENT(properties->backend)) {
         MAKE_STD_ZVAL(ztmp);
         ZVAL_STRINGL(ztmp, properties->backend.value, properties->backend.len, 1);

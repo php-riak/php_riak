@@ -34,6 +34,14 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_noargs, 0, ZEND_RETURN_VALUE, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_set_consistent, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, consistent)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_set_datatype, 0, ZEND_RETURN_VALUE, 1)
+    ZEND_ARG_INFO(0, datatype)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_bucket_props_set_nval, 0, ZEND_RETURN_VALUE, 1)
     ZEND_ARG_INFO(0, nVal)
 ZEND_END_ARG_INFO()
@@ -107,6 +115,11 @@ static zend_function_entry riak_bucket_properties_methods[] = {
     PHP_ME(RiakBucketProperties, getReplicationMode, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
     PHP_ME(RiakBucketProperties, setReplicationMode, arginfo_bucket_props_set_rwpr, ZEND_ACC_PUBLIC)
 
+    PHP_ME(RiakBucketProperties, isConsistent, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, setConsistent, arginfo_bucket_props_set_consistent, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, getDatatype, arginfo_bucket_props_noargs, ZEND_ACC_PUBLIC)
+    PHP_ME(RiakBucketProperties, setDatatype, arginfo_bucket_props_set_datatype, ZEND_ACC_PUBLIC)
+
 	{NULL, NULL, NULL}
 };
 
@@ -140,6 +153,8 @@ void riak_bucket_props_init(TSRMLS_D)/* {{{ */
     zend_declare_property_null(riak_bucket_properties_ce, "chashKeyFun", sizeof("chashKeyFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "linkFun", sizeof("linkFun")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
     zend_declare_property_null(riak_bucket_properties_ce, "replicationMode", sizeof("replicationMode")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "consistent", sizeof("consistent")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
+    zend_declare_property_null(riak_bucket_properties_ce, "datatype", sizeof("datatype")-1, ZEND_ACC_PRIVATE TSRMLS_CC);
 
 }
 /* }}} */
@@ -432,3 +447,25 @@ PHP_METHOD(RiakBucketProperties, getReplicationMode)
     RIAK_GETTER_OBJECT(riak_bucket_properties_ce, "replicationMode")
 }
 
+PHP_METHOD(RiakBucketProperties, isConsistent)
+{
+    RIAK_GETTER_BOOL(riak_bucket_properties_ce, "consistent")
+}
+
+
+PHP_METHOD(RiakBucketProperties, setConsistent)
+{
+    RIAK_SETTER_BOOL(riak_bucket_properties_ce, "consistent")
+    RIAK_RETURN_THIS
+}
+
+PHP_METHOD(RiakBucketProperties, getDatatype)
+{
+    RIAK_GETTER_STRING(riak_bucket_properties_ce, "datatype")
+}
+
+PHP_METHOD(RiakBucketProperties, setDatatype)
+{
+    RIAK_SETTER_STRING(riak_bucket_properties_ce, "datatype")
+    RIAK_RETURN_THIS
+}

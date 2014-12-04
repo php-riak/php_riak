@@ -73,5 +73,9 @@ PHP_METHOD(RiakBucketProperties, getLinkFun);
 PHP_METHOD(RiakBucketProperties, getReplicationMode);
 PHP_METHOD(RiakBucketProperties, setReplicationMode);
 
+PHP_METHOD(RiakBucketProperties, isConsistent);
+PHP_METHOD(RiakBucketProperties, setConsistent);
+PHP_METHOD(RiakBucketProperties, getDatatype);
+PHP_METHOD(RiakBucketProperties, setDatatype);
 
 #endif
