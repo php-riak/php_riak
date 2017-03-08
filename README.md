@@ -81,7 +81,7 @@ Remember php_riak uses to protobuffers interface which means you should use the 
   
 ####Get/put
 Since all objects in Riak are stored in buckets you start by creating a \Riak\Bucket and then you can call put to store an object.  
-Below is a simple example that show how to do a put an object and get it back from Riak, the example assumes siblings(allowMult) are turned of on the bucket, which it is be by default.  
+Below is a simple example that show how to do a put an object and get it back from Riak, the example assumes siblings(allowMult) are turned off on the bucket, which it is be by default.  
 ```PHP
 // Create a new bucket
 $bucket = new \Riak\Bucket($connection, 'bucket_name');
