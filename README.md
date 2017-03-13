@@ -26,12 +26,12 @@ In a terminal make sure you are in project root, then run the following commands
 Module is now installed but it needs to be added to the appropriate php.ini as well, this can be done by adding the following line to your php.ini  
 
 	extension=riak.so
-Migh vary depending on you php installation though.
+Might vary depending on your php installation though.
 
 ## ini settings
 You can override the following settings in your php.ini (settings shown below are the default settings if not specified in php.ini)
 
-        ; How many persistent connections pr. host:port so if you are connecting to 5 differenct servers there will be 20 persistent connections to each.  
+        ; How many persistent connections pr. host:port so if you are connecting to 5 different servers there will be 20 persistent connections to each.  
         ; If you do not want to reuse connections between request set this value to 0  
         riak.persistent.connections=20
         ; If a connection has not been active within this time frame, automatically reconnect before using it again
@@ -149,7 +149,7 @@ The conflict is now gone since you resolved it after the read and you put the re
 
 What about when you don't want to update the object but just read the value?  
 * Either ignore the conflict, this means that your resolver will be called on every read until next time the object is updated, 
-however your resolver function should always return a single merged object so you should not se any difference on the output.  
+however your resolver function should always return a single merged object so you should not see any difference on the output.  
 * Or put back your resolved object, you can make your conflict resolver do a put after it have resolved the object, remember to read back the vclock as well.  
   Be very carefull when doing it this ways as you increases the chance of multiple clients trying to resolve the same conflict at the same time 
 which will result in even more conflicts (read more about it here http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/ )  
@@ -163,7 +163,7 @@ To deal with the siblings your code needs to merge siblings, for this purpose ph
 class SimpleMergeResolver implements \Riak\Output\ConflictResolver {
 
     /**
-     * Resolve or merge the conflicting objects and return one that should be store back into riak.
+     * Resolve or merge the conflicting objects and return one that should be stored back into riak.
      * @param \Riak\ObjectList $objects
      * @return Object|null
      */
@@ -217,7 +217,7 @@ echo var_export($getOutput->getObject()->getContent(), true).PHP_EOL;
 
 ####Secondary Indexes
 Secondary indexes can be added to \Riak\Object by calling addIndex.  
-Querying secondary indexes is also very easy, simply call the index function on an \Riak\Bucket object, se the example below:  
+Querying secondary indexes is also very easy, simply call the index function on an \Riak\Bucket object, see the example below:  
  ```PHP
 // Create 10 objects with indexes
 for ($i=0; $i<10; $i++) {
@@ -244,7 +244,7 @@ print_r($result);
 ```
  
 ####Search
-Riak have builtin full text search which can be very usefull, I will only demonstrate 
+Riak have builtin full text search which can be very useful, I will only demonstrate 
 how php_riak client can query Riak search not how it works in general, to get the 
 full picture jump to the http://docs.basho.com/riak/latest/dev/using/search/  
 
@@ -318,7 +318,7 @@ however take a look in this php_riak unittest: https://github.com/php-riak/php_r
 
 ## Test requirements
 To make all tests succeed you need a running riak server with eleveldb backend and riak search enabled in app.config.
-You also need to have seach enabled on the ´testsearch´ bucket, this can be done using the riak search-cmd like this:
+You also need to have search enabled on the ´testsearch´ bucket, this can be done using the riak search-cmd like this:
 ```
 bin/search-cmd install testsearch
 ```
